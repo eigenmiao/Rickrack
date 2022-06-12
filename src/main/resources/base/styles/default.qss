@@ -1,0 +1,750 @@
+/*
+Real-time Color Kit (Rickrack) is a free software, which is distributed 
+in the hope that it will be useful, but WITHOUT ANY WARRANTY. You can 
+redistribute it and/or modify it under the terms of the GNU General Public 
+License as published by the Free Software Foundation. See the GNU General 
+Public License for more details.
+
+Please visit https://github.com/eigenmiao/Rickrack for more infomation 
+about Rickrack.
+
+Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
+*/
+
+/*
+QWidget styles.
+*/
+
+QWidget {
+    font-family: $qc_font_family;
+    font-size: $qc_font_size;
+    font-weight: $qc_font_weight;
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+}
+
+/*
+WorkArea styles.
+*/
+
+.WorkArea {
+    background-color: $qc_workarea;
+    color: $qc_char_over;
+}
+
+/*
+QLabel styles.
+*/
+
+QLabel {
+    background-color: none;
+}
+
+/*
+QMenuBar styles.
+*/
+
+QMenuBar {
+    background-color: $qc_list;
+    color: $qc_char;
+}
+
+QMenuBar::item {
+    padding: 4px 12px 4px 12px;
+}
+
+QMenuBar::item:hover {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QMenuBar::item:pressed {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QMenuBar::item:selected {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+/*
+QMenu styles.
+*/
+
+QMenu {
+    background-color: $qc_list;
+    color: $qc_char;
+}
+
+QMenu::separator {
+    background-color: $qc_list_selected;
+    color: $qc_list_selected;
+    height: 2px;
+    border: 0px;
+    margin: 6px;
+}
+
+QMenu::indicator {
+    border: 3px solid $qc_list_over;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+    margin: 0px 6px 0px 6px;
+}
+
+QMenu::indicator:checked {
+    background-color: $qc_list_selected;
+    border: 3px solid $qc_list_over;
+}
+
+QMenu::item {
+    padding: 4px 32px 4px 32px;
+}
+
+QMenu::item:enabled {
+    color: $qc_char_over;
+}
+
+QMenu::item:enabled:hover {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QMenu::item:enabled:pressed {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QMenu::item:enabled:selected {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QMenu::item:disabled {
+    color: $qc_list_over;
+}
+
+QMenu::item:disabled:hover {
+    background-color: $qc_list_over;
+    color: $qc_list;
+}
+
+QMenu::item:disabled:pressed {
+    background-color: $qc_list_over;
+    color: $qc_list;
+}
+
+QMenu::item:disabled:selected {
+    background-color: $qc_list_over;
+    color: $qc_list;
+}
+
+/*
+QToolBar styles.
+*/
+
+QToolBar {
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+    border: 4px solid $qc_list;
+    spacing: 4px;
+}
+
+QToolBar::item {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+    padding: px 0px 0px 0px;
+}
+
+QToolBar::handle {
+    background-color: $qc_list;
+    color: $qc_char;
+    border: 8px;
+}
+
+/*
+QToolButton styles.
+*/
+
+QToolButton {
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+    width: 40px;
+    height: 40px;
+    padding: 4px 4px 4px 4px;
+    border: 1px solid $qc_workarea_over;
+}
+
+QToolButton:hover {
+    background-color: $qc_list;
+    color: $qc_char;
+    border: 1px solid $qc_list;
+}
+
+QToolButton:pressed {
+    background-color: $qc_list;
+    color: $qc_char;
+    border: 2px solid $qc_list;
+}
+
+/*
+QDockWidget styles.
+*/
+
+QDockWidget {
+    background-color: $qc_workarea_over;
+    color: $qc_char_over;
+    border: 0px;
+}
+
+QDockWidget::title {
+    background-color: $qc_workarea_over;
+    color: $qc_char_over;
+    border: 0px;
+    padding: 8px 0px 8px 0px;
+}
+
+QDockWidget::close-button {
+    background-color: $qc_workarea_over;
+    color: $qc_char_over;
+    border: 0px;
+}
+
+QDockWidget::close-button:hover {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QDockWidget::close-button:pressed {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QDockWidget::close-button:selected {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QDockWidget::float-button {
+    background-color: $qc_workarea_over;
+    color: $qc_char_over;
+    border: 0px;
+}
+
+QDockWidget::float-button:hover {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QDockWidget::float-button:pressed {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QDockWidget::float-button:selected {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+/*
+QPushButton styles.
+*/
+
+QPushButton {
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+    padding: 8px 16px 8px 16px;
+    border: 3px double $qc_list_over;
+    border-radius: 6px;
+    height: 24px;
+}
+
+QPushButton:hover {
+    background-color: $qc_list;
+    color: $qc_char_over;
+    padding: 8px 16px 8px 16px;
+    border: 3px solid $qc_list_over;
+    border-radius: 6px;
+}
+
+QPushButton:pressed {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+/*
+QGroupBox styles.
+*/
+
+QGroupBox {
+    color: $qc_char_over;
+    border: 2px solid $qc_list_selected;
+    border-radius: 4px;
+    margin-top: 0.5em;
+    padding-top: 0.5em;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 1em;
+}
+
+/*
+QCheckBox styles.
+*/
+
+QCheckBox {
+    color: $qc_char;
+}
+
+QCheckBox:hover {
+    color: $qc_char_over;
+}
+
+QCheckBox:focus {
+    color: $qc_char_over;
+}
+
+QCheckBox::indicator {
+    border: 3px solid $qc_list_over;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
+}
+
+QCheckBox::indicator:hover {
+    background-color: $qc_list;
+}
+
+QCheckBox::indicator:checked {
+    background-color: $qc_list_selected;
+    border: 3px solid $qc_list_over;
+}
+
+/*
+QRadioButton styles.
+*/
+
+QRadioButton {
+    color: $qc_char;
+}
+
+QRadioButton:hover {
+    color: $qc_char_over;
+}
+
+QRadioButton:pressed {
+    color: $qc_char_over;
+}
+
+QRadioButton:focus {
+    color: $qc_char_over;
+}
+
+QRadioButton::indicator {
+    border: 3px solid $qc_list_over;
+    width: 12px;
+    height: 12px;
+    border-radius: 8px;
+}
+
+QRadioButton::indicator:hover {
+    background-color: $qc_list;
+}
+
+QRadioButton::indicator:checked {
+    background-color: $qc_list_selected;
+    border: 3px solid $qc_list_over;
+}
+
+/*
+QTabBar styles.
+*/
+
+QTabBar {
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+    border-bottom: 2px solid $qc_list_selected;
+    qproperty-drawBase: 0;
+}
+
+QTabBar::tab {
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+    padding: 5px 12px 5px 12px;
+    border: 2px solid $qc_workarea_over;
+    border-bottom: 2px solid $qc_list_selected;
+}
+
+QTabBar::tab:hover {
+    background-color: $qc_list;
+    color: $qc_char;
+}
+
+QTabBar::tab:pressed {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+}
+
+QTabBar::tab:selected {
+    background-color: $qc_list_over;
+    color: $qc_char_over;
+    border: 2px solid $qc_list_selected;
+}
+
+/*
+QTabWidget styles.
+*/
+
+QTabWidget {
+    border: 0px;
+}
+
+QTabWidget::pane {
+    border: 2px solid $qc_list_selected;
+}
+
+/*
+QScrollArea styles.
+*/
+
+QScrollArea {
+    border: 0px;
+}
+
+/*
+QScrollBar styles.
+*/
+
+QScrollBar {
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+}
+
+QScrollBar:pressed {
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+}
+
+QScrollBar:vertical {
+    background-color: $qc_list;
+    color: $qc_char;
+    width: 8px;
+}
+
+QScrollBar:horizontal {
+    background-color: $qc_list;
+    color: $qc_char;
+    height: 8px;
+}
+
+QScrollBar::add-line:vertical {
+    background-color: $qc_list;
+}
+
+QScrollBar::sub-line:vertical {
+    background-color: $qc_list;
+}
+
+QScrollBar::add-line:horizontal {
+    background-color: $qc_list;
+}
+
+QScrollBar::sub-line:horizontal {
+    background-color: $qc_list;
+}
+
+QScrollBar::handle:vertical {
+    background-color: $qc_list;
+    color: $qc_char;
+    width: 8px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: $qc_list_over;
+    color: $qc_char;
+    width: 8px;
+}
+
+QScrollBar::handle:vertical:pressed {
+    background-color: $qc_list_selected;
+    color: $qc_char;
+    width: 8px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: $qc_list;
+    color: $qc_char;
+    height: 8px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: $qc_list_over;
+    color: $qc_char;
+    height: 8px;
+}
+
+QScrollBar::handle:horizontal:pressed {
+    background-color: $qc_list_selected;
+    color: $qc_char;
+    height: 8px;
+}
+
+/*
+QProgressBar styles.
+*/
+
+QProgressBar {
+    background-color: $qc_list;
+    border: 3px solid $qc_list_over;
+    color: $qc_list;
+}
+
+QProgressBar:disabled {
+    background-color: $qc_list;
+    border: 3px solid $qc_list_over;
+    color: $qc_list;
+}
+
+QProgressBar::chunk {
+    background-color: $qc_list_over;
+    border: 3px solid $qc_list;
+    color: $qc_list_over;
+}
+
+QProgressBar::chunk:disabled {
+    background-color: $qc_list_over;
+    border: 3px solid $qc_list;
+    color: $qc_list_over;
+}
+
+/*
+QSlider styles.
+*/
+
+QSlider {
+    background-color: $qc_workarea_over;
+    color: $qc_char;
+}
+
+QSlider::add-page:horizontal {
+    background-color: $qc_list;
+}
+
+QSlider::sub-page:horizontal {
+    background-color: $qc_list_over;
+}
+
+QSlider::groove:horizontal {
+    background-color: transparent;
+    height:6px;
+}
+
+QSlider::handle:horizontal {
+    background-color: $qc_list_over;
+    width: 16px;
+    height: 16px;
+    margin: -5px 0px -5px 0px;
+    border-radius: 8px;
+}
+
+QSlider::handle:horizontal:hover {
+    background-color: $qc_list_selected;
+}
+
+QSlider::handle:horizontal:disabled {
+    background-color: $qc_list;
+}
+
+QSlider::add-page:vertical {
+    background-color: $qc_list;
+}
+
+QSlider::sub-page:vertical {
+    background-color: $qc_list_over;
+}
+
+QSlider::groove:vertical {
+    background-color:transparent;
+    width:6px;
+}
+
+QSlider::handle:vertical {
+    background-color: $qc_list_over;
+    width: 16px;
+    height: 16px;
+    margin: 0px -5px 0px -5px;
+    border-radius: 8px;
+}
+
+QSlider::handle:vertical:hover {
+    background-color: $qc_list_selected;
+}
+
+QSlider::handle:vertical:disabled {
+    background-color: $qc_list;
+}
+
+/*
+QSpinBox styles.
+*/
+
+QSpinBox {
+    border: 3px solid $qc_list_over;
+    color: $qc_char;
+}
+
+QSpinBox:hover {
+    background-color: $qc_list;
+    border: 3px solid $qc_list_over;
+    color: $qc_char_over;
+}
+
+QSpinBox:focus {
+    border: 3px solid $qc_list_selected;
+    color: $qc_char_over;
+}
+
+QSpinBox::up-button {
+    background-color: $qc_list_over;
+    border: 0px;
+}
+
+QSpinBox::up-button:hover {
+    background-color: $qc_list_selected;
+    border: 0px;
+}
+
+QSpinBox::down-button {
+    background-color: $qc_list_over;
+    border: 0px;
+}
+
+QSpinBox::down-button:hover {
+    background-color: $qc_list_selected;
+    border: 0px;
+}
+
+/*
+QDoubleSpinBox styles.
+*/
+
+QDoubleSpinBox {
+    border: 3px solid $qc_list_over;
+    color: $qc_char;
+}
+
+QDoubleSpinBox:disabled {
+    border: 3px solid $qc_list;
+}
+
+QDoubleSpinBox:hover {
+    background-color: $qc_list;
+    border: 3px solid $qc_list_over;
+    color: $qc_char_over;
+}
+
+QDoubleSpinBox:focus {
+    border: 3px solid $qc_list_selected;
+    color: $qc_char_over;
+}
+
+QDoubleSpinBox::up-button {
+    background-color: $qc_list_over;
+    border: 0px;
+}
+
+QDoubleSpinBox::up-button:hover {
+    background-color: $qc_list_selected;
+    border: 0px;
+}
+
+QDoubleSpinBox::down-button {
+    background-color: $qc_list_over;
+    border: 0px;
+}
+
+QDoubleSpinBox::down-button:hover {
+    background-color: $qc_list_selected;
+    border: 0px;
+}
+
+/*
+QLineEdit styles.
+*/
+
+QLineEdit {
+    border: 3px solid $qc_list_over;
+    color: $qc_char;
+}
+
+QLineEdit:hover {
+    background-color: $qc_list;
+    border: 3px solid $qc_list_over;
+    color: $qc_char_over;
+}
+
+QLineEdit:focus {
+    border: 3px solid $qc_list_selected;
+    color: $qc_char_over;
+}
+
+/*
+QTextEdit styles.
+*/
+
+QTextEdit {
+    border: 3px solid $qc_list_over;
+    color: $qc_char;
+}
+
+QTextEdit:hover {
+    background-color: $qc_list;
+    border: 3px solid $qc_list_over;
+    color: $qc_char_over;
+}
+
+QTextEdit:focus {
+    border: 3px solid $qc_list_selected;
+    color: $qc_char_over;
+}
+
+/*
+QComboBox styles.
+*/
+
+QComboBox {
+    border: 3px solid $qc_list_over;
+    color: $qc_char;
+}
+
+QComboBox:hover {
+    background-color: $qc_list;
+    border: 3px solid $qc_list_over;
+    color: $qc_char_over;
+}
+
+QComboBox:focus {
+    border: 3px solid $qc_list_selected;
+    color: $qc_char_over;
+}
+
+QComboBox::drop-down {
+    background-color: $qc_list_over;
+    border: 0px;
+}
+
+QComboBox::drop-down:hover {
+    background-color: $qc_list_selected;
+    border: 0px;
+}
+
+QComboBox QAbstractItemView {
+    border: 0px;
+    background-color: $qc_list;
+    selection-background-color: $qc_list_over;
+    color: $qc_char;
+    selection-color: $qc_char_over;
+}
