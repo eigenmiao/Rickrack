@@ -1,9 +1,9 @@
 # Rickrack
-![Rickrack](src/main/icons/full/icon_full_256.png)
+Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free color editor. It is designed for generating a set of harmonious colors from color wheel or elsewhere. You can share these colors with your friends, or apply them into your creative works.
 
 [中文](https://eigenmiao.com/yanhuo/zh.html) | [English](https://eigenmiao.com/yanhuo/en.html) | [日本語](https://eigenmiao.com/yanhuo/ja.html)
 
-Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free color editor. It is designed for generating a set of harmonious colors from color wheel or elsewhere. You can share these colors with your friends, or apply them into your creative works.
+![Rickrack](src/main/icons/logo.png)
 
 # Table of Content
 * [Introduction](#introduction)
@@ -78,7 +78,7 @@ https://github.com/eigenmiao/Rickrack
 The latest stable version is [v2.5.24](https://github.com/eigenmiao/Rickrack/releases/tag/v2.5.24-stable).
 
 ## Download Software
-https://eigenmiao.com/rickrack/
+https://github.com/eigenmiao/Rickrack/releases/tag/v2.5.24-stable
 
 ## Install Software
 Visit https://eigenmiao.com/rickrack/ for more information. The installation steps are presented in tutorials.
