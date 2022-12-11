@@ -50,7 +50,7 @@ QMenuBar {
 }
 
 QMenuBar::item {
-    padding: 4px 12px 4px 12px;
+    padding: 1px 9px 1px 9px;
 }
 
 QMenuBar::item:hover {
@@ -85,17 +85,22 @@ QMenu::separator {
     margin: 6px;
 }
 
+QMenu::icon {
+    border: 0px;
+    padding: 6px 6px 6px 6px;
+}
+
 QMenu::indicator {
-    border: 3px solid $qc_list_over;
-    width: 12px;
-    height: 12px;
-    border-radius: 6px;
-    margin: 0px 6px 0px 6px;
+    border: 2px solid $qc_list_over;
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    margin: 6px 6px 6px 6px;
 }
 
 QMenu::indicator:checked {
     background-color: $qc_list_selected;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
 }
 
 QMenu::item {
@@ -170,9 +175,9 @@ QToolButton styles.
 QToolButton {
     background-color: $qc_workarea_over;
     color: $qc_char;
-    width: 40px;
-    height: 40px;
-    padding: 4px 4px 4px 4px;
+    width: 30px;
+    height: 30px;
+    padding: 3px 3px 3px 3px;
     border: 1px solid $qc_workarea_over;
 }
 
@@ -254,7 +259,7 @@ QPushButton styles.
 QPushButton {
     background-color: $qc_workarea_over;
     color: $qc_char;
-    padding: 8px 16px 8px 16px;
+    padding: 2px 16px 2px 16px;
     border: 3px double $qc_list_over;
     border-radius: 6px;
     height: 24px;
@@ -263,7 +268,7 @@ QPushButton {
 QPushButton:hover {
     background-color: $qc_list;
     color: $qc_char_over;
-    padding: 8px 16px 8px 16px;
+    padding: 2px 16px 2px 16px;
     border: 3px solid $qc_list_over;
     border-radius: 6px;
 }
@@ -309,9 +314,9 @@ QCheckBox:focus {
 
 QCheckBox::indicator {
     border: 3px solid $qc_list_over;
-    width: 12px;
-    height: 12px;
-    border-radius: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
 }
 
 QCheckBox::indicator:hover {
@@ -345,8 +350,8 @@ QRadioButton:focus {
 
 QRadioButton::indicator {
     border: 3px solid $qc_list_over;
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 8px;
 }
 

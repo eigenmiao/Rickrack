@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.5.24-x2d2s2-stable
+v2.6.5-x2d2s2-pre
 """
 
 __AUTHOR__ = """
@@ -25,12 +25,14 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-May 1, 2022
+December 11, 2022
 """
 
 __HELP__ = """
 INTRODUCTION:
-  Rickrack-Startup is the startup code for Rickrack.
+  Rickrack-Startup provides methods to operate Rickrack in command line or 
+  Python code, including starting, closing, and obtaining color results 
+  from Rickrack.
 
   See https://eigenmiao.com/rickrack/ for more information.
 
@@ -44,10 +46,10 @@ USAGE:
   rickrack [OPTION]... [FILE]
 
 OPTION:
-  -h, --help        : display this help.
-  -v, --version     : output version information.
-  -d, --project=DIR : project or software directory for Rickrack. (Both 
-     (--dir=DIR)      "--project" and "--dir" are avaiable.)
+  -h, --help        : display this help information.
+  -v, --version     : output the version information.
+  -d, --project=DIR : set the project or software directory for Rickrack. 
+     (--dir=DIR)      (Both "--project" and "--dir" are avaiable.)
 
 EXAMPLE:
   $> rickrack
@@ -113,18 +115,22 @@ PYTHON:
   >> 
 
 NOTICE:
-* For python module, option items in dictionary "dp_argv" should be full 
-  names without prefix "--", such as "input".
-  
-* For python module, it will not output log file if item "help" or 
-  "version" in dictionary "dp_argv", or running in sub-thread mode with 
+* In python module, option items in dictionary "dp_argv" are full names 
+  without prefix "--", such as "input".
+
+* In python module, it will not output the log file if item "help" or 
+  "version" is in dictionary "dp_argv", or running in sub-thread mode with 
   port > 0.
 
-* To open this software without any option or file, please use command 
-  `rickrack` or python code "rr.run()".
+* In python module, it will not output the log file if software is running 
+  in sub-thread mode with port > 0.
 
-* For other options such as "-i" and "--input", see OPTION section in 
-  Rickrack help information.
+* Use command `rickrack` or python code "rr.run()" without any option, and 
+  this software will automatically load previous settings and color results 
+  from history files (see the Rickrack help information).
+
+* For other options (such as "-i" and "--input"), see the OPTION section in 
+  the Rickrack help information.
 
 COPYRIGHT:
   {copyright}
@@ -141,6 +147,7 @@ ATTENTION PLEASE! -------------------------------------------------------------+
 import os
 import sys
 import json
+import time
 import types
 import socket
 import hashlib
@@ -278,7 +285,9 @@ class Rickrack(object):
         self._host = str(host)
         self._port = int(port)
         self._timeout = float(timeout)
-        self._disconnect = False
+        self._will_disconnect = False
+
+        self.is_started_by_script = False
 
         self._items_for_render = []
 
@@ -374,8 +383,7 @@ class Rickrack(object):
     def grid_v_line(self):
         return self._result.grid_v_line
 
-    # ---------- ---------- ---------- Public Funcs ---------- ---------- ---------- #
-
+    @property
     def is_connected(self):
         """
         Check if connected to server.
@@ -397,34 +405,13 @@ class Rickrack(object):
 
         return True
 
-    def disconnect_after_load(self):
-        """
-        Disconnect server (set port as 0) after loading log.
-        """
-
-        self._disconnect = True
-
-    def require_a_choice(self):
-        """
-        Start a color choice.
-        """
-
-        if self.is_connected():
-            client = socket.socket()
-            client.settimeout(self._timeout)
-            client.connect((self._host, self._port))
-
-            info = "star{}".format(os.path.basename(sys.argv[0]))
-            client.sendall(info.encode("utf-8"))
-
-            client.close()
-
+    @property
     def is_choice_available(self):
         """
         Check if color choice confirmed.
         """
 
-        if self.is_connected():
+        if self.is_connected:
             client = socket.socket()
             client.settimeout(self._timeout)
             client.connect((self._host, self._port))
@@ -439,6 +426,30 @@ class Rickrack(object):
             return ans == "1"
 
         return False
+
+    # ---------- ---------- ---------- Public Funcs ---------- ---------- ---------- #
+
+    def disconnect_after_load(self):
+        """
+        Disconnect server (set port as 0) after loading log.
+        """
+
+        self._will_disconnect = True
+
+    def require_a_choice(self):
+        """
+        Start a color choice.
+        """
+
+        if self.is_connected:
+            client = socket.socket()
+            client.settimeout(self._timeout)
+            client.connect((self._host, self._port))
+
+            info = "star{}".format(os.path.basename(sys.argv[0]))
+            client.sendall(info.encode("utf-8"))
+
+            client.close()
 
     def add_items_for_render(self, items, setcolor, color=lambda r: "#" + r.selected_color.hec):
         """
@@ -491,7 +502,7 @@ class Rickrack(object):
 
         do_first_run = True
 
-        while self.is_choice_available() or do_first_run:
+        while self.is_connected and (self.is_choice_available or do_first_run):
             do_first_run = False
 
             if head:
@@ -520,7 +531,7 @@ class Rickrack(object):
             color (str): color in Color type.
         """
 
-        if self.is_connected():
+        if self.is_connected:
             if index and index in range(5):
                 idx = str(index)
 
@@ -549,7 +560,7 @@ class Rickrack(object):
         assert os.path.isfile(dps_file), "import file doesn't exist: {}".format(dps_file)
         assert dps_file[-4:] == ".dps", "import file isn't a dps color file: {}".format(dps_file)
 
-        if self.is_connected():
+        if self.is_connected:
             client = socket.socket()
             client.settimeout(self._timeout)
             client.connect((self._host, self._port))
@@ -570,7 +581,7 @@ class Rickrack(object):
         assert os.path.isdir(os.path.dirname(dps_file)), "export dir doesn't exist: {}".format(os.path.dirname(dps_file))
         assert dps_file[-4:] == ".dps", "export file isn't a dps color file: {}".format(dps_file)
 
-        if self.is_connected():
+        if self.is_connected:
             client = socket.socket()
             client.settimeout(self._timeout)
             client.connect((self._host, self._port))
@@ -591,7 +602,7 @@ class Rickrack(object):
         assert os.path.isfile(dpc_file), "open file doesn't exist: {}".format(dpc_file)
         assert dpc_file[-4:] == ".dpc", "open file isn't a dpc color file: {}".format(dpc_file)
 
-        if self.is_connected():
+        if self.is_connected:
             client = socket.socket()
             client.settimeout(self._timeout)
             client.connect((self._host, self._port))
@@ -612,7 +623,7 @@ class Rickrack(object):
         assert os.path.isdir(os.path.dirname(dpc_file)), "save dir doesn't exist: {}".format(os.path.dirname(dpc_file))
         assert dpc_file[-4:] == ".dpc", "save file isn't a dpc color file: {}".format(dpc_file)
 
-        if self.is_connected():
+        if self.is_connected:
             client = socket.socket()
             client.settimeout(self._timeout)
             client.connect((self._host, self._port))
@@ -632,7 +643,7 @@ class Rickrack(object):
             dp_proj (str): see method: run.
         """
 
-        if self.is_connected():
+        if self.is_connected:
             self.update()
 
         else:
@@ -662,7 +673,7 @@ class Rickrack(object):
             log_file (str): see method: load_log.
         """
 
-        if self.is_connected():
+        if self.is_connected:
             self.update()
 
         else:
@@ -691,7 +702,7 @@ class Rickrack(object):
             dp_proj (str): see method: run.
         """
 
-        if self.is_connected():
+        if self.is_connected:
             self.update()
 
         else:
@@ -717,7 +728,7 @@ class Rickrack(object):
         Get result from Rickrack server.
         """
 
-        if self.is_connected():
+        if self.is_connected:
             client = socket.socket()
             client.settimeout(self._timeout)
             client.connect((self._host, self._port))
@@ -788,15 +799,16 @@ class Rickrack(object):
         # run project.
         sdp_argv = dict()
 
-        if isinstance(dp_argv, dict):
-            sdp_argv = dp_argv.copy()
+        if dp_argv:
+            if isinstance(dp_argv, dict):
+                sdp_argv = dp_argv.copy()
 
-        elif isinstance(dp_argv, str):
-            sdp_argv[dp_argv] = True
+            elif isinstance(dp_argv, str):
+                sdp_argv[dp_argv] = True
 
-        elif isinstance(dp_argv, (tuple, list, set)):
-            for i in dp_argv:
-                sdp_argv[i] = True
+            elif isinstance(dp_argv, (tuple, list, set)):
+                for i in dp_argv:
+                    sdp_argv[i] = True
 
         # priority: local port (sdp_argv["port"]) > global port (self._port).
         # global port will be synced by local port if not zero.
@@ -852,6 +864,8 @@ class Rickrack(object):
             dp_thread.start()
             dp_thread.join()
 
+            self.is_started_by_script = True
+
         else:
             results = os.popen(cmd, "r")
 
@@ -869,6 +883,31 @@ class Rickrack(object):
 
         self._load(exec_results)
 
+    def close(self, save_data=True):
+        """
+        Close Rickrack.
+
+        Args:
+            save_data (bool): if save data before close.
+        """
+
+        if self.is_connected:
+            client = socket.socket()
+            client.settimeout(self._timeout)
+            client.connect((self._host, self._port))
+
+            info = "exit{}".format(save_data)
+            client.sendall(info.encode("utf-8"))
+
+            client.close()
+
+        # please don't close Rickrack abnormally.
+        while self.is_started_by_script and self.is_connected:
+            print("Waitting for closing Rickrack...")
+            time.sleep(1)
+
+        self.is_started_by_script = False
+
     def load_log(self, log_file):
         """
         Loading result from a log file.
@@ -880,7 +919,7 @@ class Rickrack(object):
         assert os.path.isfile(log_file), "load file doesn't exist: {}".format(log_file)
 
         # disconnect after load.
-        if self._disconnect:
+        if self._will_disconnect:
             self._port = 0
 
         # load.
