@@ -128,9 +128,11 @@ class Image(QWidget):
             self._tip_label.setGeometry((self.width() - bar_wid) / 2, self.height() * 0.76, bar_wid, bar_hig)
 
             img_wid = min(self.width() * 0.8, self.height() * 0.6)
-            resized_img = self._ico.scaled(img_wid, img_wid, Qt.KeepAspectRatio, Qt.SmoothTransformation)
 
-            self._ico_label.setPixmap(QPixmap.fromImage(resized_img))
+            resized_pix = QPixmap.fromImage(self._ico)
+            resized_pix.setDevicePixelRatio(self._ico.width() / img_wid)
+
+            self._ico_label.setPixmap(resized_pix)
             self._ico_label.setGeometry((self.width() - img_wid) / 2, (self.height() * 0.76 - img_wid) / 2, img_wid, img_wid)
 
         else:
@@ -153,8 +155,10 @@ class Image(QWidget):
                 self._resized_img_pos[1] = 2 - self._resized_img_pos[3] if self._resized_img_pos[1] < 2 - self._resized_img_pos[3] else self._resized_img_pos[1]
 
                 # aspect ratio mode: IgnoreAspectRatio, KeepAspectRatio and KeepAspectRatioByExpanding.
-                resized_img = self._image3c.display.scaled(self._resized_img_pos[2], self._resized_img_pos[3], Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                painter.drawPixmap(*self._resized_img_pos, QPixmap.fromImage(resized_img))
+                resized_pix = QPixmap.fromImage(self._image3c.display)
+                resized_pix.setDevicePixelRatio(self._image3c.display.width() / self._resized_img_pos[2])
+
+                painter.drawPixmap(*self._resized_img_pos, resized_pix)
 
                 # display locating circles.
                 idx_seq = list(range(5))

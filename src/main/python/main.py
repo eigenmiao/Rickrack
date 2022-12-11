@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.5.24-x2d2s2-stable
+v2.6.5-x2d2s2-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-May 1, 2022
+December 11, 2022
 """
 
 __HELP__ = """
@@ -46,35 +46,35 @@ USAGE:
   Rickrack [OPTION]... [FILE]
 
 OPTION:
-  -h, --help        : display this help.
-  -v, --version     : output version information.
-  -t, --temporary   : open software in temporary mode, i.e., not load local 
-                      settings, not read history color set and depot, and 
-                      also not save settings and history files.
-  -r, --reset=NAME  : reset software, where NAME is "settings" (or 
+  -h, --help        : display this help information.
+  -v, --version     : output the version information.
+  -t, --temporary   : open software in temporary mode without loading local 
+                      settings and history color results. It will discard all 
+                      changes on exit.
+  -r, --reset=NAME  : reset software functions, where NAME is "settings" (or 
                       "setting"), "layout" (or "geometry"), "set", "depot", 
                       "work" or "all".
-  -i, --input=FILE  : software input, where FILE is the file path for 
-                      openning, such as color set file or color depot file 
-                      with extension "dps" or "dpc", respectively.
-  -o, --output=FILE : color set export, where FILE is the file path for 
-     (--export=FILE)  output. Acceptable file extension is "dps", "txt", 
-                      "aco", "ase", "gpl" or "xml". (Both "--output" and 
-                      "--export" are avaiable.)
-  -w, --window=NUM  : display or hide seven dock windows, where NUM is a 
-                      decimal integer less than 128 (0 refers to hide all 
-                      windows, and 127 for display all, and 1 for display 
-                      Rickrack Result window only).
-  -e, --sequence=NUM: similar to "-w" and "--window", but NUM in binary 
+  -i, --input=FILE  : open the FILE in software on startup, where FILE is 
+                      the file path for input, such as a color set file (or 
+                      a color depot file) with extension "dps" (or "dpc").
+  -o, --output=FILE : export color results into the FILE on exit, where FILE 
+     (--export=FILE)  is the file path for output. Acceptable file extensions 
+                      include "dps", "txt", "aco", "ase", "gpl" and "xml". 
+                      (Both "--output" and "--export" are avaiable.)
+  -w, --window=NUM  : display or hide the seven dock windows in software, 
+                      where NUM is a decimal integer less than 128 (0 refers 
+                      to hide all windows, and 127 for display all, and 1 for 
+                      display Rickrack Result window only).
+  -e, --sequence=NUM: similar to "-w" and "--window", but NUM is in binary 
                       type, i.e., 0000000 (or 0) refers to hide all 
                       windows, and 1111111 for display all, and 0000001 
                       (or 1) for display Rickrack Result window only.
-  -l, --lang=LANG   : set language for display, where LANG is "zh", "en", 
+  -l, --lang=LANG   : set display language, where LANG is "zh", "en", 
      (--locale=LANG)  "ja", or other self-defined languages. (Both "--lang" 
                       and "--locale" are avaiable.)
-  -p, --port=INDEX  : provide color result on local server, where INDEX is 
-                      the port index for server (less than 65536). 0 refers 
-                      to not start the server (by default).
+  -p, --port=INDEX  : provide color result on local service, where INDEX is 
+                      the service port (less than 65536). Here, 0 stands for 
+                      not opening the service (by default).
 
 FILE:
   The input tag "-i" or "--input" can be omitted and use command 
@@ -83,12 +83,10 @@ FILE:
   depot file or an image file with png, jpg, bmp extentions.
 
 CONSOLE OUTPUT:
-  The output information is printed on screen by default.
-  Note that in information context, tag "*" before an index number 
-  indicate the index of selected color before closing the software. The 
-  sequence displayed in Rickrack Result window is 2, 1, 0, 3, 4 
-  according to the color set list, i.e., the first color in color list is 
-  the middle (main) color in Rickrack Result window.
+  The output information is printed on screen by default. The tag "*" 
+  indicates the index of selected color before closing the software. The sequence 
+  displayed in Rickrack Result window is 2, 1, 0, 3, 4, i.e., the first color in 
+  color list is the middle (main) color in Rickrack Result window.
   The information is shown like below:
   ------------------------------------
   + # Name: Console Results
@@ -125,9 +123,9 @@ EXAMPLE:
   $> 
 
 NOTICE:
-* To open this software without any option or file, please use command 
-  `Rickrack`. Then, this software will automatically load settings, 
-  color set and color depot from history files.
+* Use command `Rickrack` without any option, and this software will 
+  automatically load previous settings and color results from history
+  files.
 
 COPYRIGHT:
   {copyright}
@@ -182,6 +180,9 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
         super().__init__()
         self.setupUi(self)
+
+        # set attr.
+        self.setAttribute(Qt.WA_AcceptTouchEvents)
 
         # load args.
         self._sys_argv = sys_argv
@@ -654,6 +655,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
             self._choice_dialog = Choice(self, self._args)
             self._server.ps_star.connect(self._choice_dialog.showup)
+
+            self._server.ps_exit.connect(lambda x: self.close_with_verify() if x else self.close_without_save())
 
             self._server.start()
 
@@ -1304,9 +1307,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             qstyle = qstyle.replace("$qc_font_weight", str(self._args.font_weight * 100))
             qstyle = qstyle.replace("$qc_font_size", str(self._args.font_size) + "px")
 
+            # forecolors.
+            # 
             # white, light grey.
             if self._args.style_id in (1, 2):
-
                 qc_char = Color.hsv2hec((0, 0, 0.1))
                 qc_char_over = Color.hsv2hec((0, 0, 0.0))
 
@@ -1335,10 +1339,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 qc_list_selected = Color.hsv2hec((gen_h, gen_s, 0.55))
 
                 qc_workarea = Color.hsv2hec((gen_h, gen_s, gen_v))
-                qc_workarea_over = Color.hsv2hec((gen_h, gen_s, gen_v + 0.05))
+                qc_workarea_over = Color.hsv2hec((gen_h, gen_s, gen_v + 0.1))
 
             # light colors.
-            if self._args.style_id in (5, 6, 7, 8, 9, 10):
+            elif self._args.style_id in (5, 6, 7, 8, 9, 10):
                 qc_char = Color.hsv2hec((0, 0, 0.1))
                 qc_char_over = Color.hsv2hec((0, 0, 0.0))
 
@@ -1348,7 +1352,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
                 qc_list = Color.hsv2hec((gen_h + 10.0, gen_s + 0.24, gen_v - 0.02))
                 qc_list_over = Color.hsv2hec((gen_h - 10.0, gen_s + 0.32, gen_v - 0.03))
-                qc_list_selected = Color.hsv2hec((gen_h - 30.0, gen_s + 0.46, 0.90))
+                qc_list_selected = Color.hsv2hec((gen_h - 30.0, gen_s + 0.42, 0.90))
 
                 qc_workarea = Color.hsv2hec((gen_h - 5.0, gen_s, gen_v))
                 qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s + 0.1, gen_v - 0.01))
@@ -1358,17 +1362,19 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 qc_char = Color.hsv2hec((0, 0, 0.9))
                 qc_char_over = Color.hsv2hec((0, 0, 1.0))
 
-                gen_h = (self._args.style_id - 11) * 60.0 + 25.0
+                gen_h = (self._args.style_id - 11) * 60.0 + 5.0
                 gen_s = 1.0
-                gen_v = 0.1
+                gen_v = 0.05
 
                 qc_list = Color.hsv2hec((gen_h + 10.0, gen_s - 0.24, gen_v + 0.24))
                 qc_list_over = Color.hsv2hec((gen_h - 10.0, gen_s - 0.32, gen_v + 0.36))
                 qc_list_selected = Color.hsv2hec((gen_h - 30.0, gen_s - 0.32, 0.64))
 
                 qc_workarea = Color.hsv2hec((gen_h - 5.0, gen_s, gen_v))
-                qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s - 0.1, gen_v + 0.12))
+                qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s - 0.1, gen_v + 0.06))
 
+            # backcolors.
+            # 
             # white, light grey.
             if self._args.bakgd_id in (1, 2):
                 qc_char = Color.hsv2hec((0, 0, 0.1))
@@ -1395,7 +1401,35 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 qc_list = Color.hsv2hec((gen_h, gen_s, gen_v + 0.08))
 
                 qc_workarea = Color.hsv2hec((gen_h, gen_s, gen_v))
-                qc_workarea_over = Color.hsv2hec((gen_h, gen_s, gen_v + 0.05))
+                qc_workarea_over = Color.hsv2hec((gen_h, gen_s, gen_v + 0.1))
+
+            # light colors.
+            elif self._args.bakgd_id in (5, 6, 7, 8, 9, 10):
+                qc_char = Color.hsv2hec((0, 0, 0.1))
+                qc_char_over = Color.hsv2hec((0, 0, 0.0))
+
+                gen_h = (self._args.bakgd_id - 5) * 60.0 + 25.0
+                gen_s = 0.05
+                gen_v = 1.0
+
+                qc_list = Color.hsv2hec((gen_h + 10.0, gen_s + 0.24, gen_v - 0.02))
+
+                qc_workarea = Color.hsv2hec((gen_h - 5.0, gen_s, gen_v))
+                qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s + 0.1, gen_v - 0.01))
+
+            # dark colors.
+            elif self._args.bakgd_id in (11, 12, 13, 14, 15, 16):
+                qc_char = Color.hsv2hec((0, 0, 0.9))
+                qc_char_over = Color.hsv2hec((0, 0, 1.0))
+
+                gen_h = (self._args.bakgd_id - 11) * 60.0 + 5.0
+                gen_s = 1.0
+                gen_v = 0.05
+
+                qc_list = Color.hsv2hec((gen_h + 10.0, gen_s - 0.24, gen_v + 0.24))
+
+                qc_workarea = Color.hsv2hec((gen_h - 5.0, gen_s, gen_v))
+                qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s - 0.1, gen_v + 0.06))
 
             forecolor = qc_list_selected
             backcolor = qc_list_over
@@ -1891,6 +1925,10 @@ if __name__ == "__main__":
 
     if not sys_argv["input"] and argv_left and os.path.isfile(argv_left[-1]):
         sys_argv["input"] = argv_left[-1]
+
+    # high dpi.
+    QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
+    QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
 
     # init software.
     appctxt = ApplicationContext()

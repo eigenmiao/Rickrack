@@ -131,6 +131,9 @@ class Cube(QWidget, Ui_ScrollCube):
         super().__init__(wget)
         self.setupUi(self)
 
+        # set attr.
+        self.setAttribute(Qt.WA_AcceptTouchEvents)
+
         # load args.
         self._args = args
         self._idx = idx
@@ -171,6 +174,9 @@ class CubeTable(QWidget):
         """
 
         super().__init__(wget)
+
+        # set attr.
+        self.setAttribute(Qt.WA_AcceptTouchEvents)
 
         # load args.
         self._args = args
