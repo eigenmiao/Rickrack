@@ -33,6 +33,9 @@ class Mode(QWidget):
 
         super().__init__(wget)
 
+        # set attr.
+        self.setAttribute(Qt.WA_AcceptTouchEvents)
+
         # load args.
         self._args = args
 

@@ -28,6 +28,9 @@ class Choice(QDialog):
 
         super().__init__(wget, Qt.WindowCloseButtonHint)
 
+        # set attr.
+        self.setAttribute(Qt.WA_AcceptTouchEvents)
+
         # load args.
         self._args = args
 

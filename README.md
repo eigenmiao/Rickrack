@@ -1,12 +1,18 @@
+<div align="center">
+<img width="100%" align="center" src="src/main/icons/logo_long.png" alt="Rickrack">
+<br/><br/>
+Rickrack<br/>焰火十二卷<br/> ----- ----- ----- ----- ----- ----- ----- ----- <br/>
+Generate Harmonious Colors Freely.<br/>自由自在生成和谐色彩。
+<br/><br/>
+[<a href="https://eigenmiao.com/yanhuo/zh.html">中文</a>] | [<a href="https://eigenmiao.com/yanhuo/en.html">English</a>] | [<a href="https://eigenmiao.com/yanhuo/ja.html">日本語</a>]
+<br/><br/>
+</div>
+
 # Rickrack
 Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free color editor. It is designed for generating a set of harmonious colors from color wheel or elsewhere. You can share these colors with your friends, or apply them into your creative works.
 
 # 焰火十二卷
 焰火十二卷（实时色彩工具箱）是一款免费开源的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。
-
-![Rickrack](src/main/icons/logo.png)
-
-[中文](https://eigenmiao.com/yanhuo/zh.html) | [English](https://eigenmiao.com/yanhuo/en.html) | [日本語](https://eigenmiao.com/yanhuo/ja.html)
 
 # Table of Content
 * [Introduction](#introduction)
@@ -78,10 +84,10 @@ https://github.com/eigenmiao/Rickrack
 
 # Installation
 ## Current Release
-The latest stable version is [v2.5.24](https://github.com/eigenmiao/Rickrack/releases/tag/v2.5.24-stable).
+The latest preview version is [v2.6.5](https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.5-pre).
 
 ## Download Software
-https://github.com/eigenmiao/Rickrack/releases/tag/v2.5.24-stable
+https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.5-pre
 
 ## Install Software
 Visit https://eigenmiao.com/rickrack/ for more information. The installation steps are presented in tutorials.

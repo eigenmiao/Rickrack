@@ -43,6 +43,9 @@ class Settings(QDialog, Ui_SettingsDialog):
         super().__init__(wget, Qt.WindowCloseButtonHint)
         self.setupUi(self)
 
+        # set attr.
+        self.setAttribute(Qt.WA_AcceptTouchEvents)
+
         # load args.
         self._args = args
 
@@ -165,7 +168,7 @@ class Settings(QDialog, Ui_SettingsDialog):
         for fweight in range(9):
             self.font_weight_comb.addItem(str((fweight + 1) * 100))
 
-        for bakid in range(5):
+        for bakid in range(17):
             self.bakgd_id_comb.addItem("")
 
         for styid in range(17):
@@ -522,7 +525,7 @@ class Settings(QDialog, Ui_SettingsDialog):
         for idx in range(3):
             self.export_ase_type_comb.setItemText(idx, self._ase_descs[idx])
 
-        for idx in range(5):
+        for idx in range(17):
             self.bakgd_id_comb.setItemText(idx, self._bakgd_descs[idx])
 
         for idx in range(17):
@@ -568,6 +571,18 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "Light Grey"),
             _translate("Settings", "Dark Grey"),
             _translate("Settings", "Black"),
+            _translate("Settings", "Light Red"),
+            _translate("Settings", "Light Yellow"),
+            _translate("Settings", "Light Green"),
+            _translate("Settings", "Light Cyan"),
+            _translate("Settings", "Light Blue"),
+            _translate("Settings", "Light Magenta"),
+            _translate("Settings", "Dark Red"),
+            _translate("Settings", "Dark Yellow"),
+            _translate("Settings", "Dark Green"),
+            _translate("Settings", "Dark Cyan"),
+            _translate("Settings", "Dark Blue"),
+            _translate("Settings", "Dark Magenta"),
         )
 
         self._theme_descs = (

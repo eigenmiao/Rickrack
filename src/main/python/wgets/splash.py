@@ -60,7 +60,10 @@ class DPSplash(QSplashScreen):
 
         super().__init__()
 
-        self.setPixmap(QPixmap.fromImage(QImage(":/images/images/design_{}.png".format(display_lang))))
+        design_pix = QPixmap.fromImage(QImage(":/images/images/design_{}.png".format(display_lang)))
+        design_pix.setDevicePixelRatio(2)
+
+        self.setPixmap(design_pix)
 
     def mousePressEvent(self, event):
         event.ignore()

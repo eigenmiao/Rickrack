@@ -29,6 +29,7 @@ class ResultServer(QThread):
     ps_odpt = pyqtSignal(str)
     ps_cidx = pyqtSignal(tuple)
     ps_star = pyqtSignal(bool)
+    ps_exit = pyqtSignal(bool)
 
     def __init__(self, args, port=None):
         """
@@ -45,6 +46,7 @@ class ResultServer(QThread):
         self.req.ps_odpt = self.ps_odpt
         self.req.ps_cidx = self.ps_cidx
         self.req.ps_star = self.ps_star
+        self.req.ps_exit = self.ps_exit
 
         self._port = port
         self._server = None
