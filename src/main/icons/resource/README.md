@@ -18,13 +18,22 @@ Images with name start with "icon" or "file" are licensed under [Creative Common
 
 Images with name start with "repository" are licensed under [Creative Commons Attribution-NonCommercial-ShareAlike License 4.0 (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
-* Repository and old splash images (CC BY-NC-SA 4.0)
+* Current repository images (CC BY-NC-SA 4.0)
 <div>
 <img src="repository_zh.png" alt="repository_zh" width="512" />
 <img src="repository_en.png" alt="repository_en" width="512" />
-</div><div>
-<img src="repository_zh_old.png" alt="repository_zh_old" width="512" />
-<img src="repository_en_old.png" alt="repository_en_old" width="512" />
+</div>
+
+* Repository images for v2.5.24 (CC BY-NC-SA 4.0)
+<div>
+<img src="repository_zh_v2.5.24.png" alt="repository_zh_v2.5.24" width="512" />
+<img src="repository_en_v2.5.24.png" alt="repository_en_v2.5.24" width="512" />
+</div>
+
+* Repository images for v2.4.9 (CC BY-NC-SA 4.0)
+<div>
+<img src="repository_zh_v2.4.9.png" alt="repository_zh_v2.4.9" width="512" />
+<img src="repository_en_v2.4.9.png" alt="repository_en_v2.4.9" width="512" />
 </div>
 
 Images with name start with "design" are copyrighted to [Eigenmiao](mailto:eigenmiao@outlook.com). All Rights Reserved.
@@ -33,4 +42,10 @@ Images with name start with "design" are copyrighted to [Eigenmiao](mailto:eigen
 <div>
 <img src="design_zh.png" alt="design_zh" width="512" />
 <img src="design_en.png" alt="design_en" width="512" />
+</div>
+
+* Splash images for v2.5.24 (All Rights Reserved)
+<div>
+<img src="design_zh_v2.5.24.png" alt="design_zh_v2.5.24" width="512" />
+<img src="design_en_v2.5.24.png" alt="design_en_v2.5.24" width="512" />
 </div>
