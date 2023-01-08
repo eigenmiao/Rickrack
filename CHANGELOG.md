@@ -16,3 +16,12 @@
 6. Update help informations.
 7. Add close method in Rickrack module. Now this software can be started and closed through Python codes and scripts.
 8. Change the proporties of "is_connected" and "is_choice_available" methods in Rickrack module.
+
+# v2.6.6-pre
+* Date: January 8, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.6-pre
+* Comments:
+1. Change the splash images.
+2. Add waiting times for starting and closing software in Rickrack module.
+3. Add demo for Rickrack module.
+4. Update repository images.

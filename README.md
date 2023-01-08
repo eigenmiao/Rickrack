@@ -84,13 +84,15 @@ https://github.com/eigenmiao/Rickrack
 
 # Installation
 ## Current Release
-The latest preview version is [v2.6.5](https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.5-pre).
+The latest preview version is [v2.6.6](https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.6-pre).
 
 ## Download Software
-https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.5-pre
+https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.6-pre
 
 ## Install Software
 Visit https://eigenmiao.com/rickrack/ for more information. The installation steps are presented in tutorials.
+
+Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 
 ## Install Module
 Install the latest [Rickrack](https://pypi.org/project/Rickrack/) from PyPI!
@@ -109,8 +111,16 @@ rickrack -d "/PATH/TO/RICKRACK/SOFTWARE"
 ## How to Use the Software
 Visit https://eigenmiao.com/rickrack/ for tutorials. Just feel free to click anywhere in the interface!
 
+Here is a [video tutorial](https://www.bilibili.com/video/BV17L4y1A7P9/).
+
+Here is a [demo](https://zhuanlan.zhihu.com/p/590842339)
+
 ## How to Use the Module
-Include Rickrack in other scripts, programs and softwares!
+Include Rickrack in other Python scripts, programs and softwares!
+
+Here is a [video tutorial](https://www.bilibili.com/video/BV1VD4y157tX/).
+
+Here is a [demo](demo/).
 
 ```Python
 # Use Rickrack module in code.
@@ -132,7 +142,7 @@ rr.run(dp_argv=dp_argv, dp_proj=dp_proj)
 
 ## Notice
 * Please read the documents and tutorials when you encounter problems.
-* Please don't open the socket server if you are not familiar with it. It is designed for obtain colors through python module in real-time. This server is disabled by default and can only be started from the command line.
+* The socket server is designed for obtaining colors from the Rickrack software in real-time. This server is disabled by default and can only be started from the command line.
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 

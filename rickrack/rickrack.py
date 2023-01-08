@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.6.5-x2d2s2-pre
+v2.6.6-x2d2s2-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-December 11, 2022
+January 8, 2023
 """
 
 __HELP__ = """
@@ -756,6 +756,11 @@ class Rickrack(object):
             dp_proj (str): rickrack startup argv, project directory.
         """
 
+        if self.is_started_by_script or self.is_connected:
+            print("Rickrack is already started.")
+
+            return
+
         if dp_proj:
             dirname, basename = para_dir(dp_proj)
 
@@ -866,6 +871,10 @@ class Rickrack(object):
 
             self.is_started_by_script = True
 
+            while not self.is_connected:
+                time.sleep(1)
+                print("Waiting for starting Rickrack.")
+
         else:
             results = os.popen(cmd, "r")
 
@@ -891,7 +900,7 @@ class Rickrack(object):
             save_data (bool): if save data before close.
         """
 
-        if self.is_connected:
+        if self.is_started_by_script and self.is_connected:
             client = socket.socket()
             client.settimeout(self._timeout)
             client.connect((self._host, self._port))
@@ -901,10 +910,9 @@ class Rickrack(object):
 
             client.close()
 
-        # please don't close Rickrack abnormally.
-        while self.is_started_by_script and self.is_connected:
-            print("Waitting for closing Rickrack...")
-            time.sleep(1)
+            while self.is_connected:
+                time.sleep(1)
+                print("Waiting for closing Rickrack.")
 
         self.is_started_by_script = False
 
