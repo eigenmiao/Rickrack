@@ -9,7 +9,7 @@ Public License for more details.
 """
 
 __COPYRIGHT__ = """
-Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
+Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
 """
 
 __WEBSITE__ = """
@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.6.6-x2d2s2-pre
+v2.7.23-x2d3s3-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-January 8, 2023
+February 19, 2023
 """
 
 __HELP__ = """
@@ -276,10 +276,11 @@ class Rickrack(object):
 
         rt_rule = "Custom"
         rt_cidx = 0
-        rt_cset = [Color(default_color, tp="hec"), Color(default_color, tp="hec"), Color(default_color, tp="hec"), Color(default_color, tp="hec"), Color(default_color, tp="hec")]
-        rt_cgrd = rt_cgrd = Grid([])
+        rt_cset = Grid([default_color, default_color, default_color, default_color, default_color], [], 5)
+        rt_refs = Grid([], [], 0)
+        rt_cgrd = Grid([], [], (0, 0))
 
-        result = {"rule": str(rt_rule), "index": int(rt_cidx), "colors": tuple(rt_cset), "grid": rt_cgrd}
+        result = {"rule": str(rt_rule), "index": int(rt_cidx), "colors": rt_cset, "refs": rt_refs, "grid": rt_cgrd}
         self._result = Result(result)
 
         self._host = str(host)
@@ -390,6 +391,7 @@ class Rickrack(object):
         """
 
         if not self._port:
+            self.is_started_by_script = False
             return False
 
         try:
@@ -401,6 +403,7 @@ class Rickrack(object):
 
         except Exception as err:
             print("Connect to server with port {} faild:\n{}".format(self._port, err))
+            self.is_started_by_script = False
             return False
 
         return True
@@ -756,7 +759,7 @@ class Rickrack(object):
             dp_proj (str): rickrack startup argv, project directory.
         """
 
-        if self.is_started_by_script or self.is_connected:
+        if self.is_connected:
             print("Rickrack is already started.")
 
             return
@@ -827,19 +830,18 @@ class Rickrack(object):
         run_argv = ""
 
         for dp_key in sdp_argv:
-            if sdp_argv[dp_key]:
-                if dp_key in ("help", "version", "temporary"):
-                    run_argv = run_argv + " --{}".format(dp_key)
+            if dp_key in ("help", "version", "temporary"):
+                run_argv = run_argv + " --{}".format(dp_key)
 
-                    if dp_key == "help":
-                        print("\n+" + "-" * 30 + " Rickrack-Startup " + "-" * 30 + "+")
-                        print(__HELP__)
+                if dp_key == "help":
+                    print("\n+" + "-" * 30 + " Rickrack-Startup " + "-" * 30 + "+")
+                    print(__HELP__)
 
-                    elif dp_key == "version":
-                        print("Rickrack-Startup {} ({})\n".format(__VERSION__[1:-1], __DATE__[1:-1]))
+                elif dp_key == "version":
+                    print("Rickrack-Startup {} ({})\n".format(__VERSION__[1:-1], __DATE__[1:-1]))
 
-                else:
-                    run_argv = run_argv + " --{}=\"{}\"".format(dp_key, sdp_argv[dp_key])
+            else:
+                run_argv = run_argv + " --{}=\"{}\"".format(dp_key, sdp_argv[dp_key])
 
         cmd = ""
         results = ""
@@ -960,7 +962,7 @@ class Rickrack(object):
         """
 
         # calc hash.
-        data_hash = hashlib.sha256(log_text.encode("utf-8")).hexdigest()[:10]
+        data_hash = hashlib.md5(log_text.encode("utf-8")).hexdigest()[:10]
 
         if data_hash == self._hash:
             return
@@ -971,49 +973,83 @@ class Rickrack(object):
         # para results.
         rt_rule = "Custom"
         rt_cidx = 0
-        rt_cset = [Color("FFFFFF", tp="hec"), Color("FFFFFF", tp="hec"), Color("FFFFFF", tp="hec"), Color("FFFFFF", tp="hec"), Color("FFFFFF", tp="hec")]
+        rt_cset = ["FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF", "FFFFFF"]
+        rt_cset_name = ["RR-1", "RR-2", "RR-3", "RR-4", "RR-5"]
+        rt_refs = []
+        rt_refs_name = []
+        rt_gcol = 0
         rt_cgrd = []
+        rt_cgrd_name = []
+
+        para_full_colors = False
+        para_color_grid = False
 
         for line in log_text.split("\n"):
             if len(line) > 9 and line[0] == "+" and line[2] in (" ", "*", "#"):
-                if line[4] in [str(i) for i in range(5)]:
-                    if line[2] == "*":
-                        rt_cidx = int(line[4])
+                if line[4:] == "Full Colors":
+                    para_full_colors = True
 
-                    try:
-                        h, s, v = line[3:].split()[4:7]
-                        rt_cset[int(line[4])] = Color((float(h), float(s), float(v)), tp="hsv")
+                elif line[4:] == "Color Grid ...":
+                    para_color_grid = True
 
-                    except Exception as err:
-                        print("Parse colors for id {} faild:\n{}".format(line[4], err))
+                # Color Grid ...
+                if para_color_grid:
+                    if line[2] == " ":
+                        color_line = line[4:].split(" ")
+                        rt_gcol = len(color_line)
 
-                        rt_cset[int(line[4])] = Color(self._default_color, tp="hec")
+                        for i in range(len(color_line)):
+                            try:
+                                color_line[i] = Color.fmt_hec(color_line[i])
 
-                elif line[4:8] == "Rule":
-                    rt_rule = line[10:].lstrip().rstrip()
+                            except Exception as err:
+                                print("Parse colors in grid faild:\n{}".format(color_line[i]))
 
-                    if rt_rule not in ("Analogous", "Monochromatic", "Triad", "Tetrad", "Pentad", "Complementary", "Shades", "Custom"):
-                        rt_rule = "Custom"
+                                color_line[i] = self._default_color
 
-            elif len(line) > 9 and line[0] == "+" and line[2] == "!":
-                color_line = line[4:].split(" ")
+                        rt_cgrd += color_line
 
-                for i in range(len(color_line)):
-                    try:
-                        color_line[i] = Color.fmt_hec(color_line[i])
+                # Full Colors
+                elif para_full_colors:
+                    if line[2] == " ":
+                        color_line = line[4:].split(" ")
 
-                    except Exception as err:
-                        print("Parse colors in grid faild:\n{}".format(color_line[i]))
+                        for i in range(len(color_line)):
+                            try:
+                                color_line[i] = Color.fmt_hec(color_line[i])
 
-                        color_line[i] = self._default_color
+                            except Exception as err:
+                                print("Parse colors in grid faild:\n{}".format(color_line[i]))
 
-                rt_cgrd.append(tuple(color_line))
+                                color_line[i] = self._default_color
+
+                        rt_refs = color_line
+
+                else:
+                    if line[4] in [str(i) for i in range(5)]:
+                        if line[2] == "*":
+                            rt_cidx = int(line[4])
+
+                        try:
+                            rt_cset[int(line[4])] = Color.fmt_hec(line[3:].split()[7])
+
+                        except Exception as err:
+                            print("Parse colors for id {} faild:\n{}".format(line[4], err))
+
+                            rt_cset[int(line[4])] = self._default_color
+
+                    elif line[4:8] == "Rule":
+                        rt_rule = line[10:].lstrip().rstrip()
+
+                        if rt_rule not in ("Analogous", "Monochromatic", "Triad", "Tetrad", "Pentad", "Complementary", "Shades", "Custom"):
+                            rt_rule = "Custom"
 
             elif len(line) > 9 and line[0] == "+" and line[2] == "@":
                 doc = line[4:].split("; ")
 
-                if len(doc) == 5:
-                    data_rule, data_index, data_set, data_col, data_grid = doc
+                if len(doc) in (5, 6):
+                    data_rule, data_index, data_set, data_col, data_grid = doc[:5]
+                    data_grid_name = "" if len(doc) < 6 else doc[5]
 
                     if data_rule in ("Analogous", "Monochromatic", "Triad", "Tetrad", "Pentad", "Complementary", "Shades", "Custom"):
                         rt_rule = data_rule
@@ -1021,51 +1057,51 @@ class Rickrack(object):
                     if data_index in [str(i) for i in range(5)]:
                         rt_cidx = int(data_index)
 
+                    rt_gcol = int(data_col)
                     data_set = data_set.split(" ")
-
-                    if len(data_set) == 15:
-                        for i in range(5):
-                            try:
-                                hsv = data_set[3 * i: 3 * (i + 1)]
-                                hsv = [float(i) for i in hsv]
-                                rt_cset[i] = Color(hsv, tp="hsv")
-
-                            except Exception as err:
-                                print("Parse colors for id {} faild:\n{}".format(i, err))
-
-                                rt_cset[i] = Color(self._default_color, tp="hec")
-
-                    if data_col in [str(i) for i in range(100)]:
-                        col = int(data_col)
-
-                    else:
-                        col = 0
-
                     data_grid = data_grid.split(" ")
+                    data_grid_name = data_grid_name.lstrip().rstrip()
 
-                    for i in range(col):
-                        rt_cgrd.append([])
+                    if data_grid_name:
+                        data_grid_name = data_grid_name[1:-1].split('" "')
 
-                        for j in range(col):
-                            idx = col *i + j
+                    for i in range(5):
+                        try:
+                            rt_cset[(2, 1, 0, 3, 4)[i]] = Color.fmt_hec(data_set[i])
 
-                            if len(data_grid) > idx:
-                                try:
-                                    curr_hec = Color.fmt_hec(data_grid[idx])
+                        except Exception as err:
+                            print("Parse colors for id {} faild:\n{}".format(i, err))
 
-                                except Exception as err:
-                                    print("Parse colors in grid faild:\n{}".format(data_grid[idx]))
+                            rt_cset[i] = self._default_color
 
-                                    curr_hec = self._default_color
+                    for i in range(len(data_set) - 6):
+                        try:
+                            rt_refs.append(Color.fmt_hec(data_set[i + 6]))
 
-                                rt_cgrd[-1].append(curr_hec)
+                        except Exception as err:
+                            print("Parse ref colors for id {} faild:\n{}".format(i, err))
 
-                            else:
-                                rt_cgrd[-1].append(self._default_color)
+                            rt_refs.append(self._default_color)
+                            rt_refs_name.append("RR")
 
-        rt_cgrd = Grid(rt_cgrd)
+                    for i in range(len(data_grid)):
+                        try:
+                            rt_cgrd.append(Color.fmt_hec(data_grid[i]))
 
-        result = {"rule": str(rt_rule), "index": int(rt_cidx), "colors": tuple(rt_cset), "grid": rt_cgrd}
+                            if data_grid_name:
+                                rt_cgrd_name.append(data_grid_name[i])
+
+                        except Exception as err:
+                            print("Parse color grid for id {} faild:\n{}".format(i, err))
+
+                            rt_cgrd.append(self._default_color)
+                            rt_cgrd_name.append("RR")
+
+        rt_cset = Grid(rt_cset, rt_cset_name, 5)
+        rt_refs = Grid(rt_refs, rt_refs_name, len(rt_refs))
+        rt_cgrd = Grid(rt_cgrd, rt_cgrd_name, (rt_gcol, rt_gcol))
+
+        result = {"rule": str(rt_rule), "index": int(rt_cidx), "colors": rt_cset, "refs": rt_refs, "grid": rt_cgrd}
         result = Result(result)
 
         self._result = result

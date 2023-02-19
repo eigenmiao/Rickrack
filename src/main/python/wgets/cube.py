@@ -18,7 +18,8 @@ from PyQt5.QtCore import Qt, QSize, pyqtSignal, QMimeData, QPoint
 from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
 from cguis.design.scroll_cube import Ui_ScrollCube
 from ricore.color import Color
-from ricore.transpt import get_link_tag
+from ricore.transpt import get_link_tag, get_outer_box
+from ricore.grid import gen_assit_color, gen_assit_args
 
 
 class Square(QWidget):
@@ -43,6 +44,10 @@ class Square(QWidget):
     # ---------- ---------- ---------- Paint Funcs ---------- ---------- ---------- #
 
     def paintEvent(self, event):
+        # norm assit point index.
+        if self._args.sys_activated_assit_idx > len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]):
+            self._args.sys_activated_assit_idx = -1
+
         rto = (1.0 - self._args.cubic_ratio) / 2
 
         self._box = (self.width() * rto, self.height() * rto, self.width() * self._args.cubic_ratio, self.height() * self._args.cubic_ratio)
@@ -53,15 +58,51 @@ class Square(QWidget):
         painter.setRenderHint(QPainter.TextAntialiasing, True)
         painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
 
+        # main color.
+        painter.setPen(QPen(Qt.NoPen))
+        painter.setBrush(QColor(*self._args.sys_color_set[self._idx].rgb))
+        painter.drawRect(*self._box)
+
+        # assit colors and frames.
+        assit_len = len(self._args.sys_grid_assitlocs[self._idx])
+        assit_w = self._box[2] / (assit_len + 1)
+        assit_h = self._box[3] / 4
+
+        self._assit_boxes = []
+
+        self._assit_idx_seq = list(range(len(self._args.sys_grid_assitlocs[self._idx])))
+        if self._args.sys_activated_assit_idx >= 0:
+            self._assit_idx_seq = self._assit_idx_seq[self._args.sys_activated_assit_idx + 1: ] + self._assit_idx_seq[: self._args.sys_activated_assit_idx + 1]
+
+        for assit_idx in self._assit_idx_seq:
+            assit_box = (self._box[0] + assit_w * (assit_idx + 1), self._box[1] + assit_h * 3, assit_w, assit_h)
+            assit_color = gen_assit_color(self._args.sys_color_set[self._idx], *self._args.sys_grid_assitlocs[self._idx][assit_idx][2:6])
+            assit_frame_color = self._args.positive_color if self._idx == self._args.sys_activated_idx and assit_idx == self._args.sys_activated_assit_idx else self._args.negative_color
+
+            self._assit_boxes.append(assit_box)
+
+            painter.setPen(QPen(QColor(*assit_frame_color), self._args.negative_wid))
+            painter.setBrush(QColor(*assit_color.rgb))
+            painter.drawRect(*assit_box)
+
+            # relative (move-able) or ref (un-move-able) point tag.
+            if not self._args.sys_grid_assitlocs[self._idx][assit_idx][5]:
+                dot_box = get_outer_box((assit_box[0] + assit_box[2] / 5, assit_box[1] + assit_box[3] / 5), self._args.negative_wid)
+                painter.setPen(QPen(Qt.NoPen))
+                painter.setBrush(QBrush(QColor(*assit_frame_color)))
+                painter.drawEllipse(*dot_box)
+
+        # main frame.
         if self._idx == self._args.sys_activated_idx:
             painter.setPen(QPen(QColor(*self._args.positive_color), self._args.positive_wid * 1.5))
 
         else:
             painter.setPen(QPen(QColor(*self._args.negative_color), self._args.negative_wid * 1.5))
 
-        painter.setBrush(QColor(*self._args.sys_color_set[self._idx].rgb))
+        painter.setBrush(QBrush(Qt.NoBrush))
         painter.drawRect(*self._box)
 
+        # link tag.
         if self._idx == self._args.sys_activated_idx and (self._args.sys_link_colors[0] or self._args.sys_link_colors[1]):
             link_box = (self._box[0], self._box[1], self._box[2] / 3.0, self._box[3] / 3.0)
             link_square_left, link_square_right, link_wid, link_line_start, link_line_end = get_link_tag(link_box)
@@ -76,12 +117,27 @@ class Square(QWidget):
     # ---------- ---------- ---------- Mouse Event Funcs ---------- ---------- ---------- #
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
+        if event.button() in (Qt.LeftButton, Qt.RightButton):
             p_x = event.x()
             p_y = event.y()
 
             if self._box[0] < p_x < (self._box[0] + self._box[2]) and self._box[1] < p_y < (self._box[1] + self._box[3]):
-                self._args.sys_activated_idx = self._idx
+                self._args.sys_activated_assit_idx = -1
+
+                # click on assit colors.
+                for seq_idx in range(len(self._assit_idx_seq)):
+                    assit_box = self._assit_boxes[seq_idx]
+
+                    if assit_box[0] < p_x < (assit_box[0] + assit_box[2]) and assit_box[1] < p_y < (assit_box[1] + assit_box[3]):
+                        self._args.sys_activated_idx = self._idx
+                        self._args.sys_activated_assit_idx = self._assit_idx_seq[seq_idx]
+
+                        break
+
+                # click on the main color.
+                if self._args.sys_activated_assit_idx < 0:
+                    self._args.sys_activated_idx = self._idx
+                    self._args.sys_activated_assit_idx = -1
 
                 self.ps_index_changed.emit(True)
 
@@ -100,11 +156,22 @@ class Square(QWidget):
             p_y = event.y()
 
             if self._box[0] < p_x < (self._box[0] + self._box[2]) and self._box[1] < p_y < (self._box[1] + self._box[3]):
-                dialog = QColorDialog.getColor(QColor(*self._args.sys_color_set[self._idx].rgb))
+                if self._idx == self._args.sys_activated_idx and self._args.sys_activated_assit_idx >= 0:
+                    curr_color = gen_assit_color(self._args.sys_color_set[self._idx], *self._args.sys_grid_assitlocs[self._idx][self._args.sys_activated_assit_idx][2:6])
+
+                else:
+                    curr_color = self._args.sys_color_set[self._idx]
+
+                dialog = QColorDialog.getColor(QColor(*curr_color.rgb))
 
                 if dialog.isValid():
                     color = Color((dialog.red(), dialog.green(), dialog.blue()), tp="rgb", overflow=self._args.sys_color_set.get_overflow())
-                    self._args.sys_color_set.modify(self._args.hm_rule, self._idx, color)
+
+                    if self._idx == self._args.sys_activated_idx and self._args.sys_activated_assit_idx >= 0:
+                        self._args.sys_grid_assitlocs[self._idx][self._args.sys_activated_assit_idx][2:5] = gen_assit_args(self._args.sys_color_set[self._idx], color, self._args.sys_grid_assitlocs[self._idx][self._args.sys_activated_assit_idx][5])
+
+                    else:
+                        self._args.sys_color_set.modify(self._args.hm_rule, self._idx, color)
 
                     self.ps_color_changed.emit(True)
 
@@ -157,8 +224,8 @@ class Cube(QWidget, Ui_ScrollCube):
 
     def paintEvent(self, event):
         wid = self.cube_color.width()
-        self.cube_color.setMinimumHeight(wid * 0.618)
-        self.cube_color.setMaximumHeight(wid * 0.618)
+        self.cube_color.setMinimumHeight(wid * 0.72)
+        self.cube_color.setMaximumHeight(wid * 0.72)
 
 
 class CubeTable(QWidget):
@@ -167,6 +234,7 @@ class CubeTable(QWidget):
     """
 
     ps_color_changed = pyqtSignal(bool)
+    ps_history_backup = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -215,6 +283,7 @@ class CubeTable(QWidget):
         for idx in (2, 1, 0, 3, 4):
             scroll_horizontal_layout.addWidget(self._cubes[idx])
             self._cubes[idx].square.ps_color_changed.connect(lambda x: self.update_color())
+            self._cubes[idx].square.ps_color_changed.connect(lambda x: self.ps_history_backup.emit(True))
             self._cubes[idx].square.ps_index_changed.connect(lambda x: self.update_index())
 
             for ctp in ("r", "g", "b"):
@@ -320,17 +389,35 @@ class CubeTable(QWidget):
         Modify stored color set by rule selection.
         """
 
-        self._args.sys_color_set.create(self._args.hm_rule)
+        if True in [bool(i) for i in self._args.sys_grid_assitlocs]:
+            self._args.sys_grid_assitlocs = [[], [], [], [], []]
+            self._args.sys_assit_color_locs = [[], [], [], [], []]
+            self._args.sys_activated_assit_idx = -1
+
+        else:
+            self._args.sys_color_set.create(self._args.hm_rule)
+
         self.update_color()
+
+        self.ps_history_backup.emit(True)
 
     def create_set(self):
         """
         Create stored color set by create button.
         """
 
-        self._args.sys_color_set.initialize()
-        self._args.sys_color_set.create(self._args.hm_rule)
+        if True in [bool(i) for i in self._args.sys_grid_assitlocs]:
+            self._args.sys_grid_assitlocs = [[], [], [], [], []]
+            self._args.sys_assit_color_locs = [[], [], [], [], []]
+            self._args.sys_activated_assit_idx = -1
+
+        else:
+            self._args.sys_color_set.initialize()
+            self._args.sys_color_set.create(self._args.hm_rule)
+
         self.update_color()
+
+        self.ps_history_backup.emit(True)
 
     def modify_box_visibility(self):
         """
@@ -381,6 +468,7 @@ class CubeTable(QWidget):
 
         def _func_():
             self._args.sys_activated_idx = idx
+            self._args.sys_activated_assit_idx = -1
             self.update_index()
 
         return _func_

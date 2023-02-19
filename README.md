@@ -33,8 +33,8 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free color editor. It is
   * [Notice](#notice)
 * [Development](#development)
   * [Install Requirement](#install-requirement)
-  * [Build Software](#build-software)
-  * [Build Module](#build-module)
+  * [How to Build the Software](#how-to-build-the-software)
+  * [How to Build the Module](#how-to-build-the-module)
 * [Copyright](#copyright)
 * [License](#license)
   * [License for Rickrack](#license-for-rickrack)
@@ -84,13 +84,13 @@ https://github.com/eigenmiao/Rickrack
 
 # Installation
 ## Current Release
-The latest preview version is [v2.6.6](https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.6-pre).
+The latest preview version is [v2.7.23](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.23-pre).
 
 ## Download Software
-https://github.com/eigenmiao/Rickrack/releases/tag/v2.6.6-pre
+https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.23-pre
 
 ## Install Software
-Visit https://eigenmiao.com/rickrack/ for more information. The installation steps are presented in tutorials.
+Visit https://eigenmiao.com/rickrack/ for more information. The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 
@@ -113,7 +113,7 @@ Visit https://eigenmiao.com/rickrack/ for tutorials. Just feel free to click any
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17L4y1A7P9/).
 
-Here is a [demo](https://zhuanlan.zhihu.com/p/590842339)
+Here is a [demo](https://zhuanlan.zhihu.com/p/590842339).
 
 ## How to Use the Module
 Include Rickrack in other Python scripts, programs and softwares!
@@ -152,10 +152,10 @@ rr.run(dp_argv=dp_argv, dp_proj=dp_proj)
 * Git version control system
 * Additional modules listed in requirements folder
 
-## Build Software
-Not supported.
+## How to Build the Software
+Not supported. The "ricore" module is not open-sourced yet.
 
-## Build Module
+## How to Build the Module
 ```bash
 # Download the Rickrack source code.
 git clone https://github.com/eigenmiao/Rickrack.git
@@ -170,7 +170,7 @@ python setup.py sdist --formats=gztar,zip
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
 # Copyright
-Copyright (c) 2019-2022 [Eigenmiao](mailto:eigenmiao@outlook.com). All Rights Reserved.
+Copyright (c) 2019-2023 [Eigenmiao](mailto:eigenmiao@outlook.com). All Rights Reserved.
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
