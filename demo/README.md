@@ -31,4 +31,4 @@ Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif)
 
 Please visit https://github.com/eigenmiao/Rickrack for more infomation about Rickrack.
 
-Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
+Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.

@@ -446,6 +446,8 @@ class Depot(QWidget):
     ps_dropped = pyqtSignal(tuple)
     ps_appended = pyqtSignal(tuple)
     ps_linked = pyqtSignal(bool)
+    ps_history_backup = pyqtSignal(bool)
+    ps_undo = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -829,68 +831,12 @@ class Depot(QWidget):
         self._args.stab_ucells = unit_cells
         self._current_idx = None
 
+        self.ps_history_backup.emit(True)
+
         for unit_cell in self._args.stab_ucells:
             if isinstance(unit_cell, UnitCell):
                 unit_cell._func_tr_()
                 unit_cell.update_text()
-
-    def create_menu(self):
-        """
-        Create a right clicked menu.
-        """
-
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_menu)
-
-        self._menu = QMenu(self)
-
-        self._action_import = QAction(self)
-        self._action_import.triggered.connect(self.import_set)
-        self._menu.addAction(self._action_import)
-
-        self._action_export = QAction(self)
-        self._action_export.triggered.connect(self.export_set)
-        self._menu.addAction(self._action_export)
-
-        self._action_delete = QAction(self)
-        self._action_delete.triggered.connect(self.confirm_delete_set)
-        self._menu.addAction(self._action_delete)
-
-        self._action_detail = QAction(self)
-        self._action_detail.triggered.connect(self.detail_set)
-        self._menu.addAction(self._action_detail)
-
-        self._action_attach = QAction(self)
-        self._action_attach.triggered.connect(self.attach_set)
-        self._menu.addAction(self._action_attach)
-
-    def show_menu(self):
-        """
-        Show the right clicked menu.
-        """
-
-        if self._current_idx == None:
-            self._action_import.setDisabled(True)
-            self._action_export.setDisabled(True)
-            self._action_delete.setDisabled(True)
-            self._action_detail.setDisabled(True)
-            self._action_attach.setDisabled(True)
-
-        elif self._current_idx == len(self._args.stab_ucells) - 1:
-            self._action_import.setDisabled(True)
-            self._action_export.setDisabled(True)
-            self._action_delete.setDisabled(True)
-            self._action_detail.setDisabled(True)
-            self._action_attach.setDisabled(False)
-
-        else:
-            self._action_import.setDisabled(False)
-            self._action_export.setDisabled(False)
-            self._action_delete.setDisabled(False)
-            self._action_detail.setDisabled(False)
-            self._action_attach.setDisabled(True)
-
-        self._menu.exec_(QCursor.pos())
 
     def activate_idx(self, idx):
         """
@@ -1133,7 +1079,27 @@ class Depot(QWidget):
 
         self.prompt(self._operation_warns[3], self.delete_set)
 
-    def import_set(self):
+    def link_set(self, link):
+        """
+        Link set with result.
+
+        Args:
+            link (bool): whether linked.
+        """
+
+        if not self.isVisible():
+            return
+
+        if isinstance(self._fetched_cell, UnitCell) or self._left_click:
+            return
+
+        if self._current_idx == None or self._current_idx > len(self._args.stab_ucells) - 2:
+            return
+
+        self._args.sys_link_colors[1] = bool(link)
+        self.ps_linked.emit(True)
+
+    def import_set(self, rev_import=False):
         """
         Import current color set into color wheel.
         """
@@ -1150,7 +1116,7 @@ class Depot(QWidget):
         if isinstance(self._args.stab_ucells[self._current_idx], UnitCell):
             self.activate_idx(self._current_idx)
 
-            if self._press_key in (2, 4):
+            if self._press_key in (2, 4) or rev_import:
                 self._args.stab_ucells[self._current_idx].update_colors([i.hsv for i in self._args.sys_color_set], self._args.hm_rule, self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values)
 
                 if self._info.isVisible():
@@ -1160,22 +1126,25 @@ class Depot(QWidget):
                 self.attach_set(location_idx=self._current_idx)
 
             else:
-                self._args.sys_color_set.import_color_set(self._args.stab_ucells[self._current_idx].color_set)
+                self._args.sys_color_set.recover(self._args.stab_ucells[self._current_idx].color_set)
                 self._args.hm_rule = str(self._args.stab_ucells[self._current_idx].hm_rule)
                 self._args.sys_grid_locations, self._args.sys_grid_assitlocs = norm_grid_locations(self._args.stab_ucells[self._current_idx].grid_locations, self._args.stab_ucells[self._current_idx].grid_assitlocs)
                 self._args.sys_grid_list = norm_grid_list(self._args.stab_ucells[self._current_idx].grid_list)
                 self._args.sys_grid_values = dict(self._args.stab_ucells[self._current_idx].grid_values)
 
+                self._args.sys_activated_assit_idx = -1
+
+                self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs] for i in range(5)]
+
                 self.ps_update.emit(True)
+                self.ps_history_backup.emit(True)
 
             # link and unlink.
             if self._press_key == 2:
-                self._args.sys_link_colors[1] = not self._args.sys_link_colors[1]
-                self.ps_linked.emit(True)
+                self.link_set(not self._args.sys_link_colors[1])
 
             elif self._args.sys_link_colors[1]:
-                self._args.sys_link_colors[1] = False
-                self.ps_linked.emit(True)
+                self.link_set(False)
 
     def export_set(self):
         """
@@ -1238,7 +1207,14 @@ class Depot(QWidget):
 
         self._scroll_grid_layout.addWidget(unit_cell)
 
-        location_cell = self._args.stab_ucells[location_idx]
+        # normalize location_idx.
+        loc_idx = -1
+        if isinstance(location_idx, (int, np.int_)):
+            loc_idx = int(location_idx)
+            loc_idx = -1 if loc_idx < 0 else loc_idx
+            loc_idx = -1 if loc_idx > len(self._args.stab_ucells) - 2 else loc_idx
+
+        location_cell = self._args.stab_ucells[loc_idx]
         location_cell.activated = False
 
         unit_cell._func_tr_()
@@ -1249,13 +1225,13 @@ class Depot(QWidget):
         unit_cell.setGeometry(location_cell.geometry())
 
         total_len = len(self._args.stab_ucells)
-        self._args.stab_ucells = self._args.stab_ucells[:location_idx] + [unit_cell,] + self._args.stab_ucells[location_idx:]
+        self._args.stab_ucells = self._args.stab_ucells[:loc_idx] + [unit_cell,] + self._args.stab_ucells[loc_idx:]
 
         if activate_list:
             #
             # add judge activate_list to prevent press_act error.
             # activate current index to update info.
-            self.activate_idx((total_len + location_idx) % total_len)
+            self.activate_idx((total_len + loc_idx) % total_len)
 
         self.update()
 
@@ -1411,6 +1387,131 @@ class Depot(QWidget):
         if box.exec_() == 0:
             accept_action()
 
+    # ---------- ---------- ---------- Menu ---------- ---------- ---------- #
+
+    def create_menu(self):
+        """
+        Create a right clicked menu.
+        """
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_menu)
+
+        self._menu = QMenu(self)
+
+        #   _translate("Depot", "Undo"), # 0
+        #   _translate("Depot", "Redo"), # 1
+        self._action_undo = QAction(self)
+        self._action_undo.triggered.connect(lambda: self.ps_undo.emit(True))
+        self._menu.addAction(self._action_undo)
+
+        self._action_redo = QAction(self)
+        self._action_redo.triggered.connect(lambda: self.ps_undo.emit(False))
+        self._menu.addAction(self._action_redo)
+
+        #   _translate("Depot", "Copy RGB"), # 2
+        #   _translate("Depot", "Copy HSV"), # 3
+        #   _translate("Depot", "Copy Hex Code"), # 4
+        self._action_copy_rgb = QAction(self)
+        self._action_copy_rgb.triggered.connect(self.clipboard_cur("rgb"))
+        self._menu.addAction(self._action_copy_rgb)
+
+        self._action_copy_hsv = QAction(self)
+        self._action_copy_hsv.triggered.connect(self.clipboard_cur("hsv"))
+        self._menu.addAction(self._action_copy_hsv)
+
+        self._action_copy_hec = QAction(self)
+        self._action_copy_hec.triggered.connect(self.clipboard_cur("hec"))
+        self._menu.addAction(self._action_copy_hec)
+
+        #   _translate("Depot", "Paste"), # 5
+        self._action_paste = QAction(self)
+        self._action_paste.triggered.connect(self.clipboard_in)
+        self._menu.addAction(self._action_paste)
+
+        #   _translate("Depot", "Zoom In"), # 6
+        #   _translate("Depot", "Zoom Out"), # 7
+        self._action_zoom_in = QAction(self)
+        self._action_zoom_in.triggered.connect(lambda: self.zoom(self._args.zoom_step))
+        self._menu.addAction(self._action_zoom_in)
+
+        self._action_zoom_out = QAction(self)
+        self._action_zoom_out.triggered.connect(lambda: self.zoom(1 / self._args.zoom_step))
+        self._menu.addAction(self._action_zoom_out)
+
+        #   _translate("Depot", "Replace Color (DK)"), # 8
+        #   _translate("Depot", "Rev-Replace Color (Alt+DK)"), # 16
+        self._action_import = QAction(self)
+        self._action_import.triggered.connect(self.import_set)
+        self._menu.addAction(self._action_import)
+
+        self._action_rev_import = QAction(self)
+        self._action_rev_import.triggered.connect(lambda: self.import_set(rev_import=True))
+        self._menu.addAction(self._action_rev_import)
+
+        #   _translate("Depot", "Export Color Set"), # 9
+        self._action_export = QAction(self)
+        self._action_export.triggered.connect(self.export_set)
+        self._menu.addAction(self._action_export)
+
+        #   _translate("Depot", "Insert Color Set  (Shift+DK)"), # 10
+        self._action_attach_beside = QAction(self)
+        self._action_attach_beside.triggered.connect(lambda: self.attach_set(location_idx=self._current_idx))
+        self._menu.addAction(self._action_attach_beside)
+
+        #   _translate("Depot", "Append Color Set"), # 11
+        self._action_attach_append = QAction(self)
+        self._action_attach_append.triggered.connect(self.attach_set)
+        self._menu.addAction(self._action_attach_append)
+
+        #   _translate("Depot", "Delete Color Set"), # 12
+        self._action_delete = QAction(self)
+        self._action_delete.triggered.connect(self.delete_set)
+        self._menu.addAction(self._action_delete)
+
+        #   _translate("Depot", "Show Detail"), # 13
+        self._action_detail = QAction(self)
+        self._action_detail.triggered.connect(self.detail_set)
+        self._menu.addAction(self._action_detail)
+
+        #   _translate("Depot", "Link with Result (Ctrl+DK)"), # 14
+        #   _translate("Depot", "Un-Link with Result (Ctrl+DK)"), # 15
+        self._action_link = QAction(self)
+        self._action_link.triggered.connect(lambda: self.link_set(not self._args.sys_link_colors[1]))
+        self._menu.addAction(self._action_link)
+
+    def show_menu(self):
+        """
+        Show the right clicked menu.
+        """
+
+        # normal actions delete.
+        if self._current_idx == None or self._args.stab_ucells[self._current_idx] == None or self._current_idx >= len(self._args.stab_ucells) - 1:
+            self._action_copy_rgb.setVisible(False)
+            self._action_copy_hsv.setVisible(False)
+            self._action_copy_hec.setVisible(False)
+            self._action_import.setVisible(False)
+            self._action_rev_import.setVisible(False)
+            self._action_export.setVisible(False)
+            self._action_delete.setVisible(False)
+            self._action_detail.setVisible(False)
+            self._action_attach_beside.setVisible(False)
+            self._action_link.setVisible(False)
+
+        else:
+            self._action_copy_rgb.setVisible(True)
+            self._action_copy_hsv.setVisible(True)
+            self._action_copy_hec.setVisible(True)
+            self._action_import.setVisible(True)
+            self._action_rev_import.setVisible(True)
+            self._action_export.setVisible(True)
+            self._action_delete.setVisible(True)
+            self._action_detail.setVisible(True)
+            self._action_attach_beside.setVisible(True)
+            self._action_link.setVisible(True)
+
+        self._menu.exec_(QCursor.pos())
+
     # ---------- ---------- ---------- Shortcut ---------- ---------- ---------- #
 
     def update_skey(self):
@@ -1552,12 +1653,57 @@ class Depot(QWidget):
 
     # ---------- ---------- ---------- Translations ---------- ---------- ---------- #
 
+    def update_action_text(self):
+        #   _translate("Depot", "Undo"), # 0
+        #   _translate("Depot", "Redo"), # 1
+        self._action_undo.setText(self._action_descs[0])
+        self._action_redo.setText(self._action_descs[1])
+
+        #   _translate("Depot", "Copy RGB"), # 2
+        #   _translate("Depot", "Copy HSV"), # 3
+        #   _translate("Depot", "Copy Hex Code"), # 4
+        self._action_copy_rgb.setText(self._action_descs[2])
+        self._action_copy_hsv.setText(self._action_descs[3])
+        self._action_copy_hec.setText(self._action_descs[4])
+
+        #   _translate("Depot", "Paste"), # 5
+        self._action_paste.setText(self._action_descs[5])
+
+        #   _translate("Depot", "Zoom In"), # 6
+        #   _translate("Depot", "Zoom Out"), # 7
+        self._action_zoom_in.setText(self._action_descs[6])
+        self._action_zoom_out.setText(self._action_descs[7])
+
+        #   _translate("Depot", "Replace Color (DK)"), # 8
+        #   _translate("Depot", "Rev-Replace Color (Alt+DK)"), # 16
+        self._action_import.setText(self._action_descs[8])
+        self._action_rev_import.setText(self._action_descs[16])
+
+        #   _translate("Depot", "Export Color Set"), # 9
+        self._action_export.setText(self._action_descs[9])
+
+        #   _translate("Depot", "Insert Color Set  (Shift+DK)"), # 10
+        self._action_attach_beside.setText(self._action_descs[10])
+
+        #   _translate("Depot", "Append Color Set"), # 11
+        self._action_attach_append.setText(self._action_descs[11])
+
+        #   _translate("Depot", "Delete Color Set"), # 12
+        self._action_delete.setText(self._action_descs[12])
+
+        #   _translate("Depot", "Show Detail"), # 13
+        self._action_detail.setText(self._action_descs[13])
+
+        #   _translate("Depot", "Link with Result (Ctrl+DK)"), # 14
+        #   _translate("Depot", "Un-Link with Result (Ctrl+DK)"), # 15
+        if self._args.sys_link_colors[1]:
+            self._action_link.setText(self._action_descs[15])
+
+        else:
+            self._action_link.setText(self._action_descs[14])
+
     def update_text(self):
-        self._action_import.setText(self._action_descs[0])
-        self._action_export.setText(self._action_descs[1])
-        self._action_delete.setText(self._action_descs[2])
-        self._action_detail.setText(self._action_descs[3])
-        self._action_attach.setText(self._action_descs[4])
+        self.update_action_text()
 
         self._info._func_tr_()
         self._info.update_text()
@@ -1571,11 +1717,23 @@ class Depot(QWidget):
         _translate = QCoreApplication.translate
 
         self._action_descs = (
-            _translate("Depot", "Import"),
-            _translate("Depot", "Export"),
-            _translate("Depot", "Delete"),
-            _translate("Depot", "Detail"),
-            _translate("Depot", "Attach"),
+            _translate("Wheel", "Undo"), # 0
+            _translate("Wheel", "Redo"), # 1
+            _translate("Depot", "Copy RGB"), # 2
+            _translate("Depot", "Copy HSV"), # 3
+            _translate("Depot", "Copy Hex Code"), # 4
+            _translate("Wheel", "Paste"), # 5
+            _translate("Board", "Zoom In"), # 6
+            _translate("Board", "Zoom Out"), # 7
+            _translate("Depot", "Replace Color (DK)"), # 8
+            _translate("Depot", "Export Color Set"), # 9
+            _translate("Depot", "Insert Color Set  (Shift+DK)"), # 10
+            _translate("Depot", "Append Color Set"), # 11
+            _translate("Depot", "Delete Color Set"), # 12
+            _translate("Depot", "Show Detail"), # 13
+            _translate("Depot", "Link with Result (Ctrl+DK)"), # 14
+            _translate("Depot", "Un-Link with Result (Ctrl+DK)"), # 15
+            _translate("Depot", "Rev-Replace Color (Alt+DK)"), # 16
         )
 
         self._operation_warns = (

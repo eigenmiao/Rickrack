@@ -72,6 +72,7 @@ class Settings(QDialog, Ui_SettingsDialog):
         self._skey_distribution = (6, 8, 9, 5, 10, 10)
 
         g0_seq = (0, 1, 2, 4, 7, 8)
+        g5_seq = (0, 1, 2, 3, 4, 5, 6, 8, 9, 10)
 
         for gbox_id in range(len(self._skey_distribution)):
             skey_gbox = QGroupBox(self.shortcuts_scroll_contents)
@@ -81,7 +82,14 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_gboxe_layouts.append(gbox_grid_layout)
 
             for curr_id in range(self._skey_distribution[gbox_id]):
-                skey_id = g0_seq[curr_id] if gbox_id == 0 else curr_id
+                if gbox_id == 0:
+                    skey_id = g0_seq[curr_id]
+
+                elif gbox_id == 5:
+                    skey_id = g5_seq[curr_id]
+
+                else:
+                    skey_id = curr_id
 
                 skey_label = QLabel(skey_gbox)
                 skey_label.setMinimumSize(200, 25)
@@ -98,7 +106,7 @@ class Settings(QDialog, Ui_SettingsDialog):
                     self._skey_ledits.append(skey_ledit)
 
         # new shortcuts not in range.
-        # key no. 48 at line 5.
+        # key no. 48 at line 5, g0.
         skey_label = QLabel(self._skey_gboxes[0])
         skey_label.setMinimumSize(200, 25)
         skey_label.setMaximumSize(400, 40)
@@ -113,7 +121,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
             self._skey_ledits.append(skey_ledit)
 
-        # key no. 49 at line 6.
+        # key no. 49 at line 6, g0.
         skey_label = QLabel(self._skey_gboxes[0])
         skey_label.setMinimumSize(200, 25)
         skey_label.setMaximumSize(400, 40)
@@ -128,7 +136,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
             self._skey_ledits.append(skey_ledit)
 
-        # key no. 50 at line 3.
+        # key no. 50 at line 3, g0.
         skey_label = QLabel(self._skey_gboxes[0])
         skey_label.setMinimumSize(200, 25)
         skey_label.setMaximumSize(400, 40)
@@ -140,6 +148,52 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_ledit.setMinimumSize(68, 25)
             skey_ledit.setMaximumSize(120, 16777215)
             skey_gboxe_layouts[0].addWidget(skey_ledit, 3, ledit_id + 1, 1, 1)
+            skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
+            self._skey_ledits.append(skey_ledit)
+
+        # key no. 51 at line 7, g5.
+        skey_label = QLabel(self._skey_gboxes[5])
+        skey_label.setMinimumSize(200, 25)
+        skey_label.setMaximumSize(400, 40)
+        skey_gboxe_layouts[5].addWidget(skey_label, 7, 0, 1, 1)
+        self._skey_labels.append(skey_label)
+
+        for ledit_id in range(3):
+            skey_ledit = QLineEdit(self._skey_gboxes[5])
+            skey_ledit.setMinimumSize(68, 25)
+            skey_ledit.setMaximumSize(120, 16777215)
+            skey_gboxe_layouts[5].addWidget(skey_ledit, 7, ledit_id + 1, 1, 1)
+            skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
+            self._skey_ledits.append(skey_ledit)
+
+        # key no. 52-55 at line 5-8, g3.
+        for key_id in range(4):
+            skey_label = QLabel(self._skey_gboxes[3])
+            skey_label.setMinimumSize(200, 25)
+            skey_label.setMaximumSize(400, 40)
+            skey_gboxe_layouts[3].addWidget(skey_label, key_id + 5, 0, 1, 1)
+            self._skey_labels.append(skey_label)
+
+            for ledit_id in range(3):
+                skey_ledit = QLineEdit(self._skey_gboxes[3])
+                skey_ledit.setMinimumSize(68, 25)
+                skey_ledit.setMaximumSize(120, 16777215)
+                skey_gboxe_layouts[3].addWidget(skey_ledit, key_id + 5, ledit_id + 1, 1, 1)
+                skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
+                self._skey_ledits.append(skey_ledit)
+
+        # key no. 56 at line 11, g5.
+        skey_label = QLabel(self._skey_gboxes[5])
+        skey_label.setMinimumSize(200, 25)
+        skey_label.setMaximumSize(400, 40)
+        skey_gboxe_layouts[5].addWidget(skey_label, 11, 0, 1, 1)
+        self._skey_labels.append(skey_label)
+
+        for ledit_id in range(3):
+            skey_ledit = QLineEdit(self._skey_gboxes[5])
+            skey_ledit.setMinimumSize(68, 25)
+            skey_ledit.setMaximumSize(120, 16777215)
+            skey_gboxe_layouts[5].addWidget(skey_ledit, 11, ledit_id + 1, 1, 1)
             skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
             self._skey_ledits.append(skey_ledit)
 
@@ -259,6 +313,7 @@ class Settings(QDialog, Ui_SettingsDialog):
         self.font_size_sp.setValue(self._args.font_size)
 
         self.max_history_files_sp.setValue(self._args.max_history_files)
+        self.max_history_steps_sp.setValue(self._args.max_history_steps)
         self.export_grid_extns_ledit.setText(self._args.export_grid_extns)
 
         self.r_prefix_0_ledit.setText(self._args.r_prefix[0].replace("\n", "\\n").replace("\t", "\\t"))
@@ -376,6 +431,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             self._args.modify_settings("wheel_ed_color", (self.wheel_ed_color_0_dp.value(), self.wheel_ed_color_1_dp.value(), self.wheel_ed_color_2_dp.value()))
 
         self._args.modify_settings("max_history_files", self.max_history_files_sp.value())
+        self._args.modify_settings("max_history_steps", self.max_history_steps_sp.value())
         self._args.modify_settings("export_grid_extns", self.export_grid_extns_ledit.text())
 
         self._args.modify_settings("r_prefix", (self.r_prefix_0_ledit.text().replace("\\n", "\n").replace("\\t", "\t"), self.r_prefix_1_ledit.text().replace("\\n", "\n").replace("\\t", "\t")))
@@ -671,7 +727,13 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "Withdraw"),
             _translate("Settings", "Win_On_Top"),
             _translate("Settings", "Show_Hide_All"),
-            _translate("Rickrack", "Support Rickrack!"),
+            _translate("Settings", "Support Rickrack!"),
+            _translate("Settings", "Gen_Assit"),
+            _translate("Settings", "Wheel_View"),
+            _translate("Settings", "Image_View"),
+            _translate("Settings", "Board_View"),
+            _translate("Settings", "Depot_View"),
+            _translate("Settings", "Redo"),
         )
 
         self._white_illuminant_descs = (

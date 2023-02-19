@@ -18,12 +18,13 @@ import sys
 import time
 import numpy as np
 from PIL import Image as PImage
-from PyQt5.QtWidgets import QWidget, QLabel, QProgressBar, QMessageBox, QFileDialog, QShortcut, QApplication
+from PyQt5.QtWidgets import QWidget, QLabel, QProgressBar, QMessageBox, QFileDialog, QShortcut, QMenu, QAction, QApplication
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QRect, QPoint, QMimeData
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence
 from cguis.resource import view_rc
 from clibs.image3c import Image3C
 from ricore.transpt import get_outer_box
+from ricore.grid import gen_assit_color, gen_assit_args
 from ricore.color import Color
 
 
@@ -37,6 +38,9 @@ class Image(QWidget):
     ps_status_changed = pyqtSignal(tuple)
     ps_recover_channel = pyqtSignal(bool)
     ps_modify_rule = pyqtSignal(bool)
+    ps_assit_pt_changed = pyqtSignal(bool)
+    ps_history_backup = pyqtSignal(bool)
+    ps_undo = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -55,12 +59,11 @@ class Image(QWidget):
         self._start_pt = None
         self._enhance_lock = False
         self._home_image = False
-        self._pressing_key = 0
+        self._press_key = 0
         self._croping_img = False
         self._locating_img = False
         self._resized_img_pos = None
         self._locating_colors = False
-        self._color_locations = [None, None, None, None, None]
         self._connected_keymaps = {}
 
         # load translations.
@@ -92,7 +95,15 @@ class Image(QWidget):
         # shortcut is updated by _setup_skey in main.py.
         # self.update_skey()
 
+        self.create_menu()
+        self.update_action_text()
+
     def paintEvent(self, event):
+        # norm assit point index.
+        if self._args.sys_activated_assit_idx > len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]):
+            self._args.sys_activated_assit_idx = -1
+            self.ps_color_changed()
+
         painter = QPainter()
         painter.begin(self)
         painter.setRenderHint(QPainter.Antialiasing, True)
@@ -113,7 +124,7 @@ class Image(QWidget):
 
             self._tip_label.setGeometry(QRect(*self._tip_box))
 
-            self._tip_label.setText(self._action_descs[0])
+            self._tip_label.setText(self._open_descs[0])
             self._tip_label.setAlignment(Qt.AlignCenter)
 
         elif self._args.sys_category * 10 + self._args.sys_channel not in self._categories:
@@ -165,13 +176,61 @@ class Image(QWidget):
                 idx_seq = idx_seq[self._args.sys_activated_idx + 1: ] + idx_seq[: self._args.sys_activated_idx + 1]
 
                 for idx in idx_seq:
-                    if self._color_locations[idx]:
-                        pt_xy = np.array((self._color_locations[idx][0] * self._resized_img_pos[2] + self._resized_img_pos[0], self._color_locations[idx][1] * self._resized_img_pos[3] + self._resized_img_pos[1]))
+                    # main points.
+                    if self._args.sys_color_locs[idx]:
+                        pt_xy = np.array((self._args.sys_color_locs[idx][0] * self._resized_img_pos[2] + self._resized_img_pos[0], self._args.sys_color_locs[idx][1] * self._resized_img_pos[3] + self._resized_img_pos[1]))
+                        pt_rgb = self._args.sys_color_set[idx].rgb
+
+                    else:
+                        continue
+
+                    # assit sequence. this code is reused in four places.
+                    assit_idx_seq = list(range(len(self._args.sys_grid_assitlocs[idx])))
+                    if idx == self._args.sys_activated_idx and self._args.sys_activated_assit_idx >= 0:
+                        assit_idx_seq = assit_idx_seq[self._args.sys_activated_assit_idx + 1: ] + assit_idx_seq[: self._args.sys_activated_assit_idx + 1]
+
+                    # assit points.
+                    for assit_idx in assit_idx_seq:
+                        if self._args.sys_assit_color_locs[idx][assit_idx]:
+                            assit_pt_xy = np.array((self._args.sys_assit_color_locs[idx][assit_idx][0] * self._resized_img_pos[2] + self._resized_img_pos[0], self._args.sys_assit_color_locs[idx][assit_idx][1] * self._resized_img_pos[3] + self._resized_img_pos[1]))
+                            assit_pt_rgb = gen_assit_color(self._args.sys_color_set[idx], *self._args.sys_grid_assitlocs[idx][assit_idx][2:6]).rgb
+
+                            pt_box = get_outer_box(assit_pt_xy, self._args.circle_dist)
+                            assit_frame_color = (0, 0, 0)
+
+                            if self._press_key == 3:
+                                painter.setBrush(QBrush(Qt.NoBrush))
+
+                            else:
+                                if idx == self._args.sys_activated_idx and assit_idx == self._args.sys_activated_assit_idx:
+                                    assit_frame_color = self._args.positive_color
+
+                                else:
+                                    assit_frame_color = self._args.negative_color
+
+                                painter.setBrush(QColor(*assit_pt_rgb))
+
+                            painter.setPen(QPen(QColor(*assit_frame_color), self._args.negative_wid, Qt.PenStyle(Qt.DashLine)))
+                            painter.drawLine(QPoint(*pt_xy), QPoint(*assit_pt_xy))
+
+                            painter.setPen(QPen(QColor(*assit_frame_color), self._args.negative_wid))
+                            painter.drawEllipse(*pt_box)
+
+                            # relative (move-able) or ref (un-move-able) point tag. assit dot box.
+                            if not self._args.sys_grid_assitlocs[idx][assit_idx][5]:
+                                dot_box = get_outer_box(assit_pt_xy, self._args.negative_wid * 2 / 3)
+                                painter.setPen(QPen(Qt.NoPen))
+                                painter.setBrush(QBrush(QColor(*assit_frame_color)))
+                                painter.drawEllipse(*dot_box)
+
+                    # main points.
+                    if self._args.sys_color_locs[idx]:
+                        pt_xy = np.array((self._args.sys_color_locs[idx][0] * self._resized_img_pos[2] + self._resized_img_pos[0], self._args.sys_color_locs[idx][1] * self._resized_img_pos[3] + self._resized_img_pos[1]))
                         pt_rgb = self._args.sys_color_set[idx].rgb
 
                         pt_box = get_outer_box(pt_xy, self._args.circle_dist + (self._args.positive_wid + self._args.negative_wid) * 2)
 
-                        if self._pressing_key == 3:
+                        if self._press_key == 3:
                             painter.setPen(QPen(Qt.white, self._args.negative_wid, Qt.PenStyle(Qt.DashLine)))
                             painter.setBrush(QBrush(Qt.NoBrush))
 
@@ -188,7 +247,7 @@ class Image(QWidget):
 
                         pt_box = get_outer_box(pt_xy, self._args.circle_dist)
 
-                        if self._pressing_key == 3:
+                        if self._press_key == 3:
                             painter.setPen(QPen(Qt.black, self._args.negative_wid))
                             painter.setBrush(QBrush(Qt.NoBrush))
 
@@ -245,8 +304,14 @@ class Image(QWidget):
 
                     painter.drawRect(0, 0, self.width(), self.height())
 
-                elif self._color_locations[self._args.sys_activated_idx]:
-                    self.ps_status_changed.emit((self._image3c.rgb_data.shape[1], self._image3c.rgb_data.shape[0], "{:.1f}".format(self._color_locations[self._args.sys_activated_idx][0] * 100), "{:.1f}".format(self._color_locations[self._args.sys_activated_idx][1] * 100), Color.sign(self._args.sys_color_set[self._args.sys_activated_idx].hsv)))
+                elif self._args.sys_color_locs[self._args.sys_activated_idx]:
+                    self.ps_status_changed.emit((self._image3c.rgb_data.shape[1], self._image3c.rgb_data.shape[0], "{:.1f}".format(self._args.sys_color_locs[self._args.sys_activated_idx][0] * 100), "{:.1f}".format(self._args.sys_color_locs[self._args.sys_activated_idx][1] * 100), Color.sign(self._args.sys_color_set[self._args.sys_activated_idx].hsv)))
+
+                elif self._args.sys_activated_assit_idx >= 0 and self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx]:
+                    curr_color = gen_assit_color(self._args.sys_color_set[self._args.sys_activated_idx], *self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][2:6])
+                    curr_loc = self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx]
+
+                    self.ps_status_changed.emit((self._image3c.rgb_data.shape[1], self._image3c.rgb_data.shape[0], "{:.1f}".format(curr_loc[0] * 100), "{:.1f}".format(curr_loc[1] * 100), Color.sign(curr_color.hsv)))
 
                 else:
                     self.ps_status_changed.emit((self._image3c.rgb_data.shape[1], self._image3c.rgb_data.shape[0]))
@@ -257,20 +322,24 @@ class Image(QWidget):
 
     def keyPressEvent(self, event):
         if event.key() == Qt.Key_Space and self._image3c.display:
-            self._pressing_key = 3
+            self._press_key = 3
             self.setCursor(QCursor(Qt.ClosedHandCursor))
 
             event.accept()
             self.update()
 
+        elif event.key() == Qt.Key_Control and self._image3c.display:
+            self._press_key = 2
+            event.accept()
+
         else:
-            self._pressing_key = 0
+            self._press_key = 0
             self.setCursor(QCursor(Qt.ArrowCursor))
             event.ignore()
 
     def keyReleaseEvent(self, event):
-        if self._pressing_key:
-            self._pressing_key = 0
+        if self._press_key:
+            self._press_key = 0
             self.setCursor(QCursor(Qt.ArrowCursor))
 
             event.ignore()
@@ -287,8 +356,26 @@ class Image(QWidget):
                 event.accept()
                 self.update()
 
+        elif self._image3c.img_data and event.button() == Qt.LeftButton and self._args.sys_activated_assit_idx >= 0:
+            point = (event.x(), event.y())
+            assit_color_loc = self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx]
+
+            if assit_color_loc:
+                assit_pt_xy = np.array((assit_color_loc[0] * self._resized_img_pos[2] + self._resized_img_pos[0], assit_color_loc[1] * self._resized_img_pos[3] + self._resized_img_pos[1]))
+
+                if np.linalg.norm(point - assit_pt_xy) < self._args.circle_dist:
+                    self.ps_assit_pt_changed.emit(not self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5])
+                    self.ps_color_changed.emit(True)
+                    event.accept()
+
+                else:
+                    event.ignore()
+
             else:
                 event.ignore()
+
+        else:
+            event.ignore()
 
     def dragEnterEvent(self, event):
         try:
@@ -337,7 +424,7 @@ class Image(QWidget):
 
     def mousePressEvent(self, event):
         if self._image3c.display and self._resized_img_pos:
-            if event.button() == Qt.MidButton or (self._pressing_key == 3 and event.button() == Qt.LeftButton):
+            if event.button() == Qt.MidButton or (self._press_key == 3 and event.button() == Qt.LeftButton):
                 if event.button() == Qt.MidButton:
                     self.setCursor(QCursor(Qt.ClosedHandCursor))
 
@@ -378,25 +465,73 @@ class Image(QWidget):
                 event.accept()
                 self.update()
 
-            elif not (self._pressing_key or self._croping_img or self._locating_img):
+            elif self._press_key in (0, 2) and event.button() == Qt.LeftButton and not (self._croping_img or self._locating_img):
+                # insert a new assit point.
+                if self._press_key == 2 and self._args.sys_color_locs[self._args.sys_activated_idx]:
+                    if self._args.sys_activated_assit_idx < 0:
+                        self._args.sys_activated_assit_idx = 0
+
+                    already_selected_assit = False
+
+                    for ci in range(len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]) - self._args.sys_activated_assit_idx):
+                        if self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx] == None:
+                            already_selected_assit = True
+
+                            break
+
+                        self._args.sys_activated_assit_idx += 1
+
+                    if not already_selected_assit:
+                        self._args.sys_activated_assit_idx = len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx])
+                        self._args.sys_grid_assitlocs[self._args.sys_activated_idx].append([0.1, 0.1, 15, 0, 0, True])
+                        self._args.sys_assit_color_locs[self._args.sys_activated_idx].append(None)
+
+                    self.ps_color_changed.emit(True)
+
                 point = np.array((event.x(), event.y()))
                 already_accept = False
 
                 for idx in range(5):
-                    if self._color_locations[idx] and np.linalg.norm(point - np.array(self._color_locations[idx]) * np.array(self._resized_img_pos[2:]) - np.array(self._resized_img_pos[:2])) < self._args.circle_dist + (self._args.positive_wid + self._args.negative_wid) * 2:
+                    if self._args.sys_color_locs[idx] and np.linalg.norm(point - np.array(self._args.sys_color_locs[idx]) * np.array(self._resized_img_pos[2:]) - np.array(self._resized_img_pos[:2])) < self._args.circle_dist + (self._args.positive_wid + self._args.negative_wid) * 2:
                         self._args.sys_activated_idx = idx
+                        self._args.sys_activated_assit_idx = -1
                         already_accept = True
 
+                    else:
+                        curr_locs = self._args.sys_assit_color_locs[idx]
+
+                        for assit_idx in range(len(curr_locs)):
+                            if curr_locs[assit_idx] and np.linalg.norm(point - np.array(curr_locs[assit_idx]) * np.array(self._resized_img_pos[2:]) - np.array(self._resized_img_pos[:2])) < (self._args.circle_dist + (self._args.positive_wid + self._args.negative_wid) * 2) * 2 / 3:
+                                self._args.sys_activated_idx = idx
+                                self._args.sys_activated_assit_idx = assit_idx
+                                already_accept = True
+
+                                break
+
+                    if already_accept:
                         break
 
-                if event.button() == Qt.LeftButton and (((self._args.press_move or not self._color_locations[self._args.sys_activated_idx]) and self._resized_img_pos[0] < point[0] < self._resized_img_pos[0] + self._resized_img_pos[2] and self._resized_img_pos[1] < point[1] < self._resized_img_pos[1] + self._resized_img_pos[3]) or already_accept):
+                # select the main color before select assit color.
+                if self._args.sys_activated_assit_idx >= 0 and (not self._args.sys_color_locs[self._args.sys_activated_idx]):
+                    self._args.sys_activated_assit_idx = -1
+
+                select_main_color = not self._args.sys_color_locs[self._args.sys_activated_idx]
+                select_assit_colors = self._args.sys_activated_assit_idx >= 0 and (not self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx])
+
+                # select.
+                if event.button() == Qt.LeftButton and (((self._args.press_move or select_main_color or select_assit_colors) and self._resized_img_pos[0] < point[0] < self._resized_img_pos[0] + self._resized_img_pos[2] and self._resized_img_pos[1] < point[1] < self._resized_img_pos[1] + self._resized_img_pos[3]) or already_accept):
                     loc = [(point[0] - self._resized_img_pos[0]) / self._resized_img_pos[2], (point[1] - self._resized_img_pos[1]) / self._resized_img_pos[3]]
                     loc[0] = 0.0 if loc[0] < 0.0 else loc[0]
                     loc[0] = 1.0 if loc[0] > 1.0 else loc[0]
                     loc[1] = 0.0 if loc[1] < 0.0 else loc[1]
                     loc[1] = 1.0 if loc[1] > 1.0 else loc[1]
 
-                    self._color_locations[self._args.sys_activated_idx] = tuple(loc)
+                    if self._args.sys_activated_assit_idx < 0:
+                        self._args.sys_color_locs[self._args.sys_activated_idx] = tuple(loc)
+
+                    else:
+                        self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx] = tuple(loc)
+
                     self.modify_color_loc()
 
                     self._locating_colors = True
@@ -458,7 +593,12 @@ class Image(QWidget):
             loc[1] = 0.0 if loc[1] < 0.0 else loc[1]
             loc[1] = 1.0 if loc[1] > 1.0 else loc[1]
 
-            self._color_locations[self._args.sys_activated_idx] = tuple(loc)
+            if self._args.sys_activated_assit_idx < 0:
+                self._args.sys_color_locs[self._args.sys_activated_idx] = tuple(loc)
+
+            else:
+                self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx] = tuple(loc)
+
             self.modify_color_loc()
 
             event.accept()
@@ -469,9 +609,11 @@ class Image(QWidget):
 
     def mouseReleaseEvent(self, event):
         self.setCursor(QCursor(Qt.ArrowCursor))
-        self._pressing_key = 0
         self._locating_colors = False
         self._start_pt = None
+
+        if event.button() == Qt.LeftButton:
+            self.ps_history_backup.emit(True)
 
         event.ignore()
 
@@ -714,7 +856,7 @@ class Image(QWidget):
             return
 
         cb_filter = "{} (*.png *.bmp *.jpg *.jpeg *.tif *.tiff *.webp);; {} (*.png);; {} (*.bmp);; {} (*.jpg *.jpeg);; {} (*.tif *.tiff);; {} (*.webp)".format(*self._extend_descs)
-        cb_file = QFileDialog.getOpenFileName(None, self._action_descs[1], self._args.usr_image, filter=cb_filter)
+        cb_file = QFileDialog.getOpenFileName(None, self._open_descs[1], self._args.usr_image, filter=cb_filter)
 
         if cb_file[0]:
             self._args.usr_image = os.path.dirname(os.path.abspath(cb_file[0]))
@@ -759,7 +901,10 @@ class Image(QWidget):
         self._args.sys_channel = 0
         self.ps_image_changed.emit(True)
 
-        self._color_locations = [None, None, None, None, None]
+        self._args.sys_activated_assit_idx = -1
+        self._args.sys_color_locs = [None, None, None, None, None]
+        self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs] for i in range(5)]
+
         self._image3c.display = None
 
         self._image3c.ori_display_data = None
@@ -852,7 +997,7 @@ class Image(QWidget):
 
         if values[0][:5] == "cover":
             cb_filter = "{} (*.png *.bmp *.jpg *.jpeg *.tif *.tiff *.webp);; {} (*.png);; {} (*.bmp);; {} (*.jpg *.jpeg);; {} (*.tif *.tiff);; {} (*.webp)".format(*self._extend_descs)
-            cb_file = QFileDialog.getOpenFileName(None, self._action_descs[3], self._args.usr_image, filter=cb_filter)
+            cb_file = QFileDialog.getOpenFileName(None, self._open_descs[3], self._args.usr_image, filter=cb_filter)
 
             if cb_file[0]:
                 self._args.usr_image = os.path.dirname(os.path.abspath(cb_file[0]))
@@ -1112,7 +1257,7 @@ class Image(QWidget):
         self._args.hm_rule = "custom"
         self.ps_modify_rule.emit(True)
 
-        self._color_locations = value
+        self._args.sys_color_locs = value
 
         for i in range(5):
             rgb = self._image3c.rgb_data[int(value[i][1] * (self._image3c.rgb_data.shape[0] - 1))][int(value[i][0] * (self._image3c.rgb_data.shape[1] - 1))]
@@ -1151,7 +1296,11 @@ class Image(QWidget):
         Modify color set by overlabel. 
         """
 
-        loc = self._color_locations[self._args.sys_activated_idx]
+        if self._args.sys_activated_assit_idx < 0:
+            loc = self._args.sys_color_locs[self._args.sys_activated_idx]
+
+        else:
+            loc = self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx]
 
         if loc:
             shape = self._image3c.rgb_data.shape
@@ -1159,7 +1308,12 @@ class Image(QWidget):
 
             if not (rgb == self._args.sys_color_set[self._args.sys_activated_idx].rgb).all():
                 color = Color(rgb, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
-                self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
+
+                if self._args.sys_activated_assit_idx < 0:
+                    self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
+
+                else:
+                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][2:5] = gen_assit_args(self._args.sys_color_set[self._args.sys_activated_idx], color, self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5])
 
         self.ps_color_changed.emit(True)
         # update_color_loc() is completed by 
@@ -1171,14 +1325,26 @@ class Image(QWidget):
         """
 
         for idx in range(5):
-            loc = self._color_locations[idx]
+            loc = self._args.sys_color_locs[idx]
 
             if loc:
                 shape = self._image3c.rgb_data.shape
                 rgb = self._image3c.rgb_data[int(loc[1] * (shape[0] - 1))][int(loc[0] * (shape[1] - 1))]
 
                 if not (rgb == self._args.sys_color_set[idx].rgb).all():
-                    self._color_locations[idx] = None
+                    self._args.sys_color_locs[idx] = None
+
+            for assit_idx in range(len(self._args.sys_grid_assitlocs[idx])):
+                loc = self._args.sys_assit_color_locs[idx][assit_idx]
+
+                if loc:
+                    shape = self._image3c.rgb_data.shape
+                    rgb = self._image3c.rgb_data[int(loc[1] * (shape[0] - 1))][int(loc[0] * (shape[1] - 1))]
+
+                    curr_color = gen_assit_color(self._args.sys_color_set[idx], *self._args.sys_grid_assitlocs[idx][assit_idx][2:6])
+
+                    if not (rgb == curr_color.rgb).all():
+                        self._args.sys_assit_color_locs[idx][assit_idx] = None
 
         self.update()
 
@@ -1213,7 +1379,7 @@ class Image(QWidget):
         name = "{}".format(time.strftime("Rickrack_Image_%Y_%m_%d.png", time.localtime()))
 
         cb_filter = "{} (*.png *.bmp *.jpg *.jpeg *.tif *.tiff *.webp);; {} (*.png);; {} (*.bmp);; {} (*.jpg *.jpeg);; {} (*.tif *.tiff);; {} (*.webp)".format(*self._extend_descs)
-        cb_file = QFileDialog.getSaveFileName(None, self._action_descs[2], os.sep.join((self._args.usr_image, name)), filter=cb_filter)
+        cb_file = QFileDialog.getSaveFileName(None, self._open_descs[2], os.sep.join((self._args.usr_image, name)), filter=cb_filter)
 
         if cb_file[0]:
             self._args.usr_image = os.path.dirname(os.path.abspath(cb_file[0]))
@@ -1273,6 +1439,79 @@ class Image(QWidget):
 
         box.exec_()
 
+    # ---------- ---------- ---------- Menu ---------- ---------- ---------- #
+
+    def create_menu(self):
+        """
+        Create a right clicked menu.
+        """
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_menu)
+
+        self._menu = QMenu(self)
+
+        #   _translate("Image", "Undo"), # 0
+        #   _translate("Image", "Redo"), # 1
+        self._action_undo = QAction(self)
+        self._action_undo.triggered.connect(lambda: self.ps_undo.emit(True))
+        self._menu.addAction(self._action_undo)
+
+        self._action_redo = QAction(self)
+        self._action_redo.triggered.connect(lambda: self.ps_undo.emit(False))
+        self._menu.addAction(self._action_redo)
+
+        #  _translate("Image", "Reset"), # 5
+        self._action_reset = QAction(self)
+        self._action_reset.triggered.connect(self.home)
+        self._menu.addAction(self._action_reset)
+
+        #   _translate("Image", "Open Image"), # 2
+        self._action_open_img = QAction(self)
+        self._action_open_img.triggered.connect(self.open_image_dialog)
+        self._menu.addAction(self._action_open_img)
+
+        #   _translate("Image", "Copy Image"), # 3
+        self._action_copy_img = QAction(self)
+        self._action_copy_img.triggered.connect(self.clipboard_img)
+        self._menu.addAction(self._action_copy_img)
+
+        #   _translate("Image", "Paste"), # 4
+        self._action_paste = QAction(self)
+        self._action_paste.triggered.connect(self.clipboard_in)
+        self._menu.addAction(self._action_paste)
+
+        #   _translate("Image", "Zoom In"), # 6
+        #   _translate("Image", "Zoom Out"), # 7
+        self._action_zoom_in = QAction(self)
+        self._action_zoom_in.triggered.connect(lambda: self.zoom(self._args.zoom_step, center="default"))
+        self._menu.addAction(self._action_zoom_in)
+
+        self._action_zoom_out = QAction(self)
+        self._action_zoom_out.triggered.connect(lambda: self.zoom(1 / self._args.zoom_step, center="default"))
+        self._menu.addAction(self._action_zoom_out)
+
+    def show_menu(self):
+        """
+        Show the right clicked menu.
+        """
+
+        self.update_action_text()
+
+        if self._image3c.display:
+            self._action_reset.setVisible(True)
+            self._action_copy_img.setVisible(True)
+            self._action_zoom_in.setVisible(True)
+            self._action_zoom_out.setVisible(True)
+
+        else:
+            self._action_reset.setVisible(False)
+            self._action_copy_img.setVisible(False)
+            self._action_zoom_in.setVisible(False)
+            self._action_zoom_out.setVisible(False)
+
+        self._menu.exec_(QCursor.pos())
+
     # ---------- ---------- ---------- Shortcut ---------- ---------- ---------- #
 
     def update_skey(self):
@@ -1304,10 +1543,44 @@ class Image(QWidget):
 
     # ---------- ---------- ---------- Translations ---------- ---------- ---------- #
 
+    def update_action_text(self):
+        #   _translate("Image", "Undo"), # 0
+        #   _translate("Image", "Redo"), # 1
+        self._action_undo.setText(self._action_descs[0])
+        self._action_redo.setText(self._action_descs[1])
+
+        #   _translate("Image", "Open Image"), # 2
+        self._action_open_img.setText(self._action_descs[2])
+
+        #   _translate("Image", "Copy Image"), # 3
+        self._action_copy_img.setText(self._action_descs[3])
+
+        #   _translate("Image", "Paste"), # 4
+        self._action_paste.setText(self._action_descs[4])
+
+        #  _translate("Image", "Reset"), # 5
+        self._action_reset.setText(self._action_descs[5])
+
+        #   _translate("Image", "Zoom In"), # 6
+        #   _translate("Image", "Zoom Out"), # 7
+        self._action_zoom_in.setText(self._action_descs[6])
+        self._action_zoom_out.setText(self._action_descs[7])
+
     def _func_tr_(self):
         _translate = QCoreApplication.translate
 
         self._action_descs = (
+            _translate("Wheel", "Undo"), # 0
+            _translate("Wheel", "Redo"), # 1
+            _translate("Image", "Open Image"), # 2
+            _translate("Image", "Copy Image"), # 3
+            _translate("Wheel", "Paste"), # 4
+            _translate("Board", "Reset"), # 5
+            _translate("Board", "Zoom In"), # 6
+            _translate("Board", "Zoom Out"), # 7
+        )
+
+        self._open_descs = (
             _translate("Image", "Double click here to open an image."),
             _translate("Image", "Open"),
             _translate("Image", "Print"),
