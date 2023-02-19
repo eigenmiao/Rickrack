@@ -9,7 +9,7 @@ Public License for more details.
 """
 
 __COPYRIGHT__ = """
-Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
+Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
 """
 
 __WEBSITE__ = """
@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.6.6-x2d2s2-pre
+v2.7.23-x2d3s3-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-January 8, 2023
+February 19, 2023
 """
 
 __HELP__ = """
@@ -99,16 +99,19 @@ CONSOLE OUTPUT:
   +   3     ...     ...     ...     ...       ...       ...       ...
   +   4     ...     ...     ...     ...       ...       ...       ...
   +
+  + # Full Colors
+  + ...   ...    ...    ...    ...
+  + 
   + # Color Grid ...
-  + ! ...   ...  ...
-  + ! ...   ...  ...
-  ... ...   ...  ...
+  + ...   ...    ...
+  + ...   ...    ...
+  . ...   ...    ...
 
 SERVER OUTPUT:
   The output information is provided on local server (default off).
   The information is shown like below:
   ------------------------------------
-  ... rule index ... color set ... col ... color grid ...
+  ... rule index ... color set, name ... col ... color grid, name ...
 
 EXAMPLE:
   $> Rickrack
@@ -145,9 +148,10 @@ from PyQt5.Qt import PYQT_VERSION_STR
 from PyQt5.QtGui import QIcon, QPixmap, QImage, QDesktopServices, QKeySequence, QFontDatabase
 from cguis.design.main_window import Ui_MainWindow
 from cguis.resource import view_rc
+from clibs.server import ResultServer
 from ricore.args import Args
 from ricore.color import Color
-from clibs.server import ResultServer
+from ricore.history import History
 from ricore.export import export_text
 from ricore.grid import gen_color_grid
 from ricore.check import check_is_num
@@ -354,6 +358,11 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
         self._setup_interface_style(change_pn_colors=False)
 
+        # history.
+        self._history = History(self._args)
+        self._history.backup()
+        self._setup_history()
+
     def _setup_geometry(self):
         """
         Keep window visiable when screen count changed.
@@ -454,6 +463,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         central_widget_grid_layout.addWidget(self._wget_board)
         central_widget_grid_layout.addWidget(self._wget_depot)
 
+        # assit color changed.
+        self._wget_image.ps_assit_pt_changed.connect(self._wget_wheel.change_assit_point)
+        self._wget_board.ps_assit_pt_changed.connect(self._wget_wheel.change_assit_point)
+
     def _setup_result(self):
         """
         Setup result (cube).
@@ -471,7 +484,6 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_image.ps_color_changed.connect(lambda x: self._wget_cube_table.update_color())
 
         self._wget_board.ps_index_changed.connect(lambda x: self._wget_cube_table.update_index())
-        self._wget_board.ps_value_changed.connect(lambda x: self._wget_mode.update_assitp())
         self._wget_board.ps_value_changed.connect(lambda x: self._wget_mode.update_grid_vales())
         self._wget_board.ps_color_changed.connect(lambda x: self._wget_cube_table.update_color())
 
@@ -482,6 +494,25 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
         self._wget_board.ps_linked.connect(lambda x: self._wget_cube_table.update_all())
         self._wget_depot.ps_linked.connect(lambda x: self._wget_cube_table.update_all())
+
+    def _setup_history(self):
+        """
+        Setup history.
+        """
+
+        self._wget_wheel.ps_history_backup.connect(self._inner_backup)
+        self._wget_image.ps_history_backup.connect(self._inner_backup)
+        self._wget_board.ps_history_backup.connect(self._inner_backup)
+        self._wget_depot.ps_history_backup.connect(self._inner_backup)
+        self._wget_cube_table.ps_history_backup.connect(self._inner_backup)
+
+        self._wget_operation.ps_opened.connect(self._inner_backup)
+        self._wget_operation.ps_update.connect(self._inner_backup)
+
+        self._wget_wheel.ps_undo.connect(self._inner_undo_or_redo)
+        self._wget_image.ps_undo.connect(self._inner_undo_or_redo)
+        self._wget_board.ps_undo.connect(self._inner_undo_or_redo)
+        self._wget_depot.ps_undo.connect(self._inner_undo_or_redo)
 
     def _setup_toolbar(self):
         """
@@ -747,221 +778,28 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         if os.path.isfile(os.sep.join((store_path, "set.json"))) and self._sys_argv["reset"] not in ("set", "work", "all"):
             self._wget_operation.dp_import(os.sep.join((store_path, "set.json")))
 
-    def _setup_skey(self):
+    def _inner_backup(self, accept=True):
         """
-        Set main window shortcuts.
+        Backup in history.
         """
 
-        self.actionHomepage.setShortcuts(self._args.shortcut_keymaps[0])
-        self.actionUpdate.setShortcuts(self._args.shortcut_keymaps[1])
-        self.actionAbout.setShortcuts(self._args.shortcut_keymaps[2])
-        self.actionInfo.setShortcuts(self._args.shortcut_keymaps[50])
+        self._history.backup()
+        self._wget_cube_table.update_color()
 
-        self.actionOpen.setShortcuts(self._args.shortcut_keymaps[6])
-        self.actionSave.setShortcuts(self._args.shortcut_keymaps[7])
-        self.actionImport.setShortcuts(self._args.shortcut_keymaps[8])
-        self.actionExport.setShortcuts(self._args.shortcut_keymaps[9])
+    def _inner_undo_or_redo(self, undo=True):
+        """
+        Undo or redo in history.
+        """
 
-        self.actionCreate.setShortcuts(self._args.shortcut_keymaps[10])
-        self.actionLocate.setShortcuts(self._args.shortcut_keymaps[11])
-        self.actionDerive.setShortcuts(self._args.shortcut_keymaps[12])
-        self.actionAttach.setShortcuts(self._args.shortcut_keymaps[13])
+        self._args.sys_activated_assit_idx = -1
 
-        self.actionSettings.setShortcuts(self._args.shortcut_keymaps[3])
-        self.actionAll.setShortcuts(self._args.shortcut_keymaps[49])
+        if undo:
+            self._history.undo()
+            self._wget_cube_table.update_color()
 
-        for skey in self._args.shortcut_keymaps[4]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self.close_with_verify)
-
-        for skey in self._args.shortcut_keymaps[5]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self.close_without_save)
-
-        for skey in self._args.shortcut_keymaps[14]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_cube_table.clipboard_act("rgb"))
-
-        for skey in self._args.shortcut_keymaps[15]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_cube_table.clipboard_act("hsv"))
-
-        for skey in self._args.shortcut_keymaps[16]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_cube_table.clipboard_act("hec"))
-
-        for skey in self._args.shortcut_keymaps[17]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_wheel.clipboard_all("rgb"))
-
-        for skey in self._args.shortcut_keymaps[18]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_wheel.clipboard_all("hsv"))
-
-        for skey in self._args.shortcut_keymaps[19]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_wheel.clipboard_all("hec"))
-
-        for actv_idx, skey_idx in zip(range(5), (25, 24, 23, 26, 27)):
-            for skey in self._args.shortcut_keymaps[skey_idx]:
-                if skey in self._connected_keymaps:
-                    shortcut = self._connected_keymaps[skey]
-                    shortcut.disconnect()
-
-                else:
-                    shortcut = QShortcut(QKeySequence(skey), self)
-                    self._connected_keymaps[skey] = shortcut
-
-                shortcut.activated.connect(self._wget_cube_table.active_by_num(actv_idx))
-
-        for skey in self._args.shortcut_keymaps[28]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_transformation.move_up)
-
-        for skey in self._args.shortcut_keymaps[29]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_transformation.move_down)
-
-        for skey in self._args.shortcut_keymaps[30]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_transformation.move_left)
-
-        for skey in self._args.shortcut_keymaps[31]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_transformation.move_right)
-
-        for skey in self._args.shortcut_keymaps[34]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_transformation.reset_home)
-
-        for skey in self._args.shortcut_keymaps[32]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_transformation.zoom_in)
-
-        for skey in self._args.shortcut_keymaps[33]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._wget_transformation.zoom_out)
-
-        for skey in self._args.shortcut_keymaps[48]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self._chg_win_on_top)
-
-        self._wget_wheel.update_skey()
-        self._wget_image.update_skey()
-        self._wget_board.update_skey()
-        self._wget_depot.update_skey()
+        else:
+            self._history.redo()
+            self._wget_cube_table.update_color()
 
     def _inner_modify_color(self, idx, color):
         """
@@ -970,6 +808,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
         if idx and idx in range(5):
             self._args.sys_activated_idx = int(idx)
+            self._args.sys_activated_assit_idx = -1
 
         fmt_color = Color(color, tp="hsv", overflow=self._args.sys_color_set.get_overflow())
         self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, fmt_color)
@@ -1220,6 +1059,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self._app.installTranslator(self._tr)
 
         self._func_tr_()
+        self._wget_wheel._func_tr_()
         self._wget_image._func_tr_()
         self._wget_board._func_tr_()
         self._wget_depot._func_tr_()
@@ -1585,6 +1425,16 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._save_settings_before_close = False
         self.close()
 
+    def rename(self, source, target):
+        """
+        Delete target if it exist.
+        """
+
+        if os.path.isfile(target):
+            os.remove(target)
+
+        os.rename(source, target)
+
     def save_main_settings(self):
         """
         Save settings before closing the main window.
@@ -1612,10 +1462,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 temp_hash = ""
 
                 with open(os.sep.join((store_path, "depot.json")), "rb") as frp:
-                    json_hash = hashlib.sha256(frp.read()).hexdigest()
+                    json_hash = hashlib.md5(frp.read()).hexdigest()
 
                 with open(os.sep.join((store_path, "depot.temp")), "rb") as frp:
-                    temp_hash = hashlib.sha256(frp.read()).hexdigest()
+                    temp_hash = hashlib.md5(frp.read()).hexdigest()
 
                 if json_hash != temp_hash or (not json_hash) or (not temp_hash):
                     for backup_file in os.listdir(os.sep.join((store_path, "History", "Depots"))):
@@ -1627,16 +1477,13 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
                             for i in range(self._args.max_history_files - 1):
                                 if os.path.isfile(os.sep.join((store_path, "History", "Depots", backup_file))) and backup_file[:6] == "depot_" and backup_file[-13:] == "_bak_{:0>3d}.json".format(i):
-                                    os.rename(os.sep.join((store_path, "History", "Depots", backup_file)), os.sep.join((store_path, "History", "Depots", backup_file[:-13] + "_bak_{:0>3d}.json".format(i + 1))))
+                                    self.rename(os.sep.join((store_path, "History", "Depots", backup_file)), os.sep.join((store_path, "History", "Depots", backup_file[:-13] + "_bak_{:0>3d}.json".format(i + 1))))
 
-                    os.rename(os.sep.join((store_path, "depot.json")), os.sep.join((store_path, "History", "Depots", "depot_{}_bak_000.json".format(time.strftime("%Y%m%d_%H%M%S", time.localtime())))))
-                    os.rename(os.sep.join((store_path, "depot.temp")), os.sep.join((store_path, "depot.json")))
+                    self.rename(os.sep.join((store_path, "depot.json")), os.sep.join((store_path, "History", "Depots", "depot_{}_bak_000.json".format(time.strftime("%Y%m%d_%H%M%S", time.localtime())))))
+                    self.rename(os.sep.join((store_path, "depot.temp")), os.sep.join((store_path, "depot.json")))
 
             else:
-                if os.path.isfile(os.sep.join((store_path, "depot.json"))):
-                    os.remove(os.sep.join((store_path, "depot.json")))
-
-                os.rename(os.sep.join((store_path, "depot.temp")), os.sep.join((store_path, "depot.json")))
+                self.rename(os.sep.join((store_path, "depot.temp")), os.sep.join((store_path, "depot.json")))
 
         # storing set.
         if not os.path.isdir(os.sep.join((store_path, "History", "Sets"))):
@@ -1664,7 +1511,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                     except Exception as err:
                         pass
 
-                    json_hash = hashlib.sha256(str(color_dict).encode("utf-8")).hexdigest()
+                    json_hash = hashlib.md5(str(color_dict).encode("utf-8")).hexdigest()
 
                 with open(os.sep.join((store_path, "set.temp")), "r", encoding="utf-8") as frp:
                     color_dict = {}
@@ -1678,7 +1525,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                     except Exception as err:
                         pass
 
-                    temp_hash = hashlib.sha256(str(color_dict).encode("utf-8")).hexdigest()
+                    temp_hash = hashlib.md5(str(color_dict).encode("utf-8")).hexdigest()
 
                 if json_hash != temp_hash or (not json_hash) or (not temp_hash):
                     for backup_file in os.listdir(os.sep.join((store_path, "History", "Sets"))):
@@ -1690,16 +1537,13 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
                             for i in range(self._args.max_history_files - 1):
                                 if os.path.isfile(os.sep.join((store_path, "History", "Sets", backup_file))) and backup_file[:4] == "set_" and backup_file[-13:] == "_bak_{:0>3d}.json".format(i):
-                                    os.rename(os.sep.join((store_path, "History", "Sets", backup_file)), os.sep.join((store_path, "History", "Sets", backup_file[:-13] + "_bak_{:0>3d}.json".format(i + 1))))
+                                    self.rename(os.sep.join((store_path, "History", "Sets", backup_file)), os.sep.join((store_path, "History", "Sets", backup_file[:-13] + "_bak_{:0>3d}.json".format(i + 1))))
 
-                    os.rename(os.sep.join((store_path, "set.json")), os.sep.join((store_path, "History", "Sets", "set_{}_bak_000.json".format(time.strftime("%Y%m%d_%H%M%S", time.localtime())))))
-                    os.rename(os.sep.join((store_path, "set.temp")), os.sep.join((store_path, "set.json")))
+                    self.rename(os.sep.join((store_path, "set.json")), os.sep.join((store_path, "History", "Sets", "set_{}_bak_000.json".format(time.strftime("%Y%m%d_%H%M%S", time.localtime())))))
+                    self.rename(os.sep.join((store_path, "set.temp")), os.sep.join((store_path, "set.json")))
 
             else:
-                if os.path.isfile(os.sep.join((store_path, "set.json"))):
-                    os.remove(os.sep.join((store_path, "set.json")))
-
-                os.rename(os.sep.join((store_path, "set.temp")), os.sep.join((store_path, "set.json")))
+                self.rename(os.sep.join((store_path, "set.temp")), os.sep.join((store_path, "set.json")))
 
         # delete temp files.
         for backup_file in os.listdir(store_path):
@@ -1711,6 +1555,251 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
         self._args.save_settings()
 
+    # ---------- ---------- ---------- Shortcut ---------- ---------- ---------- #
+
+    def _setup_skey(self):
+        """
+        Set main window shortcuts.
+        """
+
+        self.actionHomepage.setShortcuts(self._args.shortcut_keymaps[0])
+        self.actionUpdate.setShortcuts(self._args.shortcut_keymaps[1])
+        self.actionAbout.setShortcuts(self._args.shortcut_keymaps[2])
+        self.actionInfo.setShortcuts(self._args.shortcut_keymaps[50])
+
+        self.actionOpen.setShortcuts(self._args.shortcut_keymaps[6])
+        self.actionSave.setShortcuts(self._args.shortcut_keymaps[7])
+        self.actionImport.setShortcuts(self._args.shortcut_keymaps[8])
+        self.actionExport.setShortcuts(self._args.shortcut_keymaps[9])
+
+        self.actionCreate.setShortcuts(self._args.shortcut_keymaps[10])
+        self.actionLocate.setShortcuts(self._args.shortcut_keymaps[11])
+        self.actionDerive.setShortcuts(self._args.shortcut_keymaps[12])
+        self.actionAttach.setShortcuts(self._args.shortcut_keymaps[13])
+
+        self.actionWheel.setShortcuts(self._args.shortcut_keymaps[52])
+        self.actionImage.setShortcuts(self._args.shortcut_keymaps[53])
+        self.actionBoard.setShortcuts(self._args.shortcut_keymaps[54])
+        self.actionDepot.setShortcuts(self._args.shortcut_keymaps[55])
+
+        self.actionSettings.setShortcuts(self._args.shortcut_keymaps[3])
+        self.actionAll.setShortcuts(self._args.shortcut_keymaps[49])
+
+        for skey in self._args.shortcut_keymaps[4]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self.close_with_verify)
+
+        for skey in self._args.shortcut_keymaps[5]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self.close_without_save)
+
+        for skey in self._args.shortcut_keymaps[14]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_cube_table.clipboard_act("rgb"))
+
+        for skey in self._args.shortcut_keymaps[15]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_cube_table.clipboard_act("hsv"))
+
+        for skey in self._args.shortcut_keymaps[16]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_cube_table.clipboard_act("hec"))
+
+        for skey in self._args.shortcut_keymaps[17]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_wheel.clipboard_all("rgb"))
+
+        for skey in self._args.shortcut_keymaps[18]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_wheel.clipboard_all("hsv"))
+
+        for skey in self._args.shortcut_keymaps[19]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_wheel.clipboard_all("hec"))
+
+        for actv_idx, skey_idx in zip(range(5), (25, 24, 23, 26, 27)):
+            for skey in self._args.shortcut_keymaps[skey_idx]:
+                if skey in self._connected_keymaps:
+                    shortcut = self._connected_keymaps[skey]
+                    shortcut.disconnect()
+
+                else:
+                    shortcut = QShortcut(QKeySequence(skey), self)
+                    self._connected_keymaps[skey] = shortcut
+
+                shortcut.activated.connect(self._wget_cube_table.active_by_num(actv_idx))
+
+        for skey in self._args.shortcut_keymaps[28]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_transformation.move_up)
+
+        for skey in self._args.shortcut_keymaps[29]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_transformation.move_down)
+
+        for skey in self._args.shortcut_keymaps[30]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_transformation.move_left)
+
+        for skey in self._args.shortcut_keymaps[31]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_transformation.move_right)
+
+        for skey in self._args.shortcut_keymaps[34]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_transformation.reset_home)
+
+        for skey in self._args.shortcut_keymaps[32]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_transformation.zoom_in)
+
+        for skey in self._args.shortcut_keymaps[33]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._wget_transformation.zoom_out)
+
+        for skey in self._args.shortcut_keymaps[48]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self._chg_win_on_top)
+
+        for skey in self._args.shortcut_keymaps[47]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(lambda: self._inner_undo_or_redo(True))
+
+        for skey in self._args.shortcut_keymaps[56]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(lambda: self._inner_undo_or_redo(False))
+
+        self._wget_wheel.update_skey()
+        self._wget_image.update_skey()
+        self._wget_board.update_skey()
+        self._wget_depot.update_skey()
+
     # ---------- ---------- ---------- Event Funcs ---------- ---------- ---------- #
 
     def closeEvent(self, event):
@@ -1721,27 +1810,17 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         if self._sys_argv["output"]:
             self._wget_operation.dp_export(self._sys_argv["output"], True)
 
-        for line in export_text([(self._args.sys_color_set, self._args.hm_rule, "Console Results", "", (time.time(), time.time())),]).split("\n"):
-            if line:
+        result_text = export_text([(self._args.sys_color_set, self._args.hm_rule, "Console Results", "", (time.time(), time.time()), self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values),])
+
+        for line in result_text.split("\n"):
+            if line and len(line) > 3:
                 if line[2] in [str(i) for i in range(10)] and int(line[2]) == self._args.sys_activated_idx:
                     print("+ *{}".format(line[1:]))
 
                 else:
                     print("+ {}".format(line))
-
-        print("+\n+ # Color Grid ...")
-
-        color_grid = gen_color_grid(self._args.sys_color_set, self._args.sys_grid_locations, self._args.sys_grid_assitlocs, grid_list=self._args.sys_grid_list, **self._args.sys_grid_values)
-
-        for color_line in color_grid:
-            grid_line = []
-
-            for color in color_line:
-                grid_line.append(Color.rgb2hec(color))
-
-            print("+ ! " + " ".join(grid_line))
-
-        print("+ !\n+\n")
+            else:
+                print("+")
 
         if self._save_settings_before_close and not self._sys_argv["temporary"]:
             self.save_main_settings()

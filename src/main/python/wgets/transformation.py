@@ -222,6 +222,9 @@ class Transformation(QWidget):
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 3, 4, 1, 1)
 
+        """
+        -> Tag: This segment is deleted.
+
         # replace functional region.
         self._replace_gbox = QGroupBox(scroll_contents)
         gbox_grid_layout = QGridLayout(self._replace_gbox)
@@ -264,6 +267,7 @@ class Transformation(QWidget):
         gbox_grid_layout.addItem(spacer, 7, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 7, 4, 1, 1)
+        """
 
         # cover functional region.
         self._cover_gbox = QGroupBox(scroll_contents)
@@ -463,17 +467,7 @@ class Transformation(QWidget):
         self.sdt_sepr_ehs.set_text(self._enhance_descs[1])
         self.sdt_fact_ehs.set_text(self._enhance_descs[2])
         self.sdt_extd_ehs.set_text(self._enhance_descs[6])
-        self.sdt_extd_rep.set_text(self._enhance_descs[6])
-        self.sdt_scal_rep.set_text(self._enhance_descs[7])
-
         self.ckb_ubox_ehs.setText(self._enhance_descs[10])
-        self.ckb_uold_rep.setText(self._replace_descs[3])
-
-        self._replace_gbox.setTitle(self._gbox_descs[2])
-        self.ckb_reserve_rep.setText(self._enhance_descs[3])
-        self.btn_replace_rgb.setText(self._replace_descs[0])
-        self.btn_replace_hsv.setText(self._replace_descs[1])
-        self.btn_replace_cancel.setText(self._replace_descs[2])
 
         self._enhance_gbox.setTitle(self._gbox_descs[3])
         self.rhc_ehs.set_prefix_text((self._enhance_descs[0], self._enhance_descs[9]))

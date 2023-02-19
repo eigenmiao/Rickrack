@@ -200,7 +200,7 @@ class Operation(QWidget):
         if "version" in color_dict:
             vid = self._args.check_version_d(color_dict["version"])
 
-            if vid == 0 or vid > 2:
+            if vid == 0 or vid > 3:
                 self.warning(self._operation_errs[3])
                 return
 
@@ -563,7 +563,7 @@ class Operation(QWidget):
         if "version" in color_dict:
             vid = self._args.check_version_s(color_dict["version"])
 
-            if vid == 0 or vid > 2:
+            if vid == 0 or vid > 3:
                 self.warning(self._operation_errs[3])
                 return
 
@@ -684,11 +684,14 @@ class Operation(QWidget):
 
                 else:
                     self._args.hm_rule = color_dict["rule"]
-                    self._args.sys_color_set.import_color_set(color_set)
+                    self._args.sys_color_set.recover(color_set)
                     self._args.sys_grid_locations = grid_locations
                     self._args.sys_grid_assitlocs = grid_assitlocs
                     self._args.sys_grid_list = grid_list
                     self._args.sys_grid_values = grid_values
+
+                    self._args.sys_activated_assit_idx = -1
+                    self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs] for i in range(5)]
 
             else:
                 self.warning(self._operation_errs[8] + "\n{}\n{}".format(self._operation_errs[17], color_dict["rule"]))

@@ -87,6 +87,9 @@ class Mode(QWidget):
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
 
+        """
+        -> Tag: This segment is deleted.
+
         # assistant functional region.
         self._assistp_gbox = QGroupBox(scroll_contents)
         gbox_grid_layout = QGridLayout(self._assistp_gbox)
@@ -109,6 +112,7 @@ class Mode(QWidget):
         gbox_grid_layout.addItem(spacer, 2, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
+        """
 
         # grid functional region.
         self._gridvls_gbox = QGroupBox(scroll_contents)
@@ -200,87 +204,11 @@ class Mode(QWidget):
         self.sdt_assist_factor.set_value(self._args.sys_grid_values["assist_factor"])
         self.ckb_rev_grid.setChecked(self._args.sys_grid_values["rev_grid"])
 
-    def update_assitp(self):
-        """
-        Update local assistant cbox value from fake_current_assitp.
-        Opposite function to emit_assistp.
-        """
-
-        if self._args.sys_grid_assitlocs[self._args.sys_activated_idx]:
-            cur_assitp_name, cur_assitp_value = self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][2:]
-
-        else:
-            cur_assitp_name, cur_assitp_value = "h", 0.0
-
-        self.rhc_covalue.set_values(cur_assitp_name)
-
-        if cur_assitp_name in ("r", "g", "b"):
-            if self.sdt_covalue.get_num_range != (-255.0, 255.0):
-                self.sdt_covalue.set_num_range((-255.0, 255.0))
-
-            self.sdt_covalue.set_value(cur_assitp_value)
-
-        elif cur_assitp_name in ("s", "v"):
-            if self.sdt_covalue.get_num_range != (-1.0, 1.0):
-                self.sdt_covalue.set_num_range((-1.0, 1.0))
-
-            self.sdt_covalue.set_value(cur_assitp_value)
-
-        else:
-            if self.sdt_covalue.get_num_range != (-360.0, 360.0):
-                self.sdt_covalue.set_num_range((-360.0, 360.0))
-
-            self.sdt_covalue.set_value(cur_assitp_value)
-
-    def emit_assistp(self, value):
-        """
-        Emit assistant info and write fake_current_assitp from local assistant cbox value.
-        Opposite function to update_assitp.
-        """
-
-        emit_name = self.rhc_covalue.get_values()
-
-        if emit_name:
-            emit_name = emit_name[0]
-
-        else:
-            return
-
-        emit_value = 0
-
-        if emit_name in ("r", "g", "b"):
-            if self.sdt_covalue.get_num_range != (-255.0, 255.0):
-                self.sdt_covalue.set_num_range((-255.0, 255.0))
-
-            emit_value = int(self.sdt_covalue.get_value())
-
-        elif emit_name in ("s", "v"):
-            if self.sdt_covalue.get_num_range != (-1.0, 1.0):
-                self.sdt_covalue.set_num_range((-1.0, 1.0))
-
-            emit_value = self.sdt_covalue.get_value()
-
-        else:
-            if self.sdt_covalue.get_num_range != (-360.0, 360.0):
-                self.sdt_covalue.set_num_range((-360.0, 360.0))
-
-            emit_value = self.sdt_covalue.get_value()
-
-        if self._args.sys_grid_assitlocs[self._args.sys_activated_idx]:
-            self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][2] = emit_name
-            self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][3] = emit_value
-
-            self.ps_assistp_changed.emit(True)
-
     # ---------- ---------- ---------- Translations ---------- ---------- ---------- #
 
     def update_text(self):
         self._display_gbox.setTitle(self._gbox_descs[0])
-        self._assistp_gbox.setTitle(self._gbox_descs[1])
         self._gridvls_gbox.setTitle(self._gbox_descs[2])
-
-        self.rhc_covalue.set_prefix_text((self._assistp_descs[0], self._assistp_descs[1]))
-        self.sdt_covalue.set_text(self._assistp_descs[2])
 
         self.rhc_govalue.set_prefix_text((self._assistp_descs[0], self._assistp_descs[1]))
         self.sdt_col.set_text(self._assistp_descs[3])
@@ -290,7 +218,6 @@ class Mode(QWidget):
         self.ckb_rev_grid.setText(self._assistp_descs[7])
 
         self.update_mode()
-        self.update_assitp()
 
     def _func_tr_(self):
         _translate = QCoreApplication.translate

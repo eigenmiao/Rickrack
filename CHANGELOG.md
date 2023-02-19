@@ -25,3 +25,21 @@
 2. Add waiting times for starting and closing software in Rickrack module.
 3. Add demo for Rickrack module.
 4. Update repository images.
+
+# v2.7.23-pre
+* Date: February 19, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.23-pre
+* Comments:
+1. Fix empty argv bug in Rickrack module.
+2. Add assistant colors in wheel, image and board views.
+3. Add assistant colors in result cube.
+4. There are two kinds of assistant points: relative point (keep relative position with the main color, without a dot in the tag) and referenced point (keep the absoluate position, with a small dot in the tag).
+5. Add transformation between dynamic board and assistant color list.
+6. Add action menu in wheel, image, board and depot views.
+7. Add undo and redo methods.
+8. Add history points in operation, clipboard places.
+9. Add history step in settings dialog.
+10. Add assit colors in export files.
+11. Upgrade file version into x2d3s3.
+12. Update data in rickrack.py.
+13. Fix undo bug.

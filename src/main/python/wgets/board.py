@@ -23,8 +23,8 @@ from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QPoint, QMimeData, QU
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag
 from cguis.design.box_dialog import Ui_BoxDialog
 from ricore.color import Color
-from ricore.transpt import get_outer_box, get_link_tag
-from ricore.grid import gen_color_grid, norm_grid_locations, norm_grid_values, snap_point
+from ricore.transpt import get_outer_box, get_link_tag, rotate_point
+from ricore.grid import gen_color_grid, norm_grid_locations, norm_grid_values, snap_point, gen_assit_color
 from ricore.export import export_list
 
 
@@ -170,6 +170,8 @@ class ColorBox(QDialog, Ui_BoxDialog):
                 self._args.sys_grid_list[0].insert(idx, hec_color)
                 self._args.sys_grid_list[1].insert(idx, name)
 
+        self.ps_value_changed.emit(True)
+
     def update_values(self):
         """
         For button apply.
@@ -177,8 +179,6 @@ class ColorBox(QDialog, Ui_BoxDialog):
 
         self.application()
         self.set_context(self._init_idx)
-
-        self.ps_value_changed.emit(True)
 
     def reset_values(self):
         """
@@ -339,6 +339,9 @@ class Board(QWidget):
     ps_status_changed = pyqtSignal(tuple)
     ps_dropped = pyqtSignal(tuple)
     ps_linked = pyqtSignal(bool)
+    ps_assit_pt_changed = pyqtSignal(bool)
+    ps_history_backup = pyqtSignal(bool)
+    ps_undo = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -357,7 +360,6 @@ class Board(QWidget):
         self._moving_assitp = False
         self._last_moving = 0 # 0 for moving_maintp just now, 1 for moving_assitp just now.
         self._color_grid = []
-        self._withdraw_grid_list = [[], []]
         self._selecting_idx = -1
         self._last_selecting_idx = -1
         self._connected_keymaps = {}
@@ -377,6 +379,7 @@ class Board(QWidget):
         self._last_tool_tip_label = QLabel(self)
         self._color_box = ColorBox(self, self._args)
         self._color_box.ps_value_changed.connect(self.update)
+        self._color_box.ps_value_changed.connect(lambda: self.ps_history_backup.emit(True))
 
         self.create_menu()
         self.update_text()
@@ -387,6 +390,11 @@ class Board(QWidget):
     # ---------- ---------- ---------- Paint Funcs ---------- ---------- ---------- #
 
     def paintEvent(self, event):
+        # norm assit point index.
+        if self._args.sys_activated_assit_idx > len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]):
+            self._args.sys_activated_assit_idx = -1
+            self.ps_color_changed()
+
         if self._args.sys_grid_list[0] and self._show_points:
             self._show_points = False
 
@@ -459,35 +467,30 @@ class Board(QWidget):
                 pt_xy = np.array((self._args.sys_grid_locations[idx][0] * self._cs_wid + self._cs_box[0], self._args.sys_grid_locations[idx][1] * self._cs_wid + self._cs_box[1]))
                 pt_rgb = self._args.sys_color_set[idx].rgb
 
+                # assit sequence. this code is reused in four places.
+                assit_idx_seq = list(range(len(self._args.sys_grid_assitlocs[idx])))
+                if idx == self._args.sys_activated_idx and self._args.sys_activated_assit_idx >= 0:
+                    assit_idx_seq = assit_idx_seq[self._args.sys_activated_assit_idx + 1: ] + assit_idx_seq[: self._args.sys_activated_assit_idx + 1]
+
                 # assistant points.
-                for assit_idx in range(len(self._args.sys_grid_assitlocs[idx]))[::-1]:
-                    if self._show_points:
-                        if idx == self._args.sys_activated_idx and assit_idx == 0:
-                            painter.setPen(QPen(QColor(*self._args.positive_color), self._args.negative_wid, Qt.PenStyle(Qt.DashLine)))
-
-                        else:
-                            painter.setPen(QPen(QColor(*self._args.negative_color), self._args.negative_wid, Qt.PenStyle(Qt.DashLine)))
-
-                    else:
-                        painter.setPen(QPen(Qt.white, self._args.negative_wid, Qt.PenStyle(Qt.DashLine)))
-
+                for assit_idx in assit_idx_seq:
                     assit_pt = pt_xy + np.array(self._args.sys_grid_assitlocs[idx][assit_idx][0:2]) * self._cs_wid
                     assit_box = get_outer_box(assit_pt, self._args.circle_dist)
-
-                    painter.drawLine(QPoint(*pt_xy), QPoint(*assit_pt))
+                    assit_frame_color = (255, 255, 255)
 
                     if self._show_points:
-                        if idx == self._args.sys_activated_idx and assit_idx == 0:
-                            painter.setPen(QPen(QColor(*self._args.positive_color), self._args.positive_wid))
+                        if idx == self._args.sys_activated_idx and assit_idx == self._args.sys_activated_assit_idx:
+                            assit_frame_color = self._args.positive_color
 
                         else:
-                            painter.setPen(QPen(QColor(*self._args.negative_color), self._args.negative_wid))
+                            assit_frame_color = self._args.negative_color
 
-                    else:
-                        painter.setPen(QPen(Qt.white, self._args.negative_wid))
+                    painter.setPen(QPen(QColor(*assit_frame_color), self._args.negative_wid, Qt.PenStyle(Qt.DashLine)))
+                    painter.drawLine(QPoint(*pt_xy), QPoint(*assit_pt))
 
-                    assit_color = Color(self._args.sys_color_set[idx])
-                    assit_color.setti(assit_color.getti(self._args.sys_grid_assitlocs[idx][assit_idx][2]) + self._args.sys_grid_assitlocs[idx][assit_idx][3], self._args.sys_grid_assitlocs[idx][assit_idx][2])
+                    painter.setPen(QPen(QColor(*assit_frame_color), self._args.negative_wid))
+
+                    assit_color = gen_assit_color(self._args.sys_color_set[idx], *self._args.sys_grid_assitlocs[idx][assit_idx][2:6])
                     assit_color = assit_color.rgb
 
                     if self._show_points:
@@ -497,6 +500,13 @@ class Board(QWidget):
                         painter.setBrush(QBrush(Qt.NoBrush))
 
                     painter.drawEllipse(*assit_box)
+
+                    # relative (move-able) or ref (un-move-able) point tag. assit dot box.
+                    if not self._args.sys_grid_assitlocs[idx][assit_idx][5]:
+                        dot_box = get_outer_box(assit_pt, self._args.negative_wid * 2 / 3)
+                        painter.setPen(QPen(Qt.NoPen))
+                        painter.setBrush(QBrush(QColor(*assit_frame_color)))
+                        painter.drawEllipse(*dot_box)
 
                 # main points.
                 pt_box = get_outer_box(pt_xy, self._args.circle_dist + (self._args.positive_wid + self._args.negative_wid) * 2)
@@ -559,7 +569,13 @@ class Board(QWidget):
 
         elif event.key() == Qt.Key_Alt:
             self._press_key = 4
-            self.setCursor(QCursor(Qt.PointingHandCursor))
+
+            if self._args.sys_grid_list[0]:
+                self.setCursor(QCursor(Qt.PointingHandCursor))
+
+            else:
+                self.setCursor(QCursor(Qt.ArrowCursor))
+
             event.accept()
 
         else:
@@ -597,22 +613,18 @@ class Board(QWidget):
                     # self.update()
                     # is completed by self.insert_point()
 
-            elif self._show_points:
-                loc = [(point[0] - self._cs_box[0]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][0], (point[1] - self._cs_box[1]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][1]]
-                loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
-                loc[0] = -1.0 if loc[0] < -1.0 else loc[0]
-                loc[0] =  1.0 if loc[0] >  1.0 else loc[0]
-                loc[1] = -1.0 if loc[1] < -1.0 else loc[1]
-                loc[1] =  1.0 if loc[1] >  1.0 else loc[1]
+            elif self._show_points and self._args.sys_activated_assit_idx >= 0:
+                pt_xy = np.array((self._args.sys_grid_locations[self._args.sys_activated_idx][0] * self._cs_wid + self._cs_box[0], self._args.sys_grid_locations[self._args.sys_activated_idx][1] * self._cs_wid + self._cs_box[1]))
+                assit_pt = pt_xy + np.array(self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][0:2]) * self._cs_wid
 
-                self._args.sys_grid_assitlocs[self._args.sys_activated_idx] = [[loc[0], loc[1], "h", 0.0],] + self._args.sys_grid_assitlocs[self._args.sys_activated_idx]
-                self._moving_assitp = True
+                if np.linalg.norm(point - assit_pt) < self._args.circle_dist:
+                    self.ps_assit_pt_changed.emit(not self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5])
+                    self.ps_color_changed.emit(True)
+                    event.accept()
 
-                self.ps_value_changed.emit(True)
+                else:
+                    event.ignore()
 
-                # not use self.insert_point()
-
-                event.accept()
                 self.update()
 
             else:
@@ -651,6 +663,28 @@ class Board(QWidget):
 
             event.accept()
 
+        elif self._press_key == 2 and event.button() == Qt.LeftButton:
+            if (not self._args.sys_grid_list[0]) and self._show_points:
+                loc = [(point[0] - self._cs_box[0]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][0], (point[1] - self._cs_box[1]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][1]]
+                loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
+                loc[0] = -1.0 if loc[0] < -1.0 else loc[0]
+                loc[0] =  1.0 if loc[0] >  1.0 else loc[0]
+                loc[1] = -1.0 if loc[1] < -1.0 else loc[1]
+                loc[1] =  1.0 if loc[1] >  1.0 else loc[1]
+
+                self._args.sys_activated_assit_idx = len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx])
+                self._args.sys_grid_assitlocs[self._args.sys_activated_idx].append([loc[0], loc[1], 15, 0.0, 0.0, True])
+                self._args.sys_assit_color_locs[self._args.sys_activated_idx].append(None)
+
+                self._moving_assitp = True
+
+                self.ps_value_changed.emit(True)
+
+                # not use self.insert_point()
+
+                event.accept()
+                self.update()
+
         elif self._args.sys_grid_list[0] and self._cs_box[0] < point[0] < self._cs_box[0] + self._cs_box[2] and self._cs_box[1] < point[1] < self._cs_box[1] + self._cs_box[3]:
             sel_wid = 1.0 / self._args.sys_grid_values["col"] * self._cs_wid
             press_idx = int((point[1] - self._cs_box[1]) / sel_wid) * self._args.sys_grid_values["col"] + int((point[0] - self._cs_box[0]) / sel_wid)
@@ -669,30 +703,29 @@ class Board(QWidget):
             already_accept_assi = False
 
             for idx in range(5):
-                for assit_idx in range(len(self._args.sys_grid_assitlocs[idx])):
-                    if np.linalg.norm(point - np.array((self._cs_box[0], self._cs_box[1])) - (np.array(self._args.sys_grid_locations[idx]) + np.array(self._args.sys_grid_assitlocs[idx][assit_idx][0:2])) * self._cs_wid) < self._args.circle_dist:
-                        if self._args.sys_activated_idx != idx:
-                            self._args.sys_activated_idx = idx
-                            self.ps_index_changed.emit(True)
-
-                        if assit_idx != 0:
-                            self._args.sys_grid_assitlocs[idx] = self._args.sys_grid_assitlocs[idx][assit_idx:] + self._args.sys_grid_assitlocs[idx][:assit_idx]
-                            self.ps_value_changed.emit(True)
-
-                        already_accept_assi = True
-
-                        break
-
                 if np.linalg.norm(point - np.array((self._cs_box[0], self._cs_box[1])) - np.array(self._args.sys_grid_locations[idx]) * self._cs_wid) < self._args.circle_dist + (self._args.positive_wid + self._args.negative_wid) * 2:
-                    if self._args.sys_activated_idx != idx:
-                        self._args.sys_activated_idx = idx
-                        self.ps_index_changed.emit(True)
+                    self._args.sys_activated_idx = idx
+                    self._args.sys_activated_assit_idx = -1
 
+                    self.ps_index_changed.emit(True)
                     already_accept_main = True
 
+                else:
+                    for assit_idx in range(len(self._args.sys_grid_assitlocs[idx]))[::-1]:
+                        if np.linalg.norm(point - np.array((self._cs_box[0], self._cs_box[1])) - (np.array(self._args.sys_grid_locations[idx]) + np.array(self._args.sys_grid_assitlocs[idx][assit_idx][0:2])) * self._cs_wid) < self._args.circle_dist:
+                            self._args.sys_activated_idx = idx
+                            self._args.sys_activated_assit_idx = assit_idx
+
+                            self.ps_index_changed.emit(True)
+                            already_accept_assi = True
+
+                            break
+
+                if already_accept_main or already_accept_assi:
                     break
 
             if event.button() == Qt.LeftButton:
+                # main points.
                 if (self._args.press_move and not self._last_moving and not already_accept_assi and self._cs_box[0] < point[0] < self._cs_box[0] + self._cs_box[2] and self._cs_box[1] < point[1] < self._cs_box[1] + self._cs_box[3]) or already_accept_main:
                     loc = [(point[0] - self._cs_box[0]) / self._cs_wid, (point[1] - self._cs_box[1]) / self._cs_wid]
                     loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
@@ -709,6 +742,7 @@ class Board(QWidget):
                     event.accept()
                     self.update()
 
+                # assit points.
                 elif self._args.sys_grid_assitlocs[self._args.sys_activated_idx] and (self._args.press_move and self._last_moving and not already_accept_main and self._cs_box[0] < point[0] < self._cs_box[0] + self._cs_box[2] and self._cs_box[1] < point[1] < self._cs_box[1] + self._cs_box[3]) or already_accept_assi:
                     loc = [(point[0] - self._cs_box[0]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][0], (point[1] - self._cs_box[1]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][1]]
                     loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
@@ -717,8 +751,8 @@ class Board(QWidget):
                     loc[1] = -1.0 if loc[1] < -1.0 else loc[1]
                     loc[1] =  1.0 if loc[1] >  1.0 else loc[1]
 
-                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][0] = loc[0]
-                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][1] = loc[1]
+                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][0] = loc[0]
+                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][1] = loc[1]
 
                     self._moving_assitp = True
                     self._last_moving = 1
@@ -749,8 +783,8 @@ class Board(QWidget):
             loc[1] = -1.0 if loc[1] < -1.0 else loc[1]
             loc[1] =  1.0 if loc[1] >  1.0 else loc[1]
 
-            self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][0] = loc[0]
-            self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][1] = loc[1]
+            self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][0] = loc[0]
+            self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][1] = loc[1]
 
             event.accept()
             self.update()
@@ -776,6 +810,9 @@ class Board(QWidget):
     def mouseReleaseEvent(self, event):
         self._moving_maintp = False
         self._moving_assitp = False
+
+        if event.button() == Qt.LeftButton:
+            self.ps_history_backup.emit(True)
 
         event.ignore()
 
@@ -937,6 +974,7 @@ class Board(QWidget):
                 self._args.sys_grid_values["col"] = int(self._args.sys_grid_values["col"] - 1)
 
         self.ps_value_changed.emit(True)
+        self.ps_history_backup.emit(True)
 
         self.update()
 
@@ -960,70 +998,7 @@ class Board(QWidget):
         # set_context into info window, thus can change the info dynamically. (recovered)
         # similar to clone_cell in activate_idx in depot.py.
         self._color_box.set_context(self._selecting_idx)
-
-    def create_menu(self):
-        """
-        Create a right clicked menu.
-        """
-
-        self.setContextMenuPolicy(Qt.CustomContextMenu)
-        self.customContextMenuRequested.connect(self.show_menu)
-
-        self._menu = QMenu(self)
-
-        self._action_insert = QAction(self)
-        self._action_insert.triggered.connect(self.insert_point)
-        self._menu.addAction(self._action_insert)
-
-        self._action_switch = QAction(self)
-        self._action_switch.triggered.connect(self.switch_point)
-        self._menu.addAction(self._action_switch)
-
-        self._action_delete = QAction(self)
-        self._action_delete.triggered.connect(self.confirm_delete_point)
-        self._menu.addAction(self._action_delete)
-
-        self._action_detail = QAction(self)
-        self._action_detail.triggered.connect(self.detail_point)
-        self._menu.addAction(self._action_detail)
-
-    def show_menu(self):
-        """
-        Show the right clicked menu.
-        """
-
-        if self._args.sys_grid_list[0]:
-            if self._selecting_idx < 0 or self._selecting_idx > len(self._args.sys_grid_list[0]):
-                self._action_insert.setDisabled(True)
-                self._action_switch.setDisabled(True)
-                self._action_delete.setDisabled(True)
-                self._action_detail.setDisabled(True)
-
-            elif self._selecting_idx < len(self._args.sys_grid_list[0]):
-                self._action_insert.setDisabled(False)
-                self._action_switch.setDisabled(False)
-                self._action_delete.setDisabled(False)
-                self._action_detail.setDisabled(False)
-
-            else:
-                self._action_insert.setDisabled(False)
-                self._action_switch.setDisabled(True)
-                self._action_delete.setDisabled(True)
-                self._action_detail.setDisabled(True)
-
-        elif self._show_points:
-            self._action_insert.setDisabled(False)
-            self._action_switch.setDisabled(True)
-            self._action_delete.setDisabled(False)
-            self._action_detail.setDisabled(True)
-
-        else:
-            self._action_insert.setDisabled(True)
-            self._action_switch.setDisabled(True)
-            self._action_delete.setDisabled(True)
-            self._action_detail.setDisabled(True)
-
-        self._menu.exec_(QCursor.pos())
+        self.ps_history_backup.emit(True)
 
     def show_or_hide_points(self):
         """
@@ -1040,7 +1015,7 @@ class Board(QWidget):
 
     def clear_or_gen_grid_list(self):
         """
-        Clear fixed grid list and generate a dynamic grid by color set, or reverse.
+        Dynamic board <-> Grid list according to the dynamic board.
         """
 
         if not self.isVisible():
@@ -1056,7 +1031,6 @@ class Board(QWidget):
         # clean or gen.
         if self._args.sys_grid_list[0]:
             self._show_points = True
-            self._withdraw_grid_list = list(self._args.sys_grid_list)
             self._args.sys_grid_list = [[], []]
 
         else:
@@ -1071,6 +1045,61 @@ class Board(QWidget):
                     grid_list[0].append(Color.rgb2hec(color_grid[i][j]))
 
             self._args.sys_grid_list = grid_list
+
+        self._selecting_idx = -1
+        self._last_selecting_idx = -1
+        self.ps_history_backup.emit(True)
+
+        self.update()
+
+    def clear_or_gen_assit_color_list(self):
+        """
+        Dynamic board <-> Assit color list.
+        """
+
+        if not self.isVisible():
+            return
+
+        if self._color_box.isVisible():
+            return
+
+        # unlink colors.
+        self._args.sys_link_colors[0] = False
+        self.ps_linked.emit(True)
+
+        # clean or gen.
+        if self._args.sys_grid_list[0]:
+            self._show_points = True
+            self._args.sys_grid_list = [[], []]
+
+        else:
+            self._show_points = False
+
+            grid_list = [[], []]
+
+            # generate full colors. this code is reused.
+            for idx in (2, 1, 0, 3, 4):
+                grid_list[0].append(self._args.sys_color_set[idx].hec)
+                grid_list[1].append(self._color_descs[0] + " {}".format(idx))
+
+            grid_list[0].append("FFFFFF")
+            grid_list[1].append("")
+
+            for idx in (2, 1, 0, 3, 4):
+                grid_list[0].append(self._args.sys_color_set[idx].hec)
+                grid_list[1].append(self._color_descs[0] + " {}".format(idx))
+
+                for assit_idx in range(len(self._args.sys_grid_assitlocs[idx])):
+                    assit_color = gen_assit_color(self._args.sys_color_set[idx], *self._args.sys_grid_assitlocs[idx][assit_idx][2:6])
+
+                    grid_list[0].append(assit_color.hec)
+                    grid_list[1].append(self._color_descs[1] + " {}-{}".format(idx, assit_idx))
+
+            self._args.sys_grid_list = grid_list
+
+        self._selecting_idx = -1
+        self._last_selecting_idx = -1
+        self.ps_history_backup.emit(True)
 
         self.update()
 
@@ -1089,9 +1118,84 @@ class Board(QWidget):
 
         return name
 
-    def insert_point(self):
+    def act_append_color_box(self):
+        """
+        Append a color box at end.
+        """
+
+        if not self.isVisible():
+            return
+
+        if self._args.sys_grid_list[0]:
+            self._args.sys_grid_list[0].append(self._args.sys_color_set[self._args.sys_activated_idx].hec)
+            self._args.sys_grid_list[1].append("")
+
+            self.update_select_idx()
+
+    def act_append_beside_color_box(self):
+        """
+        Append a color box beside.
+        """
+
+        if not self.isVisible():
+            return
+
+        if self._args.sys_grid_list[0] and self._selecting_idx < len(self._args.sys_grid_list[0]):
+            self._args.sys_grid_list[0] = self._args.sys_grid_list[0][:self._selecting_idx] + [self._args.sys_color_set[self._args.sys_activated_idx].hec,] + self._args.sys_grid_list[0][self._selecting_idx:]
+            self._args.sys_grid_list[1] = self._args.sys_grid_list[1][:self._selecting_idx] + ["",] + self._args.sys_grid_list[1][self._selecting_idx:]
+
+            self.update_select_idx()
+
+    def act_rev_insert_color_box(self):
+        """
+        Insert the result color into a color box.
+        """
+
+        if not self.isVisible():
+            return
+
+        if self._args.sys_grid_list[0] and self._selecting_idx < len(self._args.sys_grid_list[0]):
+            self._args.sys_grid_list[0][self._selecting_idx] = self._args.sys_color_set[self._args.sys_activated_idx].hec
+
+            self.update_select_idx()
+
+    def act_insert_color_box(self):
+        """
+        Insert the color in a color box into the result.
+        """
+
+        if not self.isVisible():
+            return
+
+        if self._args.sys_grid_list[0] and self._selecting_idx < len(self._args.sys_grid_list[0]):
+            color = Color(self._args.sys_grid_list[0][self._selecting_idx], tp="hec", overflow=self._args.sys_color_set.get_overflow())
+            self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
+
+            self.ps_color_changed.emit(True)
+
+            self.update_select_idx()
+
+    def link_point(self, link):
+        """
+        Link point with result.
+
+        Args:
+            link (bool): whether linked.
+        """
+
+        if not self.isVisible():
+            return
+
+        if self._args.sys_grid_list[0] and self._selecting_idx < len(self._args.sys_grid_list[0]):
+            self._args.sys_link_colors[0] = bool(link)
+            self.ps_linked.emit(True)
+
+    def insert_point(self, insert_pt_beside=False):
         """
         Insert a point into assistant list (dynamic view) or grid list (fixed view) without updating color type and value.
+
+        Args:
+            insert_pt_beside (bool): whether append a color beside the selected color box. 
         """
 
         if not self.isVisible():
@@ -1100,59 +1204,35 @@ class Board(QWidget):
         if self._args.sys_grid_list[0]:
             if self._selecting_idx < self._args.sys_grid_values["col"] ** 2:
                 if self._selecting_idx >= len(self._args.sys_grid_list[0]):
-                    self._args.sys_grid_list[0].append(self._args.sys_color_set[self._args.sys_activated_idx].hec)
-                    self._args.sys_grid_list[1].append("")
+                    self.act_append_color_box()
 
                 else:
                     if self._press_key in (2, 4):
-                        self._args.sys_grid_list[0][self._selecting_idx] = self._args.sys_color_set[self._args.sys_activated_idx].hec
+                        self.act_rev_insert_color_box()
 
-                    elif self._press_key == 1:
-                        self._args.sys_grid_list[0] = self._args.sys_grid_list[0][:self._selecting_idx] + [self._args.sys_color_set[self._args.sys_activated_idx].hec,] + self._args.sys_grid_list[0][self._selecting_idx:]
-                        self._args.sys_grid_list[1] = self._args.sys_grid_list[1][:self._selecting_idx] + ["",] + self._args.sys_grid_list[1][self._selecting_idx:]
+                    elif self._press_key == 1 or insert_pt_beside:
+                        self.act_append_beside_color_box()
 
                     else:
-                        color = Color(self._args.sys_grid_list[0][self._selecting_idx], tp="hec", overflow=self._args.sys_color_set.get_overflow())
-                        self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
-
-                        self.ps_color_changed.emit(True)
+                        self.act_insert_color_box()
 
                     # link and unlink.
                     if self._press_key == 2:
-                        self._args.sys_link_colors[0] = not self._args.sys_link_colors[0]
-                        self.ps_linked.emit(True)
+                        self.link_point(not self._args.sys_link_colors[0])
 
                     elif self._args.sys_link_colors[0]:
-                        self._args.sys_link_colors[0] = False
-                        self.ps_linked.emit(True)
-
-                self.update_select_idx()
+                        self.link_point(False)
 
         else:
-            inserted_x = 0.05
-            inserted_y = 0.05
+            # similar to func "insert_assit_point" in wheel.py.
+            #
+            loc_a, loc_b = 0.1, 0.1
 
-            if self._args.sys_grid_locations[self._args.sys_activated_idx][0] > 0.6:
-                inserted_x = -0.05
+            self._args.sys_activated_assit_idx = len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx])
+            self._args.sys_grid_assitlocs[self._args.sys_activated_idx].append([loc_a, loc_b, 15, 0.0, 0.0, True])
+            self._args.sys_assit_color_locs[self._args.sys_activated_idx].append(None)
 
-            if self._args.sys_grid_locations[self._args.sys_activated_idx][1] > 0.6:
-                inserted_y = -0.05
-
-            if self._args.sys_grid_assitlocs[self._args.sys_activated_idx]:
-                if self._args.sys_grid_locations[self._args.sys_activated_idx][0] < 0.6 and self._args.sys_grid_locations[self._args.sys_activated_idx][0] > 0.4 and self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][0] < 0:
-                    inserted_x = -0.05
-
-                if self._args.sys_grid_locations[self._args.sys_activated_idx][1] < 0.6 and self._args.sys_grid_locations[self._args.sys_activated_idx][1] > 0.4 and self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0][1] < 0:
-                    inserted_y = -0.05
-
-                inserted_item = list(self._args.sys_grid_assitlocs[self._args.sys_activated_idx][0])
-                inserted_item[0] = inserted_item[0] + inserted_x
-                inserted_item[1] = inserted_item[1] + inserted_y
-
-            else:
-                inserted_item = [inserted_x * 2, inserted_y * 2, "h", 0.0]
-
-            self._args.sys_grid_assitlocs[self._args.sys_activated_idx] = [inserted_item,] + self._args.sys_grid_assitlocs[self._args.sys_activated_idx]
+            self.ps_color_changed.emit(True)
 
         self.update()
 
@@ -1195,8 +1275,18 @@ class Board(QWidget):
                 self.update_select_idx()
 
         else:
-            if self._args.sys_grid_assitlocs[self._args.sys_activated_idx] and self._show_points:
-                self._args.sys_grid_assitlocs[self._args.sys_activated_idx] = self._args.sys_grid_assitlocs[self._args.sys_activated_idx][1:]
+            if len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]) > self._args.sys_activated_assit_idx >= 0:
+                if self._args.sys_activated_assit_idx == 0:
+                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx] = self._args.sys_grid_assitlocs[self._args.sys_activated_idx][1:]
+                    self._args.sys_assit_color_locs[self._args.sys_activated_idx] = self._args.sys_assit_color_locs[self._args.sys_activated_idx][1:]
+
+                else:
+                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx] = self._args.sys_grid_assitlocs[self._args.sys_activated_idx][:self._args.sys_activated_assit_idx] + self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx + 1:]
+                    self._args.sys_assit_color_locs[self._args.sys_activated_idx] = self._args.sys_assit_color_locs[self._args.sys_activated_idx][:self._args.sys_activated_assit_idx] + self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx + 1:]
+
+                self._args.sys_activated_assit_idx = -1
+
+                self.ps_color_changed.emit(True)
 
         self.update()
 
@@ -1274,10 +1364,19 @@ class Board(QWidget):
 
         if self._args.sys_grid_list[0]:
             self._show_points = True
-            self._withdraw_grid_list = list(self._args.sys_grid_list)
             self._args.sys_grid_list = [[], []]
 
-        self._args.sys_grid_locations, self._args.sys_grid_assitlocs = norm_grid_locations([], [])
+        self._args.sys_grid_locations, _ = norm_grid_locations([], [])
+        self._args.sys_activated_assit_idx = -1
+
+        self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs] for i in range(5)]
+
+        # reset center.
+        for idx in range(5):
+            assit_len = len(self._args.sys_grid_assitlocs[idx])
+
+            for assit_idx in range(assit_len):
+                self._args.sys_grid_assitlocs[idx][assit_idx][0:2] = rotate_point((0.2, 0), assit_idx / assit_len * 360)
 
         self._args.sys_grid_values = norm_grid_values({})
 
@@ -1285,16 +1384,7 @@ class Board(QWidget):
         self._last_selecting_idx = -1
 
         self.ps_value_changed.emit(True)
-        self.update()
-
-    def withdraw_board(self):
-        """
-        Withdraw grid of color list.
-        """
-
-        self._show_points = False
-        self._args.sys_grid_list, self._withdraw_grid_list = self._withdraw_grid_list, self._args.sys_grid_list
-
+        self.ps_history_backup.emit(True)
         self.update()
 
     def clipboard_in(self):
@@ -1316,6 +1406,7 @@ class Board(QWidget):
 
             if set_file.split(".")[-1].lower() in ("dps", "json", "txt", "aco", "ase", "gpl", "xml") and os.path.isfile(set_file):
                 self.ps_dropped.emit((set_file, False))
+                self.ps_history_backup.emit(True)
 
         else:
             try:
@@ -1327,6 +1418,7 @@ class Board(QWidget):
             if isinstance(color_dict, dict) and "type" in color_dict and "palettes" in color_dict:
                 if color_dict["type"] == "set":
                     self.ps_dropped.emit((color_dict, True))
+                    self.ps_history_backup.emit(True)
 
     def clipboard_img(self):
         """
@@ -1383,6 +1475,202 @@ class Board(QWidget):
 
         if box.exec_() == 0:
             accept_action()
+
+    # ---------- ---------- ---------- Menu ---------- ---------- ---------- #
+
+    def create_menu(self):
+        """
+        Create a right clicked menu.
+
+        """
+
+        self.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self.show_menu)
+
+        self._menu = QMenu(self)
+
+        #   _translate("Board", "Undo"), # 0
+        #   _translate("Board", "Redo"), # 1
+        self._action_undo = QAction(self)
+        self._action_undo.triggered.connect(lambda: self.ps_undo.emit(True))
+        self._menu.addAction(self._action_undo)
+
+        self._action_redo = QAction(self)
+        self._action_redo.triggered.connect(lambda: self.ps_undo.emit(False))
+        self._menu.addAction(self._action_redo)
+
+        #   _translate("Board", "Reset"), # 2
+        self._action_reset = QAction(self)
+        self._action_reset.triggered.connect(self.reset_locations)
+        self._menu.addAction(self._action_reset)
+
+        #   _translate("Board", "Copy RGB"), # 3
+        #   _translate("Board", "Copy HSV"), # 4
+        #   _translate("Board", "Copy Hex Code"), # 5
+        self._action_copy_rgb = QAction(self)
+        self._action_copy_rgb.triggered.connect(self.clipboard_cur("rgb"))
+        self._menu.addAction(self._action_copy_rgb)
+
+        self._action_copy_hsv = QAction(self)
+        self._action_copy_hsv.triggered.connect(self.clipboard_cur("hsv"))
+        self._menu.addAction(self._action_copy_hsv)
+
+        self._action_copy_hec = QAction(self)
+        self._action_copy_hec.triggered.connect(self.clipboard_cur("hec"))
+        self._menu.addAction(self._action_copy_hec)
+
+        #   _translate("Board", "Copy as Image"), # 6
+        self._action_copy_img = QAction(self)
+        self._action_copy_img.triggered.connect(self.clipboard_img)
+        self._menu.addAction(self._action_copy_img)
+
+        #   _translate("Board", "Paste"), # 7
+        self._action_paste = QAction(self)
+        self._action_paste.triggered.connect(self.clipboard_in)
+        self._menu.addAction(self._action_paste)
+
+        #   _translate("Board", "Zoom In"), # 8
+        #   _translate("Board", "Zoom Out"), # 9
+        self._action_zoom_in = QAction(self)
+        self._action_zoom_in.triggered.connect(lambda: self.zoom(self._args.zoom_step))
+        self._menu.addAction(self._action_zoom_in)
+
+        self._action_zoom_out = QAction(self)
+        self._action_zoom_out.triggered.connect(lambda: self.zoom(1 / self._args.zoom_step))
+        self._menu.addAction(self._action_zoom_out)
+
+        #   _translate("Board", "Insert Ref Point (Ctrl+MV)"), # 10
+        #   _translate("Board", "Replace Color (DK)"), # 14
+        self._action_insert = QAction(self)
+        self._action_insert.triggered.connect(self.insert_point)
+        self._menu.addAction(self._action_insert)
+
+        #   _translate("Board", "Delete Ref Point"), # 11
+        #   _translate("Board", "Delete Color Box"), # 18
+        self._action_delete = QAction(self)
+        self._action_delete.triggered.connect(self.delete_point)
+        self._menu.addAction(self._action_delete)
+
+        #   _translate("Board", "Fix Ref Point (DK)"), # 12
+        #   _translate("Board", "Un-Fix Ref Point (DK)"), # 13
+        self._action_fix_pt = QAction(self)
+        self._action_fix_pt.triggered.connect(lambda: self.ps_assit_pt_changed.emit(not self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5]) if self._args.sys_activated_assit_idx >= 0 else None)
+        self._menu.addAction(self._action_fix_pt)
+
+        #   _translate("Board", "Rev-Replace Color (Alt+DK)"), # 15
+        self._action_rev_insert = QAction(self)
+        self._action_rev_insert.triggered.connect(self.act_rev_insert_color_box)
+        self._menu.addAction(self._action_rev_insert)
+
+        #   _translate("Board", "Insert Color Box (Shift+DK)"), # 16
+        self._action_insert_beside = QAction(self)
+        self._action_insert_beside.triggered.connect(self.act_append_beside_color_box)
+        self._menu.addAction(self._action_insert_beside)
+
+        #   _translate("Board", "Append Color Box"), # 17
+        self._action_insert_append = QAction(self)
+        self._action_insert_append.triggered.connect(self.act_append_color_box)
+        self._menu.addAction(self._action_insert_append)
+
+        #   _translate("Board", "Switch Color Boxes"), # 19
+        self._action_switch = QAction(self)
+        self._action_switch.triggered.connect(self.switch_point)
+        self._menu.addAction(self._action_switch)
+
+        #   _translate("Board", "Show Detail"), # 20
+        self._action_detail = QAction(self)
+        self._action_detail.triggered.connect(self.detail_point)
+        self._menu.addAction(self._action_detail)
+
+        #   _translate("Board", "Link with Result (Ctrl+DK)"), # 21
+        #   _translate("Board", "Un-Link with Result (Ctrl+DK)"), # 22
+        self._action_link = QAction(self)
+        self._action_link.triggered.connect(lambda: self.link_point(not self._args.sys_link_colors[0]))
+        self._menu.addAction(self._action_link)
+
+        #   _translate("Board", "Make Gradient Board"), # 23
+        #   _translate("Board", "Make Fixed Board"), # 24
+        #   _translate("Board", "Make Ref Board"), # 25
+        self._action_fixed_board = QAction(self)
+        self._action_fixed_board.triggered.connect(self.clear_or_gen_grid_list)
+        self._menu.addAction(self._action_fixed_board)
+
+        self._action_ref_board = QAction(self)
+        self._action_ref_board.triggered.connect(self.clear_or_gen_assit_color_list)
+        self._menu.addAction(self._action_ref_board)
+
+        #   _translate("Board", "Show Points"), # 26
+        #   _translate("Board", "Hide Points"), # 27
+        self._action_hide_pt = QAction(self)
+        self._action_hide_pt.triggered.connect(self.show_or_hide_points)
+        self._menu.addAction(self._action_hide_pt)
+
+    def show_menu(self):
+        """
+        Show the right clicked menu.
+        """
+
+        self.update_action_text()
+
+        # special actions for delete later.
+        self._action_copy_rgb.setVisible(True)
+        self._action_copy_hsv.setVisible(True)
+        self._action_copy_hec.setVisible(True)
+        self._action_insert_beside.setVisible(True)
+        self._action_switch.setVisible(True)
+        self._action_detail.setVisible(True)
+        self._action_link.setVisible(True)
+        self._action_fix_pt.setVisible(True)
+
+        # normal actions delete.
+        if self._args.sys_grid_list[0]:
+            self._action_rev_insert.setVisible(True)
+            self._action_insert_beside.setVisible(True)
+            self._action_insert_append.setVisible(True)
+            self._action_switch.setVisible(True)
+            self._action_detail.setVisible(True)
+            self._action_link.setVisible(True)
+            self._action_ref_board.setVisible(False)
+            self._action_hide_pt.setVisible(False)
+
+        else:
+            self._action_rev_insert.setVisible(False)
+            self._action_insert_beside.setVisible(False)
+            self._action_insert_append.setVisible(False)
+            self._action_switch.setVisible(False)
+            self._action_detail.setVisible(False)
+            self._action_link.setVisible(False)
+            self._action_ref_board.setVisible(True)
+            self._action_hide_pt.setVisible(True)
+
+        if self._args.sys_grid_list[0] or self._show_points:
+            self._action_insert.setVisible(True)
+            self._action_delete.setVisible(True)
+
+        else:
+            self._action_insert.setVisible(False)
+            self._action_delete.setVisible(False)
+
+        if not self._args.sys_grid_list[0] and self._show_points:
+            self._action_fix_pt.setVisible(True)
+
+        else:
+            self._action_fix_pt.setVisible(False)
+
+        # special actions delete here.
+        if self._args.sys_grid_list[0] and self._selecting_idx >= len(self._args.sys_grid_list[0]):
+            self._action_copy_rgb.setVisible(False)
+            self._action_copy_hsv.setVisible(False)
+            self._action_copy_hec.setVisible(False)
+            self._action_insert_beside.setVisible(False)
+            self._action_switch.setVisible(False)
+            self._action_detail.setVisible(False)
+            self._action_link.setVisible(False)
+
+        if self._args.sys_activated_assit_idx < 0:
+            self._action_fix_pt.setVisible(False)
+
+        self._menu.exec_(QCursor.pos())
 
     # ---------- ---------- ---------- Shortcut ---------- ---------- ---------- #
 
@@ -1468,6 +1756,17 @@ class Board(QWidget):
 
             shortcut.activated.connect(self.clear_or_gen_grid_list)
 
+        for skey in self._args.shortcut_keymaps[51]:
+            if skey in self._connected_keymaps:
+                shortcut = self._connected_keymaps[skey]
+                shortcut.disconnect()
+
+            else:
+                shortcut = QShortcut(QKeySequence(skey), self)
+                self._connected_keymaps[skey] = shortcut
+
+            shortcut.activated.connect(self.clear_or_gen_assit_color_list)
+
         for skey in self._args.shortcut_keymaps[20]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
@@ -1523,24 +1822,103 @@ class Board(QWidget):
 
             shortcut.activated.connect(self.clipboard_in)
 
-        for skey in self._args.shortcut_keymaps[47]:
-            if skey in self._connected_keymaps:
-                shortcut = self._connected_keymaps[skey]
-                shortcut.disconnect()
-
-            else:
-                shortcut = QShortcut(QKeySequence(skey), self)
-                self._connected_keymaps[skey] = shortcut
-
-            shortcut.activated.connect(self.withdraw_board)
-
     # ---------- ---------- ---------- Translations ---------- ---------- ---------- #
 
+    def update_action_text(self):
+        #   _translate("Board", "Undo"), # 0
+        #   _translate("Board", "Redo"), # 1
+        self._action_undo.setText(self._action_descs[0])
+        self._action_redo.setText(self._action_descs[1])
+
+        #   _translate("Board", "Reset"), # 2
+        self._action_reset.setText(self._action_descs[2])
+
+        #   _translate("Board", "Copy RGB"), # 3
+        #   _translate("Board", "Copy HSV"), # 4
+        #   _translate("Board", "Copy Hex Code"), # 5
+        self._action_copy_rgb.setText(self._action_descs[3])
+        self._action_copy_hsv.setText(self._action_descs[4])
+        self._action_copy_hec.setText(self._action_descs[5])
+
+        #   _translate("Board", "Copy as Image"), # 6
+        self._action_copy_img.setText(self._action_descs[6])
+
+        #   _translate("Board", "Paste"), # 7
+        self._action_paste.setText(self._action_descs[7])
+
+        #   _translate("Board", "Zoom In"), # 8
+        #   _translate("Board", "Zoom Out"), # 9
+        self._action_zoom_in.setText(self._action_descs[8])
+        self._action_zoom_out.setText(self._action_descs[9])
+
+        #   _translate("Board", "Insert Ref Point (Ctrl+MV)"), # 10
+        #   _translate("Board", "Replace Color (DK)"), # 14
+        if self._args.sys_grid_list[0]:
+            self._action_insert.setText(self._action_descs[14])
+
+        else:
+            self._action_insert.setText(self._action_descs[10])
+
+        #   _translate("Board", "Delete Ref Point"), # 11
+        #   _translate("Board", "Delete Color Box"), # 18
+        if self._args.sys_grid_list[0]:
+            self._action_delete.setText(self._action_descs[18])
+
+        else:
+            self._action_delete.setText(self._action_descs[11])
+
+        #   _translate("Board", "Fix Ref Point (DK)"), # 12
+        #   _translate("Board", "Un-Fix Ref Point (DK)"), # 13
+        if self._args.sys_activated_assit_idx >= 0 and self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5]:
+            self._action_fix_pt.setText(self._action_descs[12])
+
+        else:
+            self._action_fix_pt.setText(self._action_descs[13])
+
+        #   _translate("Board", "Rev-Replace Color (Alt+DK)"), # 15
+        self._action_rev_insert.setText(self._action_descs[15])
+
+        #   _translate("Board", "Insert Color Box (Shift+DK)"), # 16
+        self._action_insert_beside.setText(self._action_descs[16])
+
+        #   _translate("Board", "Append Color Box"), # 17
+        self._action_insert_append.setText(self._action_descs[17])
+
+        #   _translate("Board", "Switch Color Boxes"), # 19
+        self._action_switch.setText(self._action_descs[19])
+
+        #   _translate("Board", "Show Detail"), # 20
+        self._action_detail.setText(self._action_descs[20])
+
+        #   _translate("Board", "Link with Result (Ctrl+DK)"), # 21
+        #   _translate("Board", "Un-Link with Result (Ctrl+DK)"), # 22
+        if self._args.sys_link_colors[0]:
+            self._action_link.setText(self._action_descs[22])
+
+        else:
+            self._action_link.setText(self._action_descs[21])
+
+        #   _translate("Board", "Make Gradient Board"), # 23
+        #   _translate("Board", "Make Fixed Board"), # 24
+        #   _translate("Board", "Make Ref Board"), # 25
+        if self._args.sys_grid_list[0]:
+            self._action_fixed_board.setText(self._action_descs[23])
+            self._action_ref_board.setText(self._action_descs[23])
+
+        else:
+            self._action_fixed_board.setText(self._action_descs[24])
+            self._action_ref_board.setText(self._action_descs[25])
+
+        #   _translate("Board", "Show Points"), # 26
+        #   _translate("Board", "Hide Points"), # 27
+        if self._show_points:
+            self._action_hide_pt.setText(self._action_descs[27])
+
+        else:
+            self._action_hide_pt.setText(self._action_descs[26])
+
     def update_text(self):
-        self._action_insert.setText(self._action_descs[0])
-        self._action_switch.setText(self._action_descs[3])
-        self._action_delete.setText(self._action_descs[1])
-        self._action_detail.setText(self._action_descs[2])
+        self.update_action_text()
 
         self._color_box.set_default_name(self._tip_descs[0])
 
@@ -1551,14 +1929,47 @@ class Board(QWidget):
         _translate = QCoreApplication.translate
 
         self._action_descs = (
-            _translate("Depot", "Insert"),
-            _translate("Depot", "Delete"),
-            _translate("Depot", "Detail"),
-            _translate("Depot", "Switch"),
+            _translate("Wheel", "Undo"), # 0
+            _translate("Wheel", "Redo"), # 1
+            _translate("Board", "Reset"), # 2
+            _translate("Board", "Copy RGB"), # 3
+            _translate("Board", "Copy HSV"), # 4
+            _translate("Board", "Copy Hex Code"), # 5
+            _translate("Board", "Copy as Image"), # 6
+            _translate("Wheel", "Paste"), # 7
+            _translate("Board", "Zoom In"), # 8
+            _translate("Board", "Zoom Out"), # 9
+            _translate("Board", "Insert Ref Point (Ctrl+MV)"), # 10
+            _translate("Board", "Delete Ref Point"), # 11
+            _translate("Board", "Fix Ref Point (DK)"), # 12
+            _translate("Board", "Un-Fix Ref Point (DK)"), # 13
+            _translate("Board", "Replace Color (DK)"), # 14
+            _translate("Board", "Rev-Replace Color (Alt+DK)"), # 15
+            _translate("Board", "Insert Color Box (Shift+DK)"), # 16
+            _translate("Board", "Append Color Box"), # 17
+            _translate("Board", "Delete Color Box"), # 18
+            _translate("Board", "Switch Color Boxes"), # 19
+            _translate("Board", "Show Detail"), # 20
+            _translate("Board", "Link with Result (Ctrl+DK)"), # 21
+            _translate("Board", "Un-Link with Result (Ctrl+DK)"), # 22
+            _translate("Board", "Make Gradient Board"), # 23
+            _translate("Board", "Make Fixed Board"), # 24
+            _translate("Board", "Make Ref Board"), # 25
+            _translate("Board", "Show Points"), # 26
+            _translate("Board", "Hide Points"), # 27
+        )
+
+        self._recommend_descs = (
+            _translate("Rickrack", "{} ({})"),
         )
 
         self._tip_descs = (
             _translate("Info", "Rickrack Color Box"),
+        )
+
+        self._color_descs = (
+            _translate("Info", "Main Color"),
+            _translate("Info", "Reference Color"),
         )
 
         self._operation_warns = (

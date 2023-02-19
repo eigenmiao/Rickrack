@@ -10,7 +10,7 @@ Public License for more details.
 Please visit https://github.com/eigenmiao/Rickrack for more infomation 
 about Rickrack.
 
-Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
+Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
 """
 
 from setuptools import setup
@@ -18,7 +18,7 @@ from setuptools import setup
 
 setup(
     name="Rickrack",
-    version="2.6.6",
+    version="2.7.23",
     author="Eigenmiao",
     author_email="eigenmiao@outlook.com",
     description="Generate harmonious colors freely.",

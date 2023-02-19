@@ -10,26 +10,20 @@ Public License for more details.
 Please visit https://github.com/eigenmiao/Rickrack for more infomation 
 about Rickrack.
 
-Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
+Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
 """
 
 from rickrack.color import Color
 
 
-class Grid(object):
+class Box(object):
     """
-    Grid object. Storing color grid.
+    Box object. Storing a color and a name.
     """
 
-    def __init__(self, color_grid):
-        """
-        Init Grid ojbect.
-
-        Args:
-            color_grid (tuple or list): hex code color list.
-        """
-
-        self._grid = tuple(color_grid)
+    def __init__(self, color, name):
+        self._color = str(color)
+        self._name = str(name)
 
     # ---------- ---------- ---------- Inner Funcs ---------- ---------- ---------- #
 
@@ -41,57 +35,18 @@ class Grid(object):
             idx (int or float): color index in grid.
         """
 
-        if isinstance(idx, (tuple, list)):
-            if len(idx) > 2:
-                return self[idx[0]][idx[1:]]
+        if idx in (0, "color"):
+            return Color(self._color, tp="hec")
 
-            else:
-                return self[idx[0]][idx[1]]
-
-        elif isinstance(idx, int) and idx < len(self._grid):
-            color_line = self._grid[idx]
-
-        elif isinstance(idx, float) and 0 <= idx <= 1:
-            color_line = self._grid[int((len(self._grid) - 1) * idx)]
-
-        else:
-            color_line = self._grid[idx]
-
-        if isinstance(color_line, str):
-            return Color(color_line, tp="hec")
-
-        else:
-            return Grid(color_line)
-
-    def __len__(self):
-        """
-        Length.
-        """
-
-        return len(self._grid)
+        elif idx in (1, "name"):
+            return str(self._name)
 
     def __str__(self):
         """
         Str format.
         """
 
-        curr_size = []
-        curr_grid = self._grid
-
-        while isinstance(curr_grid, (tuple, list)):
-            curr_size.append(len(curr_grid))
-
-            if curr_grid:
-                curr_grid = curr_grid[0]
-
-            else:
-                curr_grid = None
-
-        if curr_size:
-            return "Grid(size {})".format("x".join([str(i) for i in curr_size]))
-
-        else:
-            return str(curr_grid)
+        return "Box({}: {})".format(self._name, self._color)
 
     def __repr__(self):
         """
@@ -103,32 +58,139 @@ class Grid(object):
     # ---------- ---------- ---------- Properties ---------- ---------- ---------- #
 
     @property
-    def grid(self):
-        return Grid(self._grid)
+    def color(self):
+        return Color(self._color, tp="hec")
 
     @property
-    def value(self):
-        return tuple(self._grid)
+    def name(self):
+        return str(self._name)
+
+
+class Grid(object):
+    """
+    Grid object. Storing color grid.
+    """
+
+    def __init__(self, color_grid, name_grid, grid_size):
+        """
+        Init Grid ojbect.
+
+        Args:
+            color_grid (tuple or list): hex code color list.
+            name_grid (tuple or list): name list.
+            grid_size (tuple, or list): grid size.
+        """
+
+        if not isinstance(color_grid, (tuple, list)):
+            raise ValueError("Invalid color grid: {}".format(color_grid))
+
+        if not isinstance(name_grid, (tuple, list)):
+            raise ValueError("Invalid name grid: {}".format(name_grid))
+
+        if isinstance(grid_size, int) and grid_size >= 0:
+            self._grid_size = (int(grid_size),)
+
+        elif isinstance(grid_size, (tuple, list)) and len(grid_size) == 1 and isinstance(grid_size[0], int) and grid_size[0] >= 0:
+            self._grid_size = (int(grid_size[0]),)
+
+        elif isinstance(grid_size, (tuple, list)) and len(grid_size) == 2 and isinstance(grid_size[0], int) and isinstance(grid_size[1], int) and grid_size[0] >= 0 and grid_size[1] >= 0:
+            self._grid_size = (int(grid_size[0]), int(grid_size[1]))
+
+        else:
+            raise ValueError("Invalid grid size: {}".format(grid_size))
+
+        if len(self._grid_size) == 1:
+            self._color_grid = ["FFFFFF" if i >= len(color_grid) else str(color_grid[i]) for i in range(self._grid_size[0])]
+            self._name_grid = ["RR-{}".format(i + 1) if i >= len(name_grid) else str(name_grid[i]) for i in range(self._grid_size[0])]
+
+        else:
+            self._color_grid = [["FFFFFF" if i * self._grid_size[1] + j >= len(color_grid) else str(color_grid[i * self._grid_size[1] + j]) for j in range(self._grid_size[1])] for i in range(self._grid_size[0])]
+            self._name_grid = [["RR-{}-{}".format(i + 1, j + 1) if i * self._grid_size[1] + j >= len(name_grid) else str(name_grid[i * self._grid_size[1] + j]) for j in range(self._grid_size[1])] for i in range(self._grid_size[0])]
+
+    # ---------- ---------- ---------- Inner Funcs ---------- ---------- ---------- #
+
+    def __getitem__(self, idx):
+        """
+        Get color item in color grid.
+
+        Args:
+            idx (int or float): color index in grid.
+        """
+
+        curr_color = self._color_grid[idx]
+        curr_name = self._name_grid[idx]
+
+        if isinstance(curr_color, str):
+            return Box(curr_color, curr_name)
+
+        else:
+            return Grid(curr_color, curr_name, len(curr_color))
+
+    def __str__(self):
+        """
+        Str format.
+        """
+
+        return "Grid(size {})".format("x".join([str(i) for i in self.size]))
+
+    def __repr__(self):
+        """
+        Repr format.
+        """
+
+        return str(self)
+
+    # ---------- ---------- ---------- Properties ---------- ---------- ---------- #
+
+    @property
+    def T(self):
+        if len(self.size) == 1:
+            return Grid(self._color_grid, self._name_grid, self.size)
+
+        else:
+            return Grid(*self.v_line.grid.values, (self.size[1], self.size[0]))
+
+    @property
+    def size(self):
+        return self._grid_size
+
+    @property
+    def values(self):
+        return tuple(self._color_grid), tuple(self._name_grid)
+
+    @property
+    def grid(self):
+        return Grid(*self.h_line.values, self.size)
 
     @property
     def h_line(self):
-        line = []
+        if len(self.size) == 1:
+            return Grid(self._color_grid, self._name_grid, self.size)
 
-        for i in range(len(self._grid)):
-            for j in range(len(self._grid[0])):
-                line.append(self._grid[i][j])
+        else:
+            color_grid = []
+            name_grid = []
 
-        return Grid(line)
+            for i in range(self.size[0]):
+                color_grid += self._color_grid[i]
+                name_grid += self._name_grid[i]
+
+            return Grid(color_grid, name_grid, self.size[0] * self.size[1])
 
     @property
     def v_line(self):
-        line = []
+        if len(self.size) == 1:
+            return Grid(self._color_grid, self._name_grid, self.size)
 
-        for j in range(len(self._grid[0])):
-            for i in range(len(self._grid)):
-                line.append(self._grid[i][j])
+        else:
+            color_grid = []
+            name_grid = []
 
-        return Grid(line)
+            for j in range(self.size[1]):
+                color_grid += [self._color_grid[i][j] for i in range(self.size[0])]
+                name_grid += [self._name_grid[i][j] for i in range(self.size[0])]
+
+            return Grid(color_grid, name_grid, self.size[0] * self.size[1])
 
 
 class Result(object):
@@ -144,7 +206,46 @@ class Result(object):
             color_result (dict): final result.
         """
 
-        self._result = dict(color_result)
+        self._result = {
+            "rule": "Custom",
+            "index": 0,
+            "colors": Grid([], [], 5),
+            "refs": Grid([], [], 5),
+            "grid": Grid([], [], (1, 1)),
+        }
+
+        if "rule" in color_result:
+            self._result["rule"] = str(color_result["rule"])
+
+        if "index" in color_result:
+            self._result["index"] = int(color_result["index"])
+
+        if "colors" in color_result:
+            curr_colors = color_result["colors"]
+
+            if isinstance(curr_colors, Grid):
+                self._result["colors"] = curr_colors.h_line
+
+            else:
+                raise ValueError("Invalid colors: {}.".format(curr_colors))
+
+        if "refs" in color_result:
+            curr_colors = color_result["refs"]
+
+            if isinstance(curr_colors, Grid):
+                self._result["refs"] = curr_colors.h_line
+
+            else:
+                raise ValueError("Invalid ref colors: {}.".format(curr_colors))
+
+        if "grid" in color_result:
+            curr_colors = color_result["grid"]
+
+            if isinstance(curr_colors, Grid):
+                self._result["grid"] = curr_colors.grid
+
+            else:
+                raise ValueError("Invalid color grid: {}.".format(curr_colors))
 
     # ---------- ---------- ---------- Inner Funcs ---------- ---------- ---------- #
 
@@ -183,7 +284,8 @@ class Result(object):
 
             plain_text += str(self._result["colors"][i]) + "\n"
 
-        plain_text += "Color Grid:\n  {}\n".format(self._result["grid"])
+        plain_text += "Full Colors:\n  {}\n".format(self._result["refs"])
+        plain_text += "Color Grid ...:\n  {}\n".format(self._result["grid"])
 
         return plain_text
 
@@ -210,20 +312,33 @@ class Result(object):
 
     @property
     def colors_in_order(self):
-        return tuple([self._result["colors"][i] for i in (2, 1, 0, 3, 4)])
+        colors = [self._result["colors"][i] for i in (2, 1, 0, 3, 4)]
+        return Grid([i[0].hec for i in colors], [i[1] for i in colors], 5)
 
     @property
     def selected_color(self):
         return self._result["colors"][self._result["index"]]
 
     @property
-    def grid(self):
+    def full_colors(self):
+        return self._result["refs"]
+
+    @property
+    def color_grid(self):
         return self._result["grid"]
 
     @property
-    def grid_h_line(self):
-        return self._result["grid"].h_line
+    def cset(self):
+        return self.colors
 
     @property
-    def grid_v_line(self):
-        return self._result["grid"].v_line
+    def cset_in_order(self):
+        return self.colors_in_order
+
+    @property
+    def refs(self):
+        return self.full_colors
+
+    @property
+    def grid(self):
+        return self.color_grid
