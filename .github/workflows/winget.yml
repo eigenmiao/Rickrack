@@ -6,8 +6,16 @@ jobs:
   publish:
     runs-on: windows-latest
     steps:
+      - name: Get version
+        id: get-version
+        run: |
+          # Finding the version from release name
+          $VERSION="${{ github.event.release.name }}" -replace '-.*'
+          echo "::set-output name=version::$VERSION"
+        shell: pwsh
       - uses: vedantmgoyal2009/winget-releaser@v2
         with:
           identifier: Eigenmiao.Rickrack
-          installers-regex: 'pre_en_windows.*\.exe$'
+          version: ${{ steps.get-version.outputs.version }}
+          installers-regex: 'en_windows.*\.exe$'
           token: ${{ secrets.WINGET_TOKEN }}
