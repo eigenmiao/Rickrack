@@ -10,7 +10,7 @@ jobs:
         id: get-version
         run: |
           # Finding the version from release name
-          $VERSION="${{ github.event.release.name }}" -replace '-.*'
+          $VERSION = ('${{ github.event.release.name }}' | Select-String -Pattern '[0-9.]+').Matches.Value
           echo "::set-output name=version::$VERSION"
         shell: pwsh
       - uses: vedantmgoyal2009/winget-releaser@v2
