@@ -5,7 +5,7 @@ lxml           == 4.9.1
 macholib       == 1.15.2
 numpy          == 1.22.0
 pefile         == 2021.9.3
-Pillow         == 8.4.0
+Pillow         == 9.3.0
 pip            == 21.3.1
 PyInstaller    == 3.4
 PyQt5          == 5.12.1
