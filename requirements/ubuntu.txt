@@ -11,5 +11,5 @@ PyInstaller == 3.4
 PyQt5       == 5.12.1
 PyQt5_sip   == 4.19.19
 ricore      == 0.0.0
-setuptools  == 40.6.2
+setuptools  == 65.5.1
 swatch      == 0.4.0
