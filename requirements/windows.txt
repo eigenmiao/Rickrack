@@ -1,6 +1,6 @@
 altgraph       == 0.17.2
 fbs            == 0.8.9
-future         == 0.18.2
+future         == 0.18.3
 lxml           == 4.9.1
 macholib       == 1.15.2
 numpy          == 1.22.0
