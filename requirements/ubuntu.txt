@@ -7,7 +7,7 @@ numpy       == 1.22.0
 pefile      == 2021.9.3
 Pillow      == 9.3.0
 pip         == 21.3.1
-PyInstaller == 3.4
+PyInstaller == 3.6
 PyQt5       == 5.12.1
 PyQt5_sip   == 4.19.19
 ricore      == 0.0.0
