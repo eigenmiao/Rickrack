@@ -13,5 +13,5 @@ PyQt5_sip      == 4.19.19
 pywin32        == 302
 pywin32-ctypes == 0.2.0
 ricore         == 0.0.0
-setuptools     == 40.6.2
+setuptools     == 65.5.1
 swatch         == 0.4.0
