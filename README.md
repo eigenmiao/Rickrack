@@ -9,10 +9,10 @@ Generate Harmonious Colors Freely.<br/>自由自在生成和谐色彩。
 </div>
 
 # Rickrack
-Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free color editor. It is designed for generating a set of harmonious colors from color wheel or elsewhere. You can share these colors with your friends, or apply them into your creative works.
+Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works.
 
 # 焰火十二卷
-焰火十二卷（实时色彩工具箱）是一款免费开源的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。
+焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。
 
 # Table of Content
 * [Introduction](#introduction)
@@ -42,26 +42,26 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free color editor. It is
 * [Acknowledgment](#acknowledgment)
 
 # Introduction
-Colors enrich our world and affect our emotions. For artists, they display objects and convey feelings by varied colors in photos, images and drawings. For scientist, they present data by distinguishable colors in figures and graphics. However, currently most color generator softwares and websites place restrictions on users, such as can't export color palette into local individual files, don't provide invocation interfaces, relying on cloud storages, requiring registrations and networks, regional limitations and (or) collecting user's privacies.
+Colors enrich our world and affect our emotions. For artists, they display objects and convey feelings by varied colors in photos, images and drawings. For scientist, they present data by distinguishable colors in figures and graphics. However, the majority of color softwares and websites put restrictions on users, which include the inability to export color palettes into individual files, not providing invocation interfaces, requiring registrations, regional limitations and (or) collecting users' personal information.
 
-Rickrack is designed for you if you are troubled by these restrictions!
+If you are running into these issues, Rickrack is the perfect solution for you!
 
-Rickrack is a free color editor. It is designed for generating a set of harmonious colors from color wheel or elsewhere. You can share these colors with your friends, or apply them into your creative works. You can store your favorite color sets and color boards in this software, and get them at next time. What's more, you could export color sets or color depots into individual files, backup them anywhere, share them with your friends, or import them into other softwares (such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint). Rickrack is written in PyQt5, which performs well on Windows, Linux and other mainstream operating systems.
+Rickrack is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. You can store the color sets and color boards in the software, and access them whenever you need. What's more, you can export them into individual files, back them up, share them with others or import them in to other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack, written in PyQt5, operates effectively on Windows, Linux and other mainstream operating systems.
 
-Rickrack include two parts: software and module. **The Rickrack software** is designed for generating and managing harmonious colors. **The Rickrack module** is designed for obtain colors from software in real-time and plot images combined with other modules (such as Matplotlib and Turtle).
+Rickrack consists of two parts: the Rickrack software and the Rickrack module; the Rickrack software is designed for producing and organizing harmonious colors, and the Rickrack module is utilized for obtaining colors from the software in real-time, along with the plotting of images combined with other modules such as Matplotlib and Turtle.
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
 # Feature
 Rickrack has several features:
 * A strong and free color editor.
-* Create a set of colors from color wheel.
-* Locate a set of colors from image.
-* Derive a color board from the color set.
-* Attach the color set and color board into depot.
+* Create a set of colors from the color wheel.
+* Pick-up a set of colors from an image.
+* Generate a color board from the color set.
+* Attach the color set and color board into the depot.
 * Import colors from elsewhere and manage them in depot.
-* Export colors and import it into other image processors.
-* Obtain colors through module in real-time.
+* Export colors and import them into other image processors.
+* Obtain colors through the Python module in real-time.
 * No function limitations and no registration required.
 * ... and more!
 
@@ -141,8 +141,8 @@ rr.run(dp_argv=dp_argv, dp_proj=dp_proj)
 ```
 
 ## Notice
-* Please read the documents and tutorials when you encounter problems.
-* The socket server is designed for obtaining colors from the Rickrack software in real-time. This server is disabled by default and can only be started from the command line.
+* Please read the documents and tutorials when you encounter any difficulties.
+* The socket server is designed for obtaining colors from the Rickrack software in real-time. By default, this server is disabled and can only be started from the command line.
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
@@ -153,7 +153,7 @@ rr.run(dp_argv=dp_argv, dp_proj=dp_proj)
 * Additional modules listed in requirements folder
 
 ## How to Build the Software
-Not supported. The "ricore" module is not open-sourced yet.
+Rickrack requires the "ricore" module to function, however, it is not open-sourced yet and therefore is not supported.
 
 ## How to Build the Module
 ```bash
