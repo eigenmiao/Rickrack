@@ -76,6 +76,12 @@ Rickrack has several features:
 <tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/202.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/300.gif" /> </td></tr>
 <tr><td style="border: 0px; text-align: center"> <span> Generate a color board from the color set. </span> </td><td style="border: 0px; text-align: center"> <span> Attach the color set and color board into the depot. </span> </td></tr>
 
+<tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/018.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/110.gif" /> </td></tr>
+<tr><td style="border: 0px; text-align: center"> <span> Add reference colors in the color wheel. </span> </td><td style="border: 0px; text-align: center"> <span> Add reference colors from the image. </span> </td></tr>
+
+<tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/204.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/205.gif" /> </td></tr>
+<tr><td style="border: 0px; text-align: center"> <span> Generate a fixed palette. </span> </td><td style="border: 0px; text-align: center"> <span> Generate a reference palette. </span> </td></tr>
+
 </table>
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
