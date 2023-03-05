@@ -17,6 +17,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 # Table of Content
 * [Introduction](#introduction)
 * [Feature](#feature)
+* [Demo](#demo)
 * [Information](#information)
   * [Homepage](#homepage)
   * [Repository](#repository)
@@ -64,6 +65,18 @@ Rickrack has several features:
 * Obtain colors through the Python module in real-time.
 * No function limitations and no registration required.
 * ... and more!
+
+<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+
+# Demo
+<table style="border: 0px; text-align: center">
+<tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/000.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/109.gif" /> </td></tr>
+<tr><td style="border: 0px; text-align: center"> <span> Create a set of colors from the color wheel. </span> </td><td style="border: 0px; text-align: center"> <span> Pick-up a set of colors from an image. </span> </td></tr>
+
+<tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/202.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/300.gif" /> </td></tr>
+<tr><td style="border: 0px; text-align: center"> <span> Generate a color board from the color set. </span> </td><td style="border: 0px; text-align: center"> <span> Attach the color set and color board into the depot. </span> </td></tr>
+
+</table>
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
