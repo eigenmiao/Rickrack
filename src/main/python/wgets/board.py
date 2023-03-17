@@ -18,9 +18,9 @@ import re
 import json
 import time
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QShortcut, QMenu, QAction, QLabel, QDialog, QGridLayout, QPushButton, QDialogButtonBox, QColorDialog, QApplication, QMessageBox
-from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QPoint, QMimeData, QUrl
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag
+from PySide2.QtWidgets import QWidget, QShortcut, QMenu, QAction, QLabel, QDialog, QGridLayout, QPushButton, QDialogButtonBox, QColorDialog, QApplication, QMessageBox
+from PySide2.QtCore import Qt, Signal, QCoreApplication, QPoint, QMimeData, QUrl
+from PySide2.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag
 from cguis.design.box_dialog import Ui_BoxDialog
 from ricore.color import Color
 from ricore.transpt import get_outer_box, get_link_tag, rotate_point
@@ -33,7 +33,7 @@ class ColorBox(QDialog, Ui_BoxDialog):
     ColorBox object based on QDialog. Init color box information.
     """
 
-    ps_value_changed = pyqtSignal(bool)
+    ps_value_changed = Signal(bool)
 
     def __init__(self, wget, args):
         """
@@ -219,7 +219,7 @@ class BoxSqr(QWidget):
     Square objet based on QWidget. Init a color square in box.
     """
 
-    ps_color_changed = pyqtSignal(str)
+    ps_color_changed = Signal(str)
 
     def __init__(self, wget, args, hec_color):
         """
@@ -333,15 +333,15 @@ class Board(QWidget):
     Board object based on QWidget. Init a gradual board pannel in workarea.
     """
 
-    ps_index_changed = pyqtSignal(bool)
-    ps_value_changed = pyqtSignal(bool)
-    ps_color_changed = pyqtSignal(bool)
-    ps_status_changed = pyqtSignal(tuple)
-    ps_dropped = pyqtSignal(tuple)
-    ps_linked = pyqtSignal(bool)
-    ps_assit_pt_changed = pyqtSignal(bool)
-    ps_history_backup = pyqtSignal(bool)
-    ps_undo = pyqtSignal(bool)
+    ps_index_changed = Signal(bool)
+    ps_value_changed = Signal(bool)
+    ps_color_changed = Signal(bool)
+    ps_status_changed = Signal(tuple)
+    ps_dropped = Signal(tuple)
+    ps_linked = Signal(bool)
+    ps_assit_pt_changed = Signal(bool)
+    ps_history_backup = Signal(bool)
+    ps_undo = Signal(bool)
 
     def __init__(self, wget, args):
         """
@@ -1369,7 +1369,7 @@ class Board(QWidget):
         self._args.sys_grid_locations, _ = norm_grid_locations([], [])
         self._args.sys_activated_assit_idx = -1
 
-        self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs] for i in range(5)]
+        self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs[i]] for i in range(5)]
 
         # reset center.
         for idx in range(5):

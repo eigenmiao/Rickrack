@@ -17,9 +17,9 @@ import os
 import json
 import time
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QShortcut, QMenu, QAction, QApplication, QMessageBox
-from PyQt5.QtCore import Qt, QPoint, pyqtSignal, QCoreApplication, QSize, pyqtSignal, QMimeData, QPoint, QUrl
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QConicalGradient, QRadialGradient, QLinearGradient, QKeySequence, QDrag, QPixmap, QCursor
+from PySide2.QtWidgets import QWidget, QShortcut, QMenu, QAction, QApplication, QMessageBox
+from PySide2.QtCore import Qt, QPoint, Signal, QCoreApplication, QSize, Signal, QMimeData, QPoint, QUrl
+from PySide2.QtGui import QPainter, QPen, QBrush, QColor, QConicalGradient, QRadialGradient, QLinearGradient, QKeySequence, QDrag, QPixmap, QCursor
 from cguis.resource import view_rc
 from ricore.transpt import get_outer_box, rotate_point_center, get_theta_center
 from ricore.grid import gen_assit_color
@@ -32,12 +32,12 @@ class Wheel(QWidget):
     Wheel object based on QWidget. Init a color wheel in workarea.
     """
 
-    ps_color_changed = pyqtSignal(bool)
-    ps_index_changed = pyqtSignal(bool)
-    ps_status_changed = pyqtSignal(tuple)
-    ps_dropped = pyqtSignal(tuple)
-    ps_history_backup = pyqtSignal(bool)
-    ps_undo = pyqtSignal(bool)
+    ps_color_changed = Signal(bool)
+    ps_index_changed = Signal(bool)
+    ps_status_changed = Signal(tuple)
+    ps_dropped = Signal(tuple)
+    ps_history_backup = Signal(bool)
+    ps_undo = Signal(bool)
 
     def __init__(self, wget, args):
         """
@@ -69,7 +69,7 @@ class Wheel(QWidget):
         self.setFocusPolicy(Qt.StrongFocus)
         self.setAcceptDrops(True)
 
-        self.setMinimumSize(QSize(300, 200))
+        self.setMinimumSize(QSize(150, 100))
 
         # shortcut is updated by _setup_skey in main.py.
         # self.update_skey()

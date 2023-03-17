@@ -13,7 +13,7 @@ infomation about Rickrack.
 Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtCore import QThread, pyqtSignal
+from PySide2.QtCore import QThread, Signal
 from socketserver import TCPServer
 from ricore.server_req import Request
 
@@ -23,13 +23,13 @@ class ResultServer(QThread):
     ResultServer object.
     """
 
-    ps_iset = pyqtSignal(str)
-    ps_oset = pyqtSignal(str)
-    ps_idpt = pyqtSignal(str)
-    ps_odpt = pyqtSignal(str)
-    ps_cidx = pyqtSignal(tuple)
-    ps_star = pyqtSignal(bool)
-    ps_exit = pyqtSignal(bool)
+    ps_iset = Signal(str)
+    ps_oset = Signal(str)
+    ps_idpt = Signal(str)
+    ps_odpt = Signal(str)
+    ps_cidx = Signal(tuple)
+    ps_star = Signal(bool)
+    ps_exit = Signal(bool)
 
     def __init__(self, args, port=None):
         """

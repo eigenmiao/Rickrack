@@ -14,9 +14,9 @@ Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
 import re
-from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QPushButton, QGroupBox, QGridLayout, QLabel, QLineEdit
-from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication
-from PyQt5.QtGui import QIcon, QPixmap
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QPushButton, QGroupBox, QGridLayout, QLabel, QLineEdit
+from PySide2.QtCore import Qt, Signal, QCoreApplication
+from PySide2.QtGui import QIcon, QPixmap
 from ricore.check import check_key, check_nonempt_str_lst
 from cguis.design.settings_dialog import Ui_SettingsDialog
 from cguis.resource import view_rc
@@ -27,13 +27,13 @@ class Settings(QDialog, Ui_SettingsDialog):
     Settings object based on QDialog. Init a settings in settings.
     """
 
-    ps_rule_changed = pyqtSignal()
-    ps_lang_changed = pyqtSignal()
-    ps_skey_changed = pyqtSignal()
-    ps_settings_changed = pyqtSignal()
-    ps_clean_up = pyqtSignal()
-    ps_restore_layout = pyqtSignal()
-    ps_theme_changed = pyqtSignal(bool)
+    ps_rule_changed = Signal()
+    ps_lang_changed = Signal()
+    ps_skey_changed = Signal()
+    ps_settings_changed = Signal()
+    ps_clean_up = Signal()
+    ps_restore_layout = Signal()
+    ps_theme_changed = Signal(bool)
 
     def __init__(self, wget, args):
         """
@@ -570,7 +570,7 @@ class Settings(QDialog, Ui_SettingsDialog):
 
         for idx in range(len(self._args.usr_langs)):
             lang = self._args.usr_langs[idx]
-            self.lang_comb.setItemText(idx, self._lang_descs[40].format(self._lang_descs[lang[0]], lang[1].split(".")[0]))
+            self.lang_comb.setItemText(idx, self._lang_descs[0].format(self._lang_descs[lang[0] + 1], lang[1].split(".")[0]))
 
         for idx in range(len(self._args.global_hm_rules)):
             self.hm_rule_comb.setItemText(idx, self._rule_descs[idx])
@@ -765,6 +765,7 @@ class Settings(QDialog, Ui_SettingsDialog):
         )
 
         self._lang_descs = (
+            _translate("Rickrack", "{} ({})"),
             _translate("Settings", "en"),
             _translate("Settings", "ar"),
             _translate("Settings", "be"),
@@ -774,6 +775,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "da"),
             _translate("Settings", "de"),
             _translate("Settings", "el"),
+            _translate("Settings", "eo"),
             _translate("Settings", "es"),
             _translate("Settings", "et"),
             _translate("Settings", "fi"),
@@ -803,7 +805,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "th"),
             _translate("Settings", "tr"),
             _translate("Settings", "uk"),
+            _translate("Settings", "vn"),
             _translate("Settings", "zh"),
             _translate("Settings", "default"),
-            _translate("Rickrack", "{} ({})"),
         )
