@@ -13,9 +13,9 @@ infomation about Rickrack.
 Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QDialog, QGridLayout, QLabel, QPushButton
-from PyQt5.QtCore import Qt, QCoreApplication
-from PyQt5.QtGui import QIcon, QPixmap
+from PySide2.QtWidgets import QDialog, QGridLayout, QLabel, QPushButton
+from PySide2.QtCore import Qt, QCoreApplication
+from PySide2.QtGui import QIcon, QPixmap
 from cguis.resource import view_rc
 from ricore.check import check_file_name
 
@@ -132,5 +132,5 @@ class Choice(QDialog):
             _translate("Info", ", "),
             _translate("Info", " and "),
             _translate("Choice", " wanna set of colors."),
-            _translate("Choice", "It seeems well"),
+            _translate("Choice", "It seems well"),
         )

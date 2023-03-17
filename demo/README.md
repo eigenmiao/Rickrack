@@ -2,7 +2,7 @@
 
 [中文](https://eigenmiao.com/yanhuo/zh.html) | [English](https://eigenmiao.com/yanhuo/en.html) | [日本語](https://eigenmiao.com/yanhuo/ja.html)
 
-This directory contains a demo for using the [Rickrack software and module](https://github.com/eigenmiao/Rickrack). It plots curves, bars, maps and polar bars with colors from the Rickrack. The colors can be modified by the Rickrack module in real-time.
+This directory contains a demo for using the [Rickrack software and module](https://github.com/eigenmiao/Rickrack). It plots curves, bars, maps, and polar bars with various, customizable colors from the Rickrack. The colors can be adjusted in real-time using the Rickrack module.
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV1VD4y157tX/).
 

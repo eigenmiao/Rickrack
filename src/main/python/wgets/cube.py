@@ -13,9 +13,9 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QScrollArea, QFrame, QColorDialog, QApplication
-from PyQt5.QtCore import Qt, QSize, pyqtSignal, QMimeData, QPoint
-from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
+from PySide2.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QScrollArea, QFrame, QColorDialog, QApplication
+from PySide2.QtCore import Qt, QSize, Signal, QMimeData, QPoint
+from PySide2.QtGui import QPainter, QPen, QColor, QBrush
 from cguis.design.scroll_cube import Ui_ScrollCube
 from ricore.color import Color
 from ricore.transpt import get_link_tag, get_outer_box
@@ -27,8 +27,8 @@ class Square(QWidget):
     Square objet based on QWidget. Init a color square in cube.
     """
 
-    ps_color_changed = pyqtSignal(bool)
-    ps_index_changed = pyqtSignal(bool)
+    ps_color_changed = Signal(bool)
+    ps_index_changed = Signal(bool)
 
     def __init__(self, wget, args, idx):
         """
@@ -233,8 +233,8 @@ class CubeTable(QWidget):
     CubeTable object based on QWidget. Init color cube table in result.
     """
 
-    ps_color_changed = pyqtSignal(bool)
-    ps_history_backup = pyqtSignal(bool)
+    ps_color_changed = Signal(bool)
+    ps_history_backup = Signal(bool)
 
     def __init__(self, wget, args):
         """
@@ -251,7 +251,7 @@ class CubeTable(QWidget):
         self._updated_colors = False
 
         # init qt args.
-        self.setMinimumSize(640, 10)
+        self.setMinimumSize(120, 10)
 
         cube_grid_layout = QGridLayout(self)
         cube_grid_layout.setContentsMargins(0, 0, 0, 0)
@@ -304,6 +304,33 @@ class CubeTable(QWidget):
 
     def sizeHint(self):
         return QSize(600, 150)
+
+    # ---------- ---------- ---------- Mouse Event Funcs ---------- ---------- ---------- #
+
+    def resizeEvent(self, event):
+        wid = self.geometry().width()
+
+        if wid < 650 and self._cubes[0].sp_rgb_r.isVisible():
+            for idx in (2, 1, 0, 3, 4):
+                for ctp in ("r", "g", "b"):
+                    obj = getattr(self._cubes[idx], "sp_rgb_{}".format(ctp))
+                    obj.setVisible(False)
+
+                for ctp in ("h", "s", "v"):
+                    obj = getattr(self._cubes[idx], "dp_hsv_{}".format(ctp))
+                    obj.setVisible(False)
+
+        if wid > 650 and not self._cubes[0].sp_rgb_r.isVisible():
+            for idx in (2, 1, 0, 3, 4):
+                for ctp in ("r", "g", "b"):
+                    obj = getattr(self._cubes[idx], "sp_rgb_{}".format(ctp))
+                    obj.setVisible(True)
+
+                for ctp in ("h", "s", "v"):
+                    obj = getattr(self._cubes[idx], "dp_hsv_{}".format(ctp))
+                    obj.setVisible(True)
+
+        event.ignore()
 
     # ---------- ---------- ---------- Public Funcs ---------- ---------- ---------- #
 

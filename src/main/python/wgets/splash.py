@@ -16,8 +16,8 @@ Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 import os
 import json
 import locale
-from PyQt5.QtWidgets import QSplashScreen
-from PyQt5.QtGui import QPixmap, QImage
+from PySide2.QtWidgets import QSplashScreen
+from PySide2.QtGui import QPixmap, QImage
 from cguis.resource import view_rc
 
 

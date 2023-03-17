@@ -18,6 +18,13 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 * [Introduction](#introduction)
 * [Feature](#feature)
 * [Demo](#demo)
+  * [Basic Functions](#basic-functions)
+  * [Reference Colors](#reference-colors)
+  * [Color Palettes](#color-palettes)
+  * [Export and Import Colors](#export-and-import-colors)
+  * [Languages and Settings](#languages-and-settings)
+* [Reviews about Rickrack](#reviews-about-rickrack)
+* [User Comments](#user-comments)
 * [Information](#information)
   * [Homepage](#homepage)
   * [Repository](#repository)
@@ -31,7 +38,6 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 * [Usage](#usage)
   * [How to Use the Software](#how-to-use-the-software)
   * [How to Use the Module](#how-to-use-the-module)
-  * [Notice](#notice)
 * [Development](#development)
   * [Install Requirement](#install-requirement)
   * [How to Build the Software](#how-to-build-the-software)
@@ -39,7 +45,6 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 * [Copyright](#copyright)
 * [License](#license)
   * [License for Rickrack](#license-for-rickrack)
-  * [License for Required Packages](#license-for-required-packages)
 * [Acknowledgment](#acknowledgment)
 
 # Introduction
@@ -47,7 +52,7 @@ Colors enrich our world and affect our emotions. For artists, they display objec
 
 If you are running into these issues, Rickrack is the perfect solution for you!
 
-Rickrack is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. You can store the color sets and color boards in the software, and access them whenever you need. What's more, you can export them into individual files, back them up, share them with others or import them in to other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack, written in PyQt5, operates effectively on Windows, Linux and other mainstream operating systems.
+Rickrack is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. You can store the color sets and color boards in the software, and access them whenever you need. What's more, you can export them into individual files, back them up, share them with others or import them in to other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack, written in PySide2, operates effectively on Windows, Linux and other mainstream operating systems.
 
 Rickrack consists of two parts: the Rickrack software and the Rickrack module; the Rickrack software is designed for producing and organizing harmonious colors, and the Rickrack module is utilized for obtaining colors from the software in real-time, along with the plotting of images combined with other modules such as Matplotlib and Turtle.
 
@@ -69,20 +74,72 @@ Rickrack has several features:
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
 # Demo
-<table style="border: 0px; text-align: center">
-<tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/000.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/109.gif" /> </td></tr>
-<tr><td style="border: 0px; text-align: center"> <span> Create a set of colors from the color wheel. </span> </td><td style="border: 0px; text-align: center"> <span> Pick-up a set of colors from an image. </span> </td></tr>
+## Basic Functions
+|     |     |
+| :---: | :---: |
+| ![](demo/usage/000.gif) | ![](demo/usage/109.gif) |
+| Create a set of colors from the color wheel. | Pick-up a set of colors from an image. (Image inside: [Copyright (c) 2001 Studio Ghibli](https://www.ghibli.jp/works/chihiro/), Non-Commercial Usage) |
+| ![](demo/usage/202.gif) | ![](demo/usage/300.gif) |
+| Generate a gradient color board from the color set. | Attach the color set and color board into the depot. |
 
-<tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/202.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/300.gif" /> </td></tr>
-<tr><td style="border: 0px; text-align: center"> <span> Generate a color board from the color set. </span> </td><td style="border: 0px; text-align: center"> <span> Attach the color set and color board into the depot. </span> </td></tr>
+## Reference Colors
+|     |     |
+| :---: | :---: |
+| ![](demo/usage/018.gif) | ![](demo/usage/110.gif) |
+| Add reference colors in the color wheel. | Add reference colors from the image. (Image inside: [Copyright (c) 2001 Studio Ghibli](https://www.ghibli.jp/works/chihiro/), Non-Commercial Usage) |
 
-<tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/018.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/110.gif" /> </td></tr>
-<tr><td style="border: 0px; text-align: center"> <span> Add reference colors in the color wheel. </span> </td><td style="border: 0px; text-align: center"> <span> Add reference colors from the image. </span> </td></tr>
+## Color Palettes
+|     |     |
+| :---: | :---: |
+| ![](demo/usage/204.gif) | ![](demo/usage/205.gif) |
+| Convert: gradient palette &harr; fixed palette. | Convert: gradient palette &harr; reference palette. |
+| ![](demo/usage/700.gif) | ![](demo/usage/701.gif) |
+| Fixed palette: Chinese Traditional Colors. (Color Names: [Copyright (c) China Science Publishing & Media Ltd.](http://zhongguose.com/), Non-Commercial Usage) | Fixed palette: Nippon Traditional Colors. (Color Names: [Copyright (c) PIE BOOKS.](http://nipponcolors.com/), Non-Commercial Usage) |
 
-<tr><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/204.gif" /> </td><td style="border: 0px; text-align: center"> <img src="https://raw.githubusercontent.com/eigenmiao/images/master/main/205.gif" /> </td></tr>
-<tr><td style="border: 0px; text-align: center"> <span> Generate a fixed palette. </span> </td><td style="border: 0px; text-align: center"> <span> Generate a reference palette. </span> </td></tr>
+## Export and Import Colors
+|     |     |
+| :---: | :---: |
+| ![](demo/usage/704.gif) | ![](demo/usage/702.gif) |
+| Export colors into a Rickrack file. | Export colors into a Adobe swatch file. |
+| ![](demo/usage/705.gif) | ![](demo/usage/703.gif) |
+| Import colors from a Rickrack file. | Import colors from a Adobe swatch file. |
 
-</table>
+## Languages and Settings
+|     |     |
+| :---: | :---: |
+| ![](demo/usage/707.gif) | ![](demo/usage/706.gif) |
+| Support multiple languages, including Chinese, English, Japanese, German, French, Russian, and so on. (Languages except Chinese and English are translated by [Google Translate](https://translate.google.cn/).) | Support multiple interface themes. |
+
+## Notice
+* The interface display in demo uses [LXGWWenKai (SIL Open Font License)](https://lxgw.github.io/2021/01/28/Klee-Simpchin/) font.
+
+<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+
+# Reviews about Rickrack
+> All in all, Rickrack is a comprehensive tool for anything that requires color work. Experienced users have an exhaustive toolset to work with, while a more casual audience can improve the presentation of their art by quickly getting color synergy ideas. -- [Robert Condorache @ Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
+
+> Rickrack is an easy to use desktop app for creating and saving color palettes. It supports many major color palette formats for import and export, and is a great tool for generating color palettes of colors that go well together. -- [TJ FREE @ Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E)
+
+> ... and more!
+
+<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+
+# User Comments
+> 作为一个配色软件，它本身的色彩，嗯，足够惊艳...你完全可以信得过作者。 -- User from [Open Source China](https://www.oschina.net/comment/news/231426)
+
+> 很棒！是一个不可多得的工具。 -- User from [Bilibili](https://www.bilibili.com/video/BV1VD4y157tX/)
+
+> 谢谢分享，说明写的太详细了。 -- User from [Baidu Tieba](https://tieba.baidu.com/p/8253007907)
+
+> Thanks a mil! All of my pallette creators were online. This a good offline tool to have with some additional features too. -- User from [Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E)
+
+> I don't like online-apps, so this is a huge plus from the get-go. Thanks for sharing this great tool. -- User from [Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E)
+
+> Thanks for sharing this! And - did I notice correctly that you are also the author of this software? This looks super exciting, can’t wait to investigate it more! -- User from [Krita Artists](https://krita-artists.org/t/alternatives-to-adobe-color-rickrack/60041)
+
+> Hello, your software (the deb package) runs fine on Xubuntu 22.04 and is quite impressive! Thanks for sharing. Next step is to study some tutorials. -- User from [PIXLS.US](https://discuss.pixls.us/t/alternatives-to-adobe-color-rickrack/35997)
+
+> ... and more!
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
@@ -97,19 +154,22 @@ https://github.com/eigenmiao/Rickrack
 [Eigenmiao](mailto:eigenmiao@outlook.com)
 
 ## Support
-[Support the Future of Rickrack!](https://eigenmiao.com/rickrack/support.html)
+[Support the Future of Rickrack!](https://afdian.net/a/eigenmiao)
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
 # Installation
 ## Current Release
-The latest preview version is [v2.7.23](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.23-pre).
-
-## Download Software
-https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.23-pre
+The latest preview version is [v2.7.25](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.25).
 
 ## Install Software
-Visit https://eigenmiao.com/rickrack/ for more information. The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
+### Recommend: Install on Windows 10 or 11 via WinGet tool
+```
+winget install rickrack
+```
+
+## Install on other platforms
+Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.25) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.7.25/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 
@@ -132,7 +192,7 @@ Visit https://eigenmiao.com/rickrack/ for tutorials. Just feel free to click any
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17L4y1A7P9/).
 
-Here is a [demo](https://zhuanlan.zhihu.com/p/590842339).
+Here is a [demo](https://eigenmiao.com/2023/01/29/rickrack-alternative-to-adobe-color-en/).
 
 ## How to Use the Module
 Include Rickrack in other Python scripts, programs and softwares!
@@ -172,7 +232,19 @@ rr.run(dp_argv=dp_argv, dp_proj=dp_proj)
 * Additional modules listed in requirements folder
 
 ## How to Build the Software
-Rickrack requires the "ricore" module to function, however, it is not open-sourced yet and therefore is not supported.
+```bash
+# Download the Rickrack source code.
+git clone https://github.com/eigenmiao/Rickrack.git
+
+# Change into the directory.
+cd Rickrack
+
+# Run Rickrack.
+python src/main/python/main.py
+
+# Generate the installer for Rickrack.
+fbs freeze && fbs installer
+```
 
 ## How to Build the Module
 ```bash
@@ -182,7 +254,7 @@ git clone https://github.com/eigenmiao/Rickrack.git
 # Change into the directory.
 cd Rickrack
 
-# Generate modules.
+# Generate the package for Rickrack.
 python setup.py sdist --formats=gztar,zip
 ```
 
@@ -193,6 +265,9 @@ Copyright (c) 2019-2023 [Eigenmiao](mailto:eigenmiao@outlook.com). All Rights Re
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
+# Contributing
+This project welcomes contributions of all types. Recommending Rickrack to people you know, writing reviews for Rickrack on websites, help spec'ing, design, documentation, finding bugs, etc. can all help the project grow better.
+
 # License
 ## License for Rickrack
 Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the [GNU General Public License 3.0 (GPL 3.0)](https://www.gnu.org/licenses/) for more details.
@@ -201,31 +276,8 @@ All images, documents and translations in Rickrack [code repository](https://git
 
 Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif) ([SC](https://fonts.google.com/specimen/Noto+Serif+SC)) fonts and [Noto Sans](https://fonts.google.com/specimen/Noto+Sans) ([SC](https://fonts.google.com/specimen/Noto+Sans+SC)) fonts for interface display, which are designed by Google and published in website [Google Fonts](https://fonts.google.com/). These fonts are open-sourced under [Apache 2.0](http://www.apache.org/licenses/) and [SIL Open Font License 1.1](http://scripts.sil.org/OFL), respectively.
 
-## License for Required Packages
-| Package        | Version  | License        |
-|----------------|----------|----------------|
-| altgraph       | 0.17.2   | MIT            |
-| fbs            | 0.8.9    | GPLv3 or Later |
-| future         | 0.18.2   | MIT            |
-| lxml           | 4.6.3    | BSD            |
-| macholib       | 1.15.2   | MIT            |
-| numpy          | 1.19.5   | BSD            |
-| pefile         | 2021.9.3 | MIT            |
-| Pillow         | 8.4.0    | HPND           |
-| pip            | 21.3.1   | MIT            |
-| PyInstaller    | 3.4      | GPLv2 or Later |
-| PyQt5          | 5.12.1   | GPLv3          |
-| PyQt5_sip      | 4.19.19  | SIP            |
-| pywin32        | 302      | PSF            |
-| pywin32-ctypes | 0.2.0    | BSD            |
-| ricore         | 0.0.0    | Private Module |
-| setuptools     | 40.6.2   | MIT            |
-| swatch         | 0.4.0    | MIT            |
-
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
-
 # Acknowledgment
-* The Rickrack software is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.riverbankcomputing.com/software/pyqt/) and packed up by [fbs (free edition)](https://build-system.fman.io/).
+* The Rickrack software is written in [Python](https://www.python.org/), constructed based on [PySide2](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
 * The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
 * The code repository is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
 

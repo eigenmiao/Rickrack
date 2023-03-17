@@ -13,8 +13,8 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QWidget, QRadioButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
-from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
+from PySide2.QtWidgets import QWidget, QRadioButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
+from PySide2.QtCore import Qt, Signal, QCoreApplication, QSize
 
 
 class Rule(QWidget):
@@ -22,7 +22,7 @@ class Rule(QWidget):
     Rule object based on QWidget. Init a rule in rule.
     """
 
-    ps_rule_changed = pyqtSignal(bool)
+    ps_rule_changed = Signal(bool)
 
     def __init__(self, wget, args):
         """

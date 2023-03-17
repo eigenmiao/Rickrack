@@ -44,6 +44,12 @@ Images with name start with "design" are copyrighted to [Eigenmiao](mailto:eigen
 <img src="design_en.png" alt="design_en" width="512" />
 </div>
 
+* Splash images for v2.6.6 (All Rights Reserved)
+<div>
+<img src="design_zh_v2.6.6.png" alt="design_zh_v2.6.6" width="512" />
+<img src="design_en_v2.6.6.png" alt="design_en_v2.6.6" width="512" />
+</div>
+
 * Splash images for v2.5.24 (All Rights Reserved)
 <div>
 <img src="design_zh_v2.5.24.png" alt="design_zh_v2.5.24" width="512" />

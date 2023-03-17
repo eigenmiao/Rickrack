@@ -18,9 +18,9 @@ import sys
 import time
 import numpy as np
 from PIL import Image as PImage
-from PyQt5.QtWidgets import QWidget, QLabel, QProgressBar, QMessageBox, QFileDialog, QShortcut, QMenu, QAction, QApplication
-from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QRect, QPoint, QMimeData
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence
+from PySide2.QtWidgets import QWidget, QLabel, QProgressBar, QMessageBox, QFileDialog, QShortcut, QMenu, QAction, QApplication
+from PySide2.QtCore import Qt, Signal, QCoreApplication, QRect, QPoint, QMimeData
+from PySide2.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence
 from cguis.resource import view_rc
 from clibs.image3c import Image3C
 from ricore.transpt import get_outer_box
@@ -33,14 +33,14 @@ class Image(QWidget):
     Image object based on QWidget. Init a image pannel in workarea.
     """
 
-    ps_color_changed = pyqtSignal(bool)
-    ps_image_changed = pyqtSignal(bool)
-    ps_status_changed = pyqtSignal(tuple)
-    ps_recover_channel = pyqtSignal(bool)
-    ps_modify_rule = pyqtSignal(bool)
-    ps_assit_pt_changed = pyqtSignal(bool)
-    ps_history_backup = pyqtSignal(bool)
-    ps_undo = pyqtSignal(bool)
+    ps_color_changed = Signal(bool)
+    ps_image_changed = Signal(bool)
+    ps_status_changed = Signal(tuple)
+    ps_recover_channel = Signal(bool)
+    ps_modify_rule = Signal(bool)
+    ps_assit_pt_changed = Signal(bool)
+    ps_history_backup = Signal(bool)
+    ps_undo = Signal(bool)
 
     def __init__(self, wget, args):
         """
@@ -866,7 +866,7 @@ class Image(QWidget):
             # closed without open a file.
             return
 
-    def open_image(self, image, script=""):
+    def open_image(self, image, script="", with_full_locs=[]):
         """
         Open a image.
         """
@@ -890,10 +890,11 @@ class Image(QWidget):
                 img_data = PImage.open(image)
 
             except Exception as err:
-                self.warning(self._image_errs[4])
+                self.warning(self._image_errs[4] + "\n{}\n{}".format(self._image_errs[8], err))
                 return
 
             self._image3c.img_data = img_data
+            self._args.sys_image_url = image
 
         self._categories = set()
 
@@ -903,7 +904,15 @@ class Image(QWidget):
 
         self._args.sys_activated_assit_idx = -1
         self._args.sys_color_locs = [None, None, None, None, None]
-        self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs] for i in range(5)]
+        self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs[i]] for i in range(5)]
+
+        if with_full_locs and len(with_full_locs) == 5:
+            for fidx in range(5):
+                if len(with_full_locs[fidx]) > 0:
+                    self._args.sys_color_locs[fidx] = tuple(with_full_locs[fidx][0]) if with_full_locs[fidx][0] else None
+
+                if len(with_full_locs[fidx]) - 1 == len(self._args.sys_assit_color_locs[fidx]):
+                    self._args.sys_assit_color_locs[fidx] = list(with_full_locs[fidx][1:])
 
         self._image3c.display = None
 
@@ -1272,6 +1281,7 @@ class Image(QWidget):
 
         self._home_image = False
 
+        self.ps_history_backup.emit(True)
         self.update()
 
     def enhance_finished(self, idx):
@@ -1306,14 +1316,14 @@ class Image(QWidget):
             shape = self._image3c.rgb_data.shape
             rgb = self._image3c.rgb_data[int(loc[1] * (shape[0] - 1))][int(loc[0] * (shape[1] - 1))]
 
-            if not (rgb == self._args.sys_color_set[self._args.sys_activated_idx].rgb).all():
-                color = Color(rgb, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
-
-                if self._args.sys_activated_assit_idx < 0:
+            if self._args.sys_activated_assit_idx < 0:
+                if not (rgb == self._args.sys_color_set[self._args.sys_activated_idx].rgb).all():
+                    color = Color(rgb, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
                     self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
 
-                else:
-                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][2:5] = gen_assit_args(self._args.sys_color_set[self._args.sys_activated_idx], color, self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5])
+            else:
+                color = Color(rgb, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
+                self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][2:5] = gen_assit_args(self._args.sys_color_set[self._args.sys_activated_idx], color, self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5])
 
         self.ps_color_changed.emit(True)
         # update_color_loc() is completed by 
@@ -1345,6 +1355,9 @@ class Image(QWidget):
 
                     if not (rgb == curr_color.rgb).all():
                         self._args.sys_assit_color_locs[idx][assit_idx] = None
+
+        # self.ps_history_backup.emit(True) shouldn't be placed here.
+        # it will record the moving path when moving tags.
 
         self.update()
 
@@ -1596,6 +1609,7 @@ class Image(QWidget):
             _translate("Image", "Could not process image. Translation is not completed."),
             _translate("Image", "Could not process image. The size of image is not suitable."),
             _translate("Image", "Could not process image. This image is invalid."),
+            _translate("Operation", "Detail:"),
         )
 
         self._image_descs = (

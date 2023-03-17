@@ -2,11 +2,11 @@
 
 # Form implementation generated from reading ui file 'src\main\python\cguis\design\scroll_cube.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PySide2 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 
 class Ui_ScrollCube(object):
@@ -29,7 +29,7 @@ class Ui_ScrollCube(object):
         self.sharp.setObjectName("sharp")
         self.gridLayout.addWidget(self.sharp, 1, 1, 1, 1)
         self.le_hec = QtWidgets.QLineEdit(ScrollCube)
-        self.le_hec.setMinimumSize(QtCore.QSize(64, 0))
+        self.le_hec.setMinimumSize(QtCore.QSize(0, 0))
         self.le_hec.setMaximumSize(QtCore.QSize(80, 16777215))
         self.le_hec.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.le_hec.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
@@ -49,7 +49,7 @@ class Ui_ScrollCube(object):
         self.lb_rgb_r.setObjectName("lb_rgb_r")
         self.gbox_rgb_grid_layout.addWidget(self.lb_rgb_r, 0, 0, 1, 1)
         self.hs_rgb_r = QtWidgets.QSlider(self.gbox_rgb)
-        self.hs_rgb_r.setMinimumSize(QtCore.QSize(30, 12))
+        self.hs_rgb_r.setMinimumSize(QtCore.QSize(0, 12))
         self.hs_rgb_r.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.hs_rgb_r.setMaximum(255)
         self.hs_rgb_r.setPageStep(0)
@@ -69,7 +69,7 @@ class Ui_ScrollCube(object):
         self.lb_rgb_g.setObjectName("lb_rgb_g")
         self.gbox_rgb_grid_layout.addWidget(self.lb_rgb_g, 1, 0, 1, 1)
         self.hs_rgb_g = QtWidgets.QSlider(self.gbox_rgb)
-        self.hs_rgb_g.setMinimumSize(QtCore.QSize(30, 12))
+        self.hs_rgb_g.setMinimumSize(QtCore.QSize(0, 12))
         self.hs_rgb_g.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.hs_rgb_g.setMaximum(255)
         self.hs_rgb_g.setPageStep(0)
@@ -89,7 +89,7 @@ class Ui_ScrollCube(object):
         self.lb_rgb_b.setObjectName("lb_rgb_b")
         self.gbox_rgb_grid_layout.addWidget(self.lb_rgb_b, 2, 0, 1, 1)
         self.hs_rgb_b = QtWidgets.QSlider(self.gbox_rgb)
-        self.hs_rgb_b.setMinimumSize(QtCore.QSize(30, 12))
+        self.hs_rgb_b.setMinimumSize(QtCore.QSize(0, 12))
         self.hs_rgb_b.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.hs_rgb_b.setMaximum(255)
         self.hs_rgb_b.setPageStep(0)
@@ -106,7 +106,7 @@ class Ui_ScrollCube(object):
         self.gbox_rgb_grid_layout.addWidget(self.sp_rgb_b, 2, 2, 1, 1)
         self.gridLayout.addWidget(self.gbox_rgb, 2, 0, 1, 4)
         self.cube_color = QtWidgets.QWidget(ScrollCube)
-        self.cube_color.setMinimumSize(QtCore.QSize(50, 40))
+        self.cube_color.setMinimumSize(QtCore.QSize(0, 0))
         self.cube_color.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.cube_color.setObjectName("cube_color")
         self.gridLayout.addWidget(self.cube_color, 0, 0, 1, 4)
@@ -126,7 +126,7 @@ class Ui_ScrollCube(object):
         self.lb_hsv_h.setObjectName("lb_hsv_h")
         self.gbox_hsv_grid_layout.addWidget(self.lb_hsv_h, 0, 0, 1, 1)
         self.hs_hsv_h = QtWidgets.QSlider(self.gbox_hsv)
-        self.hs_hsv_h.setMinimumSize(QtCore.QSize(30, 12))
+        self.hs_hsv_h.setMinimumSize(QtCore.QSize(0, 12))
         self.hs_hsv_h.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.hs_hsv_h.setMaximum(359999)
         self.hs_hsv_h.setPageStep(0)
@@ -147,7 +147,7 @@ class Ui_ScrollCube(object):
         self.lb_hsv_s.setObjectName("lb_hsv_s")
         self.gbox_hsv_grid_layout.addWidget(self.lb_hsv_s, 1, 0, 1, 1)
         self.hs_hsv_s = QtWidgets.QSlider(self.gbox_hsv)
-        self.hs_hsv_s.setMinimumSize(QtCore.QSize(30, 12))
+        self.hs_hsv_s.setMinimumSize(QtCore.QSize(0, 12))
         self.hs_hsv_s.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.hs_hsv_s.setMaximum(1000)
         self.hs_hsv_s.setPageStep(0)
@@ -169,7 +169,7 @@ class Ui_ScrollCube(object):
         self.lb_hsv_v.setObjectName("lb_hsv_v")
         self.gbox_hsv_grid_layout.addWidget(self.lb_hsv_v, 2, 0, 1, 1)
         self.hs_hsv_v = QtWidgets.QSlider(self.gbox_hsv)
-        self.hs_hsv_v.setMinimumSize(QtCore.QSize(30, 12))
+        self.hs_hsv_v.setMinimumSize(QtCore.QSize(0, 12))
         self.hs_hsv_v.setMaximumSize(QtCore.QSize(16777215, 16777215))
         self.hs_hsv_v.setMaximum(1000)
         self.hs_hsv_v.setPageStep(0)
