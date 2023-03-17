@@ -2,5 +2,5 @@
     "app_name": "Rickrack",
     "author": "Eigenmiao",
     "main_module": "src/main/python/main.py",
-    "version": "2.7.23"
+    "version": "2.7.25"
 }

@@ -2,12 +2,13 @@
 ## Supported Versions
 These versions of Rickrack are currently being supported with security updates.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| v2.7.23 | :white_check_mark: |
-| v2.6.6  | :x:                |
-| v2.6.5  | :x:                |
-| v2.5.24 | :white_check_mark: |
+| Version               | Supported          |
+| --------------------- | ------------------ |
+| v2.7.25-x2d3s3-stable | :white_check_mark: |
+| v2.7.23-x2d3s3-pre    | :x:                |
+| v2.6.6-x2d2s2-pre     | :x:                |
+| v2.6.5-x2d2s2-pre     | :x:                |
+| v2.5.24-x2d2s2-stable | :x:                |
 
 ## Reporting a Vulnerability
 Please send email to eigenmiao@outlook.com with the requested information listed below (as much as you can provide):

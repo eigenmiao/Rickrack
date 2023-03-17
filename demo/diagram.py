@@ -33,11 +33,11 @@ dp_proj = r"C:\Program Files\Rickrack"
 rr.run(dp_argv=dp_argv, dp_proj=dp_proj)
 
 colors = [
-    lambda r: "#" + r.colors_in_order[0].hec,
-    lambda r: "#" + r.colors_in_order[1].hec,
-    lambda r: "#" + r.colors_in_order[2].hec,
-    lambda r: "#" + r.colors_in_order[3].hec,
-    lambda r: "#" + r.colors_in_order[4].hec,
+    lambda r: "#" + r.colors_in_order[0].color.hec,
+    lambda r: "#" + r.colors_in_order[1].color.hec,
+    lambda r: "#" + r.colors_in_order[2].color.hec,
+    lambda r: "#" + r.colors_in_order[3].color.hec,
+    lambda r: "#" + r.colors_in_order[4].color.hec,
 ]
 
 # setup matplotlib.

@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.7.23-x2d3s3-pre
+v2.7.25-x2d3s3-stable
 """
 
 __AUTHOR__ = """
@@ -25,14 +25,15 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-February 19, 2023
+March 12, 2023
 """
 
 __HELP__ = """
 INTRODUCTION:
-  Rickrack is a free color editor. It is designed for generating a set of 
-  harmonious colors from color wheel or elsewhere. You can share these 
-  colors with your friends, or apply them into your creative works.
+  Rickrack is a free and user-friendly color editor. It is designed to 
+  generate a set of harmonious colors from the color wheel or other places. 
+  You can share these colors with your friends, or apply them into your 
+  creative works.
 
   See https://eigenmiao.com/rickrack/ for more information.
 
@@ -141,11 +142,12 @@ import time
 import hashlib
 import numpy as np
 from getopt import getopt
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
-from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QGridLayout, QMessageBox, QShortcut, QPushButton, QSizePolicy
-from PyQt5.QtCore import Qt, QCoreApplication, QTemporaryDir, QUrl, QTranslator, QByteArray, QT_VERSION_STR
-from PyQt5.Qt import PYQT_VERSION_STR
-from PyQt5.QtGui import QIcon, QPixmap, QImage, QDesktopServices, QKeySequence, QFontDatabase
+from fbs_runtime.application_context.PySide2 import ApplicationContext
+from PySide2 import __version__ as PYQT_VERSION_STR
+from PySide2.QtCore import __version__ as QT_VERSION_STR
+from PySide2.QtWidgets import QWidget, QMainWindow, QApplication, QGridLayout, QMessageBox, QShortcut, QPushButton, QSizePolicy
+from PySide2.QtCore import Qt, QCoreApplication, QTemporaryDir, QUrl, QTranslator, QByteArray, QSettings
+from PySide2.QtGui import QIcon, QPixmap, QImage, QDesktopServices, QKeySequence, QFontDatabase
 from cguis.design.main_window import Ui_MainWindow
 from cguis.resource import view_rc
 from clibs.server import ResultServer
@@ -153,7 +155,6 @@ from ricore.args import Args
 from ricore.color import Color
 from ricore.history import History
 from ricore.export import export_text
-from ricore.grid import gen_color_grid
 from ricore.check import check_is_num
 from ricore.icon import get_icon
 from wgets.wheel import Wheel
@@ -194,6 +195,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         reset_all_args = self._sys_argv["reset"] in ("settings", "setting", "all") or self._sys_argv["temporary"]
         self._args = Args(resources, resetall=reset_all_args, uselang=self._sys_argv["lang"])
         self._args.global_temp_dir = QTemporaryDir()
+
+        self._geo_args = QSettings(self._args.geometry_args, QSettings.IniFormat)
 
         self._save_settings_before_close = True
         self._connected_keymaps = {}
@@ -315,13 +318,19 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._default_state = self.saveState()
         self._default_size = self.size()
 
-        if self._args.main_win_state and self._args.main_win_geometry and self._sys_argv["reset"] not in ("layout", "geometry", "all"):
-            try:
-                state = QByteArray.fromBase64(bytes(self._args.main_win_state, 'ascii'))
-                self.restoreState(state)
+        main_win_state = self._geo_args.value('main_win_state', None)
+        main_win_geometry = self._geo_args.value('main_win_geometry', None)
 
-                geometry = QByteArray.fromBase64(bytes(self._args.main_win_geometry, 'ascii'))
-                self.restoreGeometry(geometry)
+        if main_win_state:
+            try:
+                self.restoreState(main_win_state)
+
+            except Exception as err:
+                pass
+
+        if main_win_geometry:
+            try:
+                self.restoreGeometry(main_win_geometry)
 
             except Exception as err:
                 pass
@@ -375,14 +384,14 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             cur_in_window = False
 
             for sc_idx in range(scr_count):
-                scr_geometry = QApplication.desktop().availableGeometry(sc_idx)
+                scr_geometry = QApplication.screens()[sc_idx].availableGeometry()
 
                 if scr_geometry.x() < cur_geometry.x() < scr_geometry.x() + scr_geometry.width() and scr_geometry.y() < cur_geometry.y() < scr_geometry.y() + scr_geometry.height():
                     cur_in_window = True
                     break
 
             if not cur_in_window:
-                scr_geometry = QApplication.desktop().availableGeometry(0)
+                scr_geometry = QApplication.primaryScreen().availableGeometry()
 
                 new_x = (scr_geometry.width() - cur_geometry.width()) / 2
                 new_y = (scr_geometry.height() - cur_geometry.height()) / 2
@@ -590,6 +599,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_depot.ps_dropped.connect(lambda x: self._inner_open(x))
         self._wget_depot.ps_appended.connect(lambda x: self._inner_append(x))
 
+        self._wget_depot.ps_open_image_url.connect(lambda x: self._wget_image.open_image(x[0], with_full_locs=x[1]))
+
     def _setup_script(self):
         """
         Setup script.
@@ -795,10 +806,12 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
         if undo:
             self._history.undo()
+            self._wget_rule.update_rule()
             self._wget_cube_table.update_color()
 
         else:
             self._history.redo()
+            self._wget_rule.update_rule()
             self._wget_cube_table.update_color()
 
     def _inner_modify_color(self, idx, color):
@@ -1550,8 +1563,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             if os.path.isfile(os.sep.join((store_path, backup_file))) and backup_file[-5:] == ".temp":
                 os.remove(os.sep.join((store_path, backup_file)))
 
-        self._args.main_win_state = bytes(self.saveState().toBase64()).decode("ascii")
-        self._args.main_win_geometry = bytes(self.saveGeometry().toBase64()).decode("ascii")
+        self._geo_args.setValue('main_win_state', self.saveState())
+        self._geo_args.setValue('main_win_geometry', self.saveGeometry())
 
         self._args.save_settings()
 
@@ -1847,7 +1860,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("Rickrack", "Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the GNU General Public License 3.0 (GPL 3.0) for more details."),
             _translate("Rickrack", "OK"),
             _translate("Rickrack", "Visit Website"),
-            _translate("Rickrack", "Rickrack uses Qt version {} (PyQt version {}) licensed under GNU General Public License. Please see qt.io/licensing for an overview of Qt licensing."),
+            _translate("Rickrack", "Rickrack uses Qt version {} (PySide version {}) licensed under GNU General Public License. Please see qt.io/licensing for an overview of Qt licensing."),
             _translate("Rickrack", "All images, documents and translations in Rickrack code repository are licensed under Creative Commons Attribution-NonCommercial-ShareAlike License 4.0 (CC BY-NC-SA 4.0) unless stating additionally."),
             _translate("Rickrack", "Rickrack default uses Noto Serif (SC) fonts and Noto Sans (SC) fonts for interface display, which are designed by Google and published in website Google Fonts."),
             _translate("Rickrack", "Support Rickrack!"),

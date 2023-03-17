@@ -2,11 +2,11 @@
 
 # Form implementation generated from reading ui file 'src\main\python\cguis\design\settings_dialog.ui'
 #
-# Created by: PyQt5 UI code generator 5.12.1
+# Created by: PySide2 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PySide2 import QtCore, QtGui, QtWidgets
 
 
 class Ui_SettingsDialog(object):
@@ -904,7 +904,7 @@ class Ui_SettingsDialog(object):
         self.usr_color_label.setText(_translate("SettingsDialog", "usr color"))
         self.clean_up_btn.setText(_translate("SettingsDialog", "clean up"))
         self.restore_original_btn.setText(_translate("SettingsDialog", "restore"))
-        self.clean_up_label.setText(_translate("SettingsDialog", "<html><head/><body><p>clean up all color sets (<span style=\" font-weight:600; color:#ff0000;\">irrecoverable</span>)</p></body></html>"))
+        self.clean_up_label.setText(_translate("SettingsDialog", "clean up all color sets (irrecoverable)"))
         self.win_on_top_cbox.setText(_translate("SettingsDialog", "win on top"))
         self.usr_image_label.setText(_translate("SettingsDialog", "usr image"))
         self.store_loc_cbox.setText(_translate("SettingsDialog", "store loc"))

@@ -17,8 +17,8 @@ import os
 import time
 import json
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QFileDialog, QMessageBox
-from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
+from PySide2.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QFileDialog, QMessageBox
+from PySide2.QtCore import Qt, Signal, QCoreApplication, QSize
 from ricore.export import export_list, export_text, export_swatch, export_ase, export_gpl, export_xml, import_text, import_swatch, import_ase, import_gpl, import_xml
 from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values, norm_im_time
 from ricore.color import Color
@@ -29,12 +29,12 @@ class Operation(QWidget):
     Operation object based on QWidget. Init a operation in operation.
     """
 
-    ps_create = pyqtSignal(bool)
-    ps_locate = pyqtSignal(bool)
-    ps_derive = pyqtSignal(bool)
-    ps_update = pyqtSignal(bool)
-    ps_attach = pyqtSignal(bool)
-    ps_opened = pyqtSignal(bool)
+    ps_create = Signal(bool)
+    ps_locate = Signal(bool)
+    ps_derive = Signal(bool)
+    ps_update = Signal(bool)
+    ps_attach = Signal(bool)
+    ps_opened = Signal(bool)
 
     def __init__(self, wget, args):
         """
@@ -180,11 +180,14 @@ class Operation(QWidget):
         """
 
         color_dict = {}
+        curr_path = ""
 
         if direct_dict:
             color_dict = depot_file
 
         else:
+            curr_path = os.path.dirname(depot_file)
+
             with open(depot_file, "r", encoding="utf-8") as f:
                 try:
                     color_dict = json.load(f)
@@ -257,6 +260,8 @@ class Operation(QWidget):
 
                     if "desc" in color:
                         cr_desc = str(color["desc"])
+                        cr_desc = cr_desc.replace("$curr_path$", curr_path)
+                        cr_desc = cr_desc.replace("$os_sep$", os.sep)
 
                     else:
                         cr_desc = ""
@@ -691,7 +696,7 @@ class Operation(QWidget):
                     self._args.sys_grid_values = grid_values
 
                     self._args.sys_activated_assit_idx = -1
-                    self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs] for i in range(5)]
+                    self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs[i]] for i in range(5)]
 
             else:
                 self.warning(self._operation_errs[8] + "\n{}\n{}".format(self._operation_errs[17], color_dict["rule"]))

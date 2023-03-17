@@ -19,15 +19,16 @@ import sys
 import json
 import time
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QGridLayout, QScrollArea, QFrame, QShortcut, QMenu, QAction, QDialog, QDialogButtonBox, QPushButton, QApplication, QMessageBox
-from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QMimeData, QPoint, QUrl
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QCursor, QKeySequence, QPixmap, QImage, QIcon, QDrag
+from PySide2.QtWidgets import QWidget, QGridLayout, QScrollArea, QFrame, QShortcut, QMenu, QAction, QDialog, QDialogButtonBox, QPushButton, QApplication, QMessageBox
+from PySide2.QtCore import Qt, Signal, QCoreApplication, QMimeData, QPoint, QUrl
+from PySide2.QtGui import QPainter, QPen, QBrush, QColor, QCursor, QKeySequence, QPixmap, QImage, QIcon, QDrag
 from cguis.design.info_dialog import Ui_InfoDialog
 from cguis.resource import view_rc
 from ricore.color import FakeColor, Color
 from ricore.export import export_list
 from ricore.transpt import get_link_tag
 from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values, norm_im_time
+from ricore.check import check_image_desc
 
 
 class Info(QDialog, Ui_InfoDialog):
@@ -440,14 +441,15 @@ class Depot(QWidget):
     Depot object based on QWidget. Init a color set depot in workarea.
     """
 
-    ps_update = pyqtSignal(bool)
-    ps_export = pyqtSignal(int)
-    ps_status_changed = pyqtSignal(tuple)
-    ps_dropped = pyqtSignal(tuple)
-    ps_appended = pyqtSignal(tuple)
-    ps_linked = pyqtSignal(bool)
-    ps_history_backup = pyqtSignal(bool)
-    ps_undo = pyqtSignal(bool)
+    ps_update = Signal(bool)
+    ps_export = Signal(int)
+    ps_status_changed = Signal(tuple)
+    ps_dropped = Signal(tuple)
+    ps_appended = Signal(tuple)
+    ps_linked = Signal(bool)
+    ps_history_backup = Signal(bool)
+    ps_undo = Signal(bool)
+    ps_open_image_url = Signal(tuple)
 
     def __init__(self, wget, args):
         """
@@ -508,11 +510,17 @@ class Depot(QWidget):
         # shortcut is updated by _setup_skey in main.py.
         # self.update_skey()
 
+        # stab_column is changed with the changing of interface size. this code is reused.
+        self._stab_column_wid = None
+
     # ---------- ---------- ---------- Paint Funcs ---------- ---------- ---------- #
 
     def paintEvent(self, event):
         self._pl_wid = int((self.width() - (self._scroll_bar.width() * 1.25)) / self._args.stab_column)
         self._tot_rows = len(self._args.stab_ucells) // self._args.stab_column if len(self._args.stab_ucells) % self._args.stab_column == 0 else len(self._args.stab_ucells) // self._args.stab_column + 1
+
+        if not self._stab_column_wid:
+            self._stab_column_wid = int(self._pl_wid)
 
         height = self._pl_wid * self._tot_rows
         height = height if height > self._scroll_area.height() else self._scroll_area.height()
@@ -808,6 +816,20 @@ class Depot(QWidget):
         else:
             event.ignore()
 
+    def resizeEvent(self, event):
+        if self._stab_column_wid:
+            wid = self.width()
+
+            stab_column = int(wid / self._stab_column_wid)
+            stab_column = 1 if stab_column < 1 else stab_column
+
+            if stab_column != self._args.stab_column:
+                self._args.modify_settings("stab_column", stab_column)
+
+            self.update()
+
+        event.ignore()
+
     # ---------- ---------- ---------- Public Funcs ---------- ---------- ---------- #
 
     def initialize(self):
@@ -945,6 +967,9 @@ class Depot(QWidget):
                 stab_column = stab_column - 1
 
         self._args.modify_settings("stab_column", stab_column)
+
+        # stab_column is changed with the changing of interface size. this code is reused.
+        self._stab_column_wid = None
 
         self.update()
 
@@ -1134,10 +1159,15 @@ class Depot(QWidget):
 
                 self._args.sys_activated_assit_idx = -1
 
-                self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs] for i in range(5)]
+                self._args.sys_assit_color_locs = [[None for j in self._args.sys_grid_assitlocs[i]] for i in range(5)]
 
                 self.ps_update.emit(True)
                 self.ps_history_backup.emit(True)
+
+                image_url, full_loc = check_image_desc(self._args.stab_ucells[self._current_idx].desc)
+
+                if image_url:
+                    self.ps_open_image_url.emit((image_url, full_loc))
 
             # link and unlink.
             if self._press_key == 2:
@@ -1202,8 +1232,10 @@ class Depot(QWidget):
             unit_cell = UnitCell(self._scroll_contents, self._args, hsv_set, color_list[1], color_list[2], color_list[3], color_list[4], color_list[5], color_list[6], color_list[7], color_list[8])
 
         else:
+            atc_name = ""
+            atc_desc = ""
             hsv_set = tuple(self._args.sys_color_set[i].hsv for i in range(5))
-            unit_cell = UnitCell(self._scroll_contents, self._args, hsv_set, self._args.hm_rule, "", "", (time.time(), time.time()), self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values)
+            unit_cell = UnitCell(self._scroll_contents, self._args, hsv_set, self._args.hm_rule, atc_name, atc_desc, (time.time(), time.time()), self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values)
 
         self._scroll_grid_layout.addWidget(unit_cell)
 

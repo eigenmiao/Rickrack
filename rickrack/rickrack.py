@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.7.23-x2d3s3-pre
+v2.7.25-x2d3s3-stable
 """
 
 __AUTHOR__ = """
@@ -25,14 +25,14 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-February 19, 2023
+March 12, 2023
 """
 
 __HELP__ = """
 INTRODUCTION:
-  Rickrack-Startup provides methods to operate Rickrack in command line or 
-  Python code, including starting, closing, and obtaining color results 
-  from Rickrack.
+  Rickrack-Startup provides the ability to operate Rickrack from the 
+  command line or through Python code, allowing you to start it, close it, 
+  and obtain color results from Rickrack.
 
   See https://eigenmiao.com/rickrack/ for more information.
 
