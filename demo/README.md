@@ -1,27 +1,14 @@
 ![Rickrack](../src/main/icons/full/icon_full_128.png)
 
-[中文](https://eigenmiao.com/yanhuo/zh.html) | [English](https://eigenmiao.com/yanhuo/en.html) | [日本語](https://eigenmiao.com/yanhuo/ja.html)
+[中文](https://eigenmiao.com/yanhuo/) | [English](https://eigenmiao.com/rickrack/)
 
-This directory contains a demo for using the [Rickrack software and module](https://github.com/eigenmiao/Rickrack). It plots curves, bars, maps, and polar bars with various, customizable colors from the Rickrack. The colors can be adjusted in real-time using the Rickrack module.
+This directory contains demos for using the [Rickrack software and module](https://github.com/eigenmiao/Rickrack). The demos in this folder are published for learning and communication purpose only.
 
-Here is a [video tutorial](https://www.bilibili.com/video/BV1VD4y157tX/).
+1. [Basic usage of Rickrack.](./usage)
 
-Steps:
-1. Install the Rickrack software.
+2. [Open a color palette in Rickrack with colors from several pictures.](./palettes/)
 
-2. Install the Python modules.
-```
-pip install rickrack
-pip install numpy matplotlib basemap
-```
-
-3. Run the demo script.
-```
-python diagram.py
-```
-
-4. Check the finall result.
-![Result](diagram.png)
+3. [Plot a diagram by Matplotlib with various, customizable colors from the Rickrack.](./plots/)
 
 Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the [GNU General Public License 3.0 (GPL 3.0)](https://www.gnu.org/licenses/) for more details.
 
