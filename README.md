@@ -4,7 +4,7 @@
 Rickrack<br/>焰火十二卷<br/> ----- ----- ----- ----- ----- ----- ----- ----- <br/>
 Generate Harmonious Colors Freely.<br/>自由自在生成和谐色彩。
 <br/><br/>
-[<a href="https://eigenmiao.com/yanhuo/zh.html">中文</a>] | [<a href="https://eigenmiao.com/yanhuo/en.html">English</a>] | [<a href="https://eigenmiao.com/yanhuo/ja.html">日本語</a>]
+[<a href="https://eigenmiao.com/yanhuo/">中文</a>] | [<a href="https://eigenmiao.com/rickrack/">English</a>]
 <br/><br/>
 </div>
 
@@ -52,7 +52,7 @@ Colors enrich our world and affect our emotions. For artists, they display objec
 
 If you are running into these issues, Rickrack is the perfect solution for you!
 
-Rickrack is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. You can store the color sets and color boards in the software, and access them whenever you need. What's more, you can export them into individual files, back them up, share them with others or import them in to other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack, written in PySide2, operates effectively on Windows, Linux and other mainstream operating systems.
+Rickrack is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. You can store the color sets and color boards in the software, and access them whenever you need. What's more, you can export them into individual files, back them up, share them with others or import them in to other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack, written in PyQt5, operates effectively on Windows, Linux and other mainstream operating systems.
 
 Rickrack consists of two parts: the Rickrack software and the Rickrack module; the Rickrack software is designed for producing and organizing harmonious colors, and the Rickrack module is utilized for obtaining colors from the software in real-time, along with the plotting of images combined with other modules such as Matplotlib and Turtle.
 
@@ -95,14 +95,6 @@ Rickrack has several features:
 | Convert: gradient palette &harr; fixed palette. | Convert: gradient palette &harr; reference palette. |
 | ![](demo/usage/700.gif) | ![](demo/usage/701.gif) |
 | Fixed palette: Chinese Traditional Colors. (Color Names: [Copyright (c) China Science Publishing & Media Ltd.](http://zhongguose.com/), Non-Commercial Usage) | Fixed palette: Nippon Traditional Colors. (Color Names: [Copyright (c) PIE BOOKS.](http://nipponcolors.com/), Non-Commercial Usage) |
-
-## Export and Import Colors
-|     |     |
-| :---: | :---: |
-| ![](demo/usage/704.gif) | ![](demo/usage/702.gif) |
-| Export colors into a Rickrack file. | Export colors into a Adobe swatch file. |
-| ![](demo/usage/705.gif) | ![](demo/usage/703.gif) |
-| Import colors from a Rickrack file. | Import colors from a Adobe swatch file. |
 
 ## Languages and Settings
 |     |     |
@@ -277,7 +269,7 @@ All images, documents and translations in Rickrack [code repository](https://git
 Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif) ([SC](https://fonts.google.com/specimen/Noto+Serif+SC)) fonts and [Noto Sans](https://fonts.google.com/specimen/Noto+Sans) ([SC](https://fonts.google.com/specimen/Noto+Sans+SC)) fonts for interface display, which are designed by Google and published in website [Google Fonts](https://fonts.google.com/). These fonts are open-sourced under [Apache 2.0](http://www.apache.org/licenses/) and [SIL Open Font License 1.1](http://scripts.sil.org/OFL), respectively.
 
 # Acknowledgment
-* The Rickrack software is written in [Python](https://www.python.org/), constructed based on [PySide2](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
+* The Rickrack software is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
 * The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
 * The code repository is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
 
