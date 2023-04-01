@@ -9,13 +9,16 @@ Generate Harmonious Colors Freely.<br/>自由自在生成和谐色彩。
 </div>
 
 # Rickrack
+In the age of digital creativity, the color palette has become an indispensable tool for designers. A good color palette can make a design more attractive and coordinated. Rickrack is designed for you if you are looking for an excellent color palette software! Rickrack has various color mixing functions and is suitable for various scenes. Rickrack is easy to use, and more importantly, it's completely free without networking or registration required.
+
 Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works.
 
 # 焰火十二卷
+在数字创意的时代，调色板成为了设计师不可或缺的工具。一个好的调色板可以让设计更加有吸引力和协调性。如果你正在寻找一款优秀的调色板软件，那就试试焰火十二卷吧！焰火十二卷具有多种配色功能，适用于多种场景。焰火十二卷简单易上手，更重要的是，它完全免费，无需联网或注册。
+
 焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。
 
 # Table of Content
-* [Introduction](#introduction)
 * [Feature](#feature)
 * [Demo](#demo)
   * [Basic Functions](#basic-functions)
@@ -24,7 +27,6 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
   * [Export and Import Colors](#export-and-import-colors)
   * [Languages and Settings](#languages-and-settings)
 * [Reviews about Rickrack](#reviews-about-rickrack)
-* [User Comments](#user-comments)
 * [Information](#information)
   * [Homepage](#homepage)
   * [Repository](#repository)
@@ -46,17 +48,6 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 * [License](#license)
   * [License for Rickrack](#license-for-rickrack)
 * [Acknowledgment](#acknowledgment)
-
-# Introduction
-Colors enrich our world and affect our emotions. For artists, they display objects and convey feelings by varied colors in photos, images and drawings. For scientist, they present data by distinguishable colors in figures and graphics. However, the majority of color softwares and websites put restrictions on users, which include the inability to export color palettes into individual files, not providing invocation interfaces, requiring registrations, regional limitations and (or) collecting users' personal information.
-
-If you are running into these issues, Rickrack is the perfect solution for you!
-
-Rickrack is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. You can store the color sets and color boards in the software, and access them whenever you need. What's more, you can export them into individual files, back them up, share them with others or import them in to other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack, written in PyQt5, operates effectively on Windows, Linux and other mainstream operating systems.
-
-Rickrack consists of two parts: the Rickrack software and the Rickrack module; the Rickrack software is designed for producing and organizing harmonious colors, and the Rickrack module is utilized for obtaining colors from the software in real-time, along with the plotting of images combined with other modules such as Matplotlib and Turtle.
-
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
 # Feature
 Rickrack has several features:
@@ -111,25 +102,6 @@ Rickrack has several features:
 > All in all, Rickrack is a comprehensive tool for anything that requires color work. Experienced users have an exhaustive toolset to work with, while a more casual audience can improve the presentation of their art by quickly getting color synergy ideas. -- [Robert Condorache @ Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
 
 > Rickrack is an easy to use desktop app for creating and saving color palettes. It supports many major color palette formats for import and export, and is a great tool for generating color palettes of colors that go well together. -- [TJ FREE @ Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E)
-
-> ... and more!
-
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
-
-# User Comments
-> 作为一个配色软件，它本身的色彩，嗯，足够惊艳...你完全可以信得过作者。 -- User from [Open Source China](https://www.oschina.net/comment/news/231426)
-
-> 很棒！是一个不可多得的工具。 -- User from [Bilibili](https://www.bilibili.com/video/BV1VD4y157tX/)
-
-> 谢谢分享，说明写的太详细了。 -- User from [Baidu Tieba](https://tieba.baidu.com/p/8253007907)
-
-> Thanks a mil! All of my pallette creators were online. This a good offline tool to have with some additional features too. -- User from [Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E)
-
-> I don't like online-apps, so this is a huge plus from the get-go. Thanks for sharing this great tool. -- User from [Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E)
-
-> Thanks for sharing this! And - did I notice correctly that you are also the author of this software? This looks super exciting, can’t wait to investigate it more! -- User from [Krita Artists](https://krita-artists.org/t/alternatives-to-adobe-color-rickrack/60041)
-
-> Hello, your software (the deb package) runs fine on Xubuntu 22.04 and is quite impressive! Thanks for sharing. Next step is to study some tutorials. -- User from [PIXLS.US](https://discuss.pixls.us/t/alternatives-to-adobe-color-rickrack/35997)
 
 > ... and more!
 
