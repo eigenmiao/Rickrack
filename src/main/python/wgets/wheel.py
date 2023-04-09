@@ -17,9 +17,9 @@ import os
 import json
 import time
 import numpy as np
-from PySide2.QtWidgets import QWidget, QShortcut, QMenu, QAction, QApplication, QMessageBox
-from PySide2.QtCore import Qt, QPoint, Signal, QCoreApplication, QSize, Signal, QMimeData, QPoint, QUrl
-from PySide2.QtGui import QPainter, QPen, QBrush, QColor, QConicalGradient, QRadialGradient, QLinearGradient, QKeySequence, QDrag, QPixmap, QCursor
+from PyQt5.QtWidgets import QWidget, QShortcut, QMenu, QAction, QApplication, QMessageBox
+from PyQt5.QtCore import Qt, QPoint, pyqtSignal, QCoreApplication, QSize, pyqtSignal, QMimeData, QPoint, QUrl
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QConicalGradient, QRadialGradient, QLinearGradient, QKeySequence, QDrag, QPixmap, QCursor
 from cguis.resource import view_rc
 from ricore.transpt import get_outer_box, rotate_point_center, get_theta_center
 from ricore.grid import gen_assit_color
@@ -32,12 +32,12 @@ class Wheel(QWidget):
     Wheel object based on QWidget. Init a color wheel in workarea.
     """
 
-    ps_color_changed = Signal(bool)
-    ps_index_changed = Signal(bool)
-    ps_status_changed = Signal(tuple)
-    ps_dropped = Signal(tuple)
-    ps_history_backup = Signal(bool)
-    ps_undo = Signal(bool)
+    ps_color_changed = pyqtSignal(bool)
+    ps_index_changed = pyqtSignal(bool)
+    ps_status_changed = pyqtSignal(tuple)
+    ps_dropped = pyqtSignal(tuple)
+    ps_history_backup = pyqtSignal(bool)
+    ps_undo = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -801,6 +801,11 @@ class Wheel(QWidget):
         self._action_reset.triggered.connect(self.reset_assit_point)
         self._menu.addAction(self._action_reset)
 
+        #   _translate("Wheel", "Paste"), # 5
+        self._action_paste = QAction(self)
+        self._action_paste.triggered.connect(self.clipboard_in)
+        self._menu.addAction(self._action_paste)
+
         #   _translate("Wheel", "Copy RGB"), # 2
         #   _translate("Wheel", "Copy HSV"), # 3
         #   _translate("Wheel", "Copy Hex Code"), # 4
@@ -815,11 +820,6 @@ class Wheel(QWidget):
         self._action_copy_hec = QAction(self)
         self._action_copy_hec.triggered.connect(self.clipboard_all("hec"))
         self._menu.addAction(self._action_copy_hec)
-
-        #   _translate("Wheel", "Paste"), # 5
-        self._action_paste = QAction(self)
-        self._action_paste.triggered.connect(self.clipboard_in)
-        self._menu.addAction(self._action_paste)
 
         #   _translate("Wheel", "Insert Ref Point (Ctrl+MV)"), # 6
         self._action_insert = QAction(self)

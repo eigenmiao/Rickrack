@@ -206,7 +206,7 @@ __SVG_UPDATE__ = """
 """
 
 import os
-from PySide2.QtGui import QIcon
+from PyQt5.QtGui import QIcon
 
 
 def get_icon(name, forecolor, backcolor, temp_dir, default):

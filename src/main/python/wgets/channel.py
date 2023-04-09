@@ -13,8 +13,8 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PySide2.QtWidgets import QWidget, QRadioButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
-from PySide2.QtCore import Qt, Signal, QCoreApplication, QSize
+from PyQt5.QtWidgets import QWidget, QRadioButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
+from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
 
 
 class Channel(QWidget):
@@ -22,7 +22,7 @@ class Channel(QWidget):
     Channel object based on QWidget. Init a channel in channel.
     """
 
-    ps_channel_changed = Signal(bool)
+    ps_channel_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """

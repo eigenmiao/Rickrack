@@ -13,8 +13,8 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PySide2.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
-from PySide2.QtCore import Qt, Signal, QCoreApplication, QSize
+from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
+from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
 from wgets.general import SlideText
 
 
@@ -23,11 +23,11 @@ class Script(QWidget):
     Script object based on QWidget. Init a script in script.
     """
 
-    ps_filter = Signal(tuple)
-    ps_crop = Signal(bool)
-    ps_freeze = Signal(bool)
-    ps_print = Signal(bool)
-    ps_extract = Signal(int)
+    ps_filter = pyqtSignal(tuple)
+    ps_crop = pyqtSignal(bool)
+    ps_freeze = pyqtSignal(bool)
+    ps_print = pyqtSignal(bool)
+    ps_extract = pyqtSignal(int)
 
     def __init__(self, wget, args):
         """

@@ -34,12 +34,12 @@ class Args(object):
         """
 
         # software version.
-        self.info_version_zh = "v2.7.25-x2d3s3-稳定版"
-        self.info_version_en = "v2.7.25-x2d3s3-stable"
+        self.info_version_zh = "v2.7.26-x2d3s3-稳定版"
+        self.info_version_en = "v2.7.26-x2d3s3-stable"
 
         # update date.
-        self.info_date_zh = "2023年3月12日"
-        self.info_date_en = "March 12, 2023"
+        self.info_date_zh = "2023年4月9日"
+        self.info_date_en = "April 9, 2023"
 
         # temporary dir.
         self.global_temp_dir = None
@@ -190,6 +190,9 @@ class Args(object):
             default_locale = str(locale.getdefaultlocale()[0])
 
         except Exception as err:
+            default_locale = ""
+
+        if default_locale.startswith("eo"):
             default_locale = ""
 
         if len(default_locale) > 1:

@@ -13,9 +13,9 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PySide2.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QScrollArea, QFrame, QColorDialog, QApplication
-from PySide2.QtCore import Qt, QSize, Signal, QMimeData, QPoint
-from PySide2.QtGui import QPainter, QPen, QColor, QBrush
+from PyQt5.QtWidgets import QWidget, QGridLayout, QHBoxLayout, QScrollArea, QFrame, QColorDialog, QApplication
+from PyQt5.QtCore import Qt, QSize, pyqtSignal, QMimeData, QPoint
+from PyQt5.QtGui import QPainter, QPen, QColor, QBrush
 from cguis.design.scroll_cube import Ui_ScrollCube
 from ricore.color import Color
 from ricore.transpt import get_link_tag, get_outer_box
@@ -27,8 +27,8 @@ class Square(QWidget):
     Square objet based on QWidget. Init a color square in cube.
     """
 
-    ps_color_changed = Signal(bool)
-    ps_index_changed = Signal(bool)
+    ps_color_changed = pyqtSignal(bool)
+    ps_index_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args, idx):
         """
@@ -233,8 +233,8 @@ class CubeTable(QWidget):
     CubeTable object based on QWidget. Init color cube table in result.
     """
 
-    ps_color_changed = Signal(bool)
-    ps_history_backup = Signal(bool)
+    ps_color_changed = pyqtSignal(bool)
+    ps_history_backup = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """

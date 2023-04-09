@@ -13,8 +13,8 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PySide2.QtWidgets import QWidget, QGridLayout, QLabel, QDoubleSpinBox, QSlider, QSpacerItem, QSizePolicy, QCheckBox
-from PySide2.QtCore import Qt, Signal
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QDoubleSpinBox, QSlider, QSpacerItem, QSizePolicy, QCheckBox
+from PyQt5.QtCore import Qt, pyqtSignal
 
 
 class NoWheelSlider(QSlider):
@@ -54,7 +54,7 @@ class SlideText(QWidget):
     Box with a text label, a spin box and a slider.
     """
 
-    ps_value_changed = Signal(float)
+    ps_value_changed = pyqtSignal(float)
 
     def __init__(self, wget, num_range=(0.0, 1.0), maxlen=100000, interval=10000, step=1000, decimals=2, default_value=0.0):
         """
@@ -230,7 +230,7 @@ class RGBHSVCkb(QWidget):
     Box with a R, G, B, H, S, V ckeckboxes.
     """
 
-    ps_value_changed = Signal(tuple)
+    ps_value_changed = pyqtSignal(tuple)
 
     def __init__(self, wget, default_values=[], oneline_mode=True):
         """

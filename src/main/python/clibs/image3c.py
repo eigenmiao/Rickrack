@@ -16,8 +16,8 @@ Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 import os
 import numpy as np
 from PIL import Image, ImageFilter
-from PySide2.QtCore import QThread, Signal
-from PySide2.QtGui import QImage
+from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtGui import QImage
 from ricore.color import Color
 from ricore.image_act import extract_image
 
@@ -54,11 +54,11 @@ class Image3C(QThread):
         5: dark
     """
 
-    ps_proceses = Signal(int)
-    ps_describe = Signal(int)
-    ps_finished = Signal(int)
-    ps_enhanced = Signal(int)
-    ps_extracts = Signal(list)
+    ps_proceses = pyqtSignal(int)
+    ps_describe = pyqtSignal(int)
+    ps_finished = pyqtSignal(int)
+    ps_enhanced = pyqtSignal(int)
+    ps_extracts = pyqtSignal(list)
 
     def __init__(self, temp_dir):
         """
