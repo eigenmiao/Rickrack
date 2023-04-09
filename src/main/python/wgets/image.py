@@ -18,9 +18,9 @@ import sys
 import time
 import numpy as np
 from PIL import Image as PImage
-from PySide2.QtWidgets import QWidget, QLabel, QProgressBar, QMessageBox, QFileDialog, QShortcut, QMenu, QAction, QApplication
-from PySide2.QtCore import Qt, Signal, QCoreApplication, QRect, QPoint, QMimeData
-from PySide2.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence
+from PyQt5.QtWidgets import QWidget, QLabel, QProgressBar, QMessageBox, QFileDialog, QShortcut, QMenu, QAction, QApplication
+from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QRect, QPoint, QMimeData
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence
 from cguis.resource import view_rc
 from clibs.image3c import Image3C
 from ricore.transpt import get_outer_box
@@ -33,14 +33,14 @@ class Image(QWidget):
     Image object based on QWidget. Init a image pannel in workarea.
     """
 
-    ps_color_changed = Signal(bool)
-    ps_image_changed = Signal(bool)
-    ps_status_changed = Signal(tuple)
-    ps_recover_channel = Signal(bool)
-    ps_modify_rule = Signal(bool)
-    ps_assit_pt_changed = Signal(bool)
-    ps_history_backup = Signal(bool)
-    ps_undo = Signal(bool)
+    ps_color_changed = pyqtSignal(bool)
+    ps_image_changed = pyqtSignal(bool)
+    ps_status_changed = pyqtSignal(tuple)
+    ps_recover_channel = pyqtSignal(bool)
+    ps_modify_rule = pyqtSignal(bool)
+    ps_assit_pt_changed = pyqtSignal(bool)
+    ps_history_backup = pyqtSignal(bool)
+    ps_undo = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -1479,6 +1479,11 @@ class Image(QWidget):
         self._action_reset.triggered.connect(self.home)
         self._menu.addAction(self._action_reset)
 
+        #   _translate("Image", "Paste"), # 4
+        self._action_paste = QAction(self)
+        self._action_paste.triggered.connect(self.clipboard_in)
+        self._menu.addAction(self._action_paste)
+
         #   _translate("Image", "Open Image"), # 2
         self._action_open_img = QAction(self)
         self._action_open_img.triggered.connect(self.open_image_dialog)
@@ -1488,11 +1493,6 @@ class Image(QWidget):
         self._action_copy_img = QAction(self)
         self._action_copy_img.triggered.connect(self.clipboard_img)
         self._menu.addAction(self._action_copy_img)
-
-        #   _translate("Image", "Paste"), # 4
-        self._action_paste = QAction(self)
-        self._action_paste.triggered.connect(self.clipboard_in)
-        self._menu.addAction(self._action_paste)
 
         #   _translate("Image", "Zoom In"), # 6
         #   _translate("Image", "Zoom Out"), # 7

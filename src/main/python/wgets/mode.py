@@ -13,8 +13,8 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PySide2.QtWidgets import QWidget, QCheckBox, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy
-from PySide2.QtCore import Qt, QSize, Signal, QCoreApplication
+from PyQt5.QtWidgets import QWidget, QCheckBox, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy
+from PyQt5.QtCore import Qt, QSize, pyqtSignal, QCoreApplication
 from wgets.general import SlideText, RGBHSVCkb
 
 
@@ -23,8 +23,8 @@ class Mode(QWidget):
     Mode object based on QWidget. Init a mode in mode.
     """
 
-    ps_mode_changed = Signal(bool)
-    ps_assistp_changed = Signal(bool)
+    ps_mode_changed = pyqtSignal(bool)
+    ps_assistp_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """

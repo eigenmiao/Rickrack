@@ -14,9 +14,9 @@ Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
 import re
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QPushButton, QGroupBox, QGridLayout, QLabel, QLineEdit
-from PySide2.QtCore import Qt, Signal, QCoreApplication
-from PySide2.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QPushButton, QGroupBox, QGridLayout, QLabel, QLineEdit
+from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication
+from PyQt5.QtGui import QIcon, QPixmap
 from ricore.check import check_key, check_nonempt_str_lst
 from cguis.design.settings_dialog import Ui_SettingsDialog
 from cguis.resource import view_rc
@@ -27,13 +27,13 @@ class Settings(QDialog, Ui_SettingsDialog):
     Settings object based on QDialog. Init a settings in settings.
     """
 
-    ps_rule_changed = Signal()
-    ps_lang_changed = Signal()
-    ps_skey_changed = Signal()
-    ps_settings_changed = Signal()
-    ps_clean_up = Signal()
-    ps_restore_layout = Signal()
-    ps_theme_changed = Signal(bool)
+    ps_rule_changed = pyqtSignal()
+    ps_lang_changed = pyqtSignal()
+    ps_skey_changed = pyqtSignal()
+    ps_settings_changed = pyqtSignal()
+    ps_clean_up = pyqtSignal()
+    ps_restore_layout = pyqtSignal()
+    ps_theme_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """

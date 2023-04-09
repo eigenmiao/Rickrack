@@ -13,6 +13,7 @@ about Rickrack.
 Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
 """
 
+import numpy as np
 from rickrack.color import Color
 
 
@@ -82,10 +83,10 @@ class Grid(object):
         """
 
         if not isinstance(color_grid, (tuple, list)):
-            raise ValueError("Invalid color grid: {}".format(color_grid))
+            raise ValueError("Color grid is not a list: {}".format(color_grid))
 
         if not isinstance(name_grid, (tuple, list)):
-            raise ValueError("Invalid name grid: {}".format(name_grid))
+            raise ValueError("Name grid is not a list: {}".format(name_grid))
 
         if isinstance(grid_size, int) and grid_size >= 0:
             self._grid_size = (int(grid_size),)
@@ -97,15 +98,18 @@ class Grid(object):
             self._grid_size = (int(grid_size[0]), int(grid_size[1]))
 
         else:
-            raise ValueError("Invalid grid size: {}".format(grid_size))
+            raise ValueError("Grid size is not a number list: {}".format(grid_size))
 
         if len(self._grid_size) == 1:
-            self._color_grid = ["FFFFFF" if i >= len(color_grid) else str(color_grid[i]) for i in range(self._grid_size[0])]
-            self._name_grid = ["RR-{}".format(i + 1) if i >= len(name_grid) else str(name_grid[i]) for i in range(self._grid_size[0])]
+            color_grid = ["FFFFFF" if i >= len(color_grid) else Color.fmt_hec(color_grid[i]) for i in range(self._grid_size[0])]
+            name_grid = ["RR-{}".format(i + 1) if i >= len(name_grid) else str(name_grid[i]) for i in range(self._grid_size[0])]
 
         else:
-            self._color_grid = [["FFFFFF" if i * self._grid_size[1] + j >= len(color_grid) else str(color_grid[i * self._grid_size[1] + j]) for j in range(self._grid_size[1])] for i in range(self._grid_size[0])]
-            self._name_grid = [["RR-{}-{}".format(i + 1, j + 1) if i * self._grid_size[1] + j >= len(name_grid) else str(name_grid[i * self._grid_size[1] + j]) for j in range(self._grid_size[1])] for i in range(self._grid_size[0])]
+            color_grid = [["FFFFFF" if i * self._grid_size[1] + j >= len(color_grid) else Color.fmt_hec(color_grid[i * self._grid_size[1] + j]) for j in range(self._grid_size[1])] for i in range(self._grid_size[0])]
+            name_grid = [["RR-{}-{}".format(i + 1, j + 1) if i * self._grid_size[1] + j >= len(name_grid) else str(name_grid[i * self._grid_size[1] + j]) for j in range(self._grid_size[1])] for i in range(self._grid_size[0])]
+
+        self._color_grid = np.array(color_grid, dtype=str).reshape(grid_size)
+        self._name_grid = np.array(name_grid, dtype=str).reshape(grid_size)
 
     # ---------- ---------- ---------- Inner Funcs ---------- ---------- ---------- #
 
@@ -120,11 +124,15 @@ class Grid(object):
         curr_color = self._color_grid[idx]
         curr_name = self._name_grid[idx]
 
-        if isinstance(curr_color, str):
+        if isinstance(curr_color, str) and isinstance(curr_name, str):
             return Box(curr_color, curr_name)
 
-        else:
-            return Grid(curr_color, curr_name, len(curr_color))
+        elif isinstance(curr_color, np.ndarray) and isinstance(curr_name, np.ndarray):
+            curr_size = curr_color.shape
+            curr_color = curr_color.reshape(-1).tolist()
+            curr_name = curr_name.reshape(-1).tolist()
+
+            return Grid(curr_color, curr_name, curr_size)
 
     def __str__(self):
         """
@@ -144,19 +152,26 @@ class Grid(object):
 
     @property
     def T(self):
-        if len(self.size) == 1:
-            return Grid(self._color_grid, self._name_grid, self.size)
+        curr_color = self._color_grid.T
+        curr_name = self._name_grid.T
 
-        else:
-            return Grid(*self.v_line.grid.values, (self.size[1], self.size[0]))
+        curr_size = curr_color.shape
+        curr_color = curr_color.reshape(-1).tolist()
+        curr_name = curr_name.reshape(-1).tolist()
+
+        return Grid(curr_color, curr_name, curr_size)
 
     @property
     def size(self):
         return self._grid_size
 
     @property
+    def shape(self):
+        return self.size
+
+    @property
     def values(self):
-        return tuple(self._color_grid), tuple(self._name_grid)
+        return self._color_grid.reshape(-1).tolist(), self._name_grid.reshape(-1).tolist()
 
     @property
     def grid(self):
@@ -164,33 +179,17 @@ class Grid(object):
 
     @property
     def h_line(self):
-        if len(self.size) == 1:
-            return Grid(self._color_grid, self._name_grid, self.size)
+        curr_color = self._color_grid.reshape(-1).tolist()
+        curr_name = self._name_grid.reshape(-1).tolist()
 
-        else:
-            color_grid = []
-            name_grid = []
-
-            for i in range(self.size[0]):
-                color_grid += self._color_grid[i]
-                name_grid += self._name_grid[i]
-
-            return Grid(color_grid, name_grid, self.size[0] * self.size[1])
+        return Grid(curr_color, curr_name, len(curr_color))
 
     @property
     def v_line(self):
-        if len(self.size) == 1:
-            return Grid(self._color_grid, self._name_grid, self.size)
+        curr_color = self._color_grid.T.reshape(-1).tolist()
+        curr_name = self._name_grid.T.reshape(-1).tolist()
 
-        else:
-            color_grid = []
-            name_grid = []
-
-            for j in range(self.size[1]):
-                color_grid += [self._color_grid[i][j] for i in range(self.size[0])]
-                name_grid += [self._name_grid[i][j] for i in range(self.size[0])]
-
-            return Grid(color_grid, name_grid, self.size[0] * self.size[1])
+        return Grid(curr_color, curr_name, len(curr_color))
 
 
 class Result(object):

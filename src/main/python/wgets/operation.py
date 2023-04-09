@@ -17,8 +17,8 @@ import os
 import time
 import json
 import numpy as np
-from PySide2.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QFileDialog, QMessageBox
-from PySide2.QtCore import Qt, Signal, QCoreApplication, QSize
+from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QFileDialog, QMessageBox
+from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
 from ricore.export import export_list, export_text, export_swatch, export_ase, export_gpl, export_xml, import_text, import_swatch, import_ase, import_gpl, import_xml
 from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values, norm_im_time
 from ricore.color import Color
@@ -29,12 +29,12 @@ class Operation(QWidget):
     Operation object based on QWidget. Init a operation in operation.
     """
 
-    ps_create = Signal(bool)
-    ps_locate = Signal(bool)
-    ps_derive = Signal(bool)
-    ps_update = Signal(bool)
-    ps_attach = Signal(bool)
-    ps_opened = Signal(bool)
+    ps_create = pyqtSignal(bool)
+    ps_locate = pyqtSignal(bool)
+    ps_derive = pyqtSignal(bool)
+    ps_update = pyqtSignal(bool)
+    ps_attach = pyqtSignal(bool)
+    ps_opened = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """

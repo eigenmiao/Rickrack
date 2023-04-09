@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.7.25-x2d3s3-stable
+v2.7.26-x2d3s3-stable
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-March 12, 2023
+April 9, 2023
 """
 
 __HELP__ = """
@@ -373,6 +373,26 @@ class Rickrack(object):
         return self._result.selected_color
 
     @property
+    def full_colors(self):
+        return self._result.full_colors
+
+    @property
+    def color_grid(self):
+        return self._result.color_grid
+
+    @property
+    def cset(self):
+        return self._result.cset
+
+    @property
+    def cset_in_order(self):
+        return self._result.cset_in_order
+
+    @property
+    def refs(self):
+        return self._result.refs
+
+    @property
     def grid(self):
         return self._result.grid
 
@@ -391,7 +411,6 @@ class Rickrack(object):
         """
 
         if not self._port:
-            self.is_started_by_script = False
             return False
 
         try:
@@ -403,7 +422,6 @@ class Rickrack(object):
 
         except Exception as err:
             print("Connect to server with port {} faild:\n{}".format(self._port, err))
-            self.is_started_by_script = False
             return False
 
         return True
@@ -903,16 +921,16 @@ class Rickrack(object):
         """
 
         if self.is_started_by_script and self.is_connected:
-            client = socket.socket()
-            client.settimeout(self._timeout)
-            client.connect((self._host, self._port))
-
-            info = "exit{}".format(save_data)
-            client.sendall(info.encode("utf-8"))
-
-            client.close()
-
             while self.is_connected:
+                client = socket.socket()
+                client.settimeout(self._timeout)
+                client.connect((self._host, self._port))
+
+                info = "exit{}".format(save_data)
+                client.sendall(info.encode("utf-8"))
+
+                client.close()
+
                 time.sleep(1)
                 print("Waiting for closing Rickrack.")
 

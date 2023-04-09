@@ -18,9 +18,9 @@ import re
 import json
 import time
 import numpy as np
-from PySide2.QtWidgets import QWidget, QShortcut, QMenu, QAction, QLabel, QDialog, QGridLayout, QPushButton, QDialogButtonBox, QColorDialog, QApplication, QMessageBox
-from PySide2.QtCore import Qt, Signal, QCoreApplication, QPoint, QMimeData, QUrl
-from PySide2.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag
+from PyQt5.QtWidgets import QWidget, QShortcut, QMenu, QAction, QLabel, QDialog, QGridLayout, QPushButton, QDialogButtonBox, QColorDialog, QApplication, QMessageBox
+from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QPoint, QMimeData, QUrl
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag
 from cguis.design.box_dialog import Ui_BoxDialog
 from ricore.color import Color
 from ricore.transpt import get_outer_box, get_link_tag, rotate_point
@@ -33,7 +33,7 @@ class ColorBox(QDialog, Ui_BoxDialog):
     ColorBox object based on QDialog. Init color box information.
     """
 
-    ps_value_changed = Signal(bool)
+    ps_value_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -219,7 +219,7 @@ class BoxSqr(QWidget):
     Square objet based on QWidget. Init a color square in box.
     """
 
-    ps_color_changed = Signal(str)
+    ps_color_changed = pyqtSignal(str)
 
     def __init__(self, wget, args, hec_color):
         """
@@ -333,15 +333,15 @@ class Board(QWidget):
     Board object based on QWidget. Init a gradual board pannel in workarea.
     """
 
-    ps_index_changed = Signal(bool)
-    ps_value_changed = Signal(bool)
-    ps_color_changed = Signal(bool)
-    ps_status_changed = Signal(tuple)
-    ps_dropped = Signal(tuple)
-    ps_linked = Signal(bool)
-    ps_assit_pt_changed = Signal(bool)
-    ps_history_backup = Signal(bool)
-    ps_undo = Signal(bool)
+    ps_index_changed = pyqtSignal(bool)
+    ps_value_changed = pyqtSignal(bool)
+    ps_color_changed = pyqtSignal(bool)
+    ps_status_changed = pyqtSignal(tuple)
+    ps_dropped = pyqtSignal(tuple)
+    ps_linked = pyqtSignal(bool)
+    ps_assit_pt_changed = pyqtSignal(bool)
+    ps_history_backup = pyqtSignal(bool)
+    ps_undo = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -1504,6 +1504,11 @@ class Board(QWidget):
         self._action_reset.triggered.connect(self.reset_locations)
         self._menu.addAction(self._action_reset)
 
+        #   _translate("Board", "Paste"), # 7
+        self._action_paste = QAction(self)
+        self._action_paste.triggered.connect(self.clipboard_in)
+        self._menu.addAction(self._action_paste)
+
         #   _translate("Board", "Copy RGB"), # 3
         #   _translate("Board", "Copy HSV"), # 4
         #   _translate("Board", "Copy Hex Code"), # 5
@@ -1524,11 +1529,6 @@ class Board(QWidget):
         self._action_copy_img.triggered.connect(self.clipboard_img)
         self._menu.addAction(self._action_copy_img)
 
-        #   _translate("Board", "Paste"), # 7
-        self._action_paste = QAction(self)
-        self._action_paste.triggered.connect(self.clipboard_in)
-        self._menu.addAction(self._action_paste)
-
         #   _translate("Board", "Zoom In"), # 8
         #   _translate("Board", "Zoom Out"), # 9
         self._action_zoom_in = QAction(self)
@@ -1545,12 +1545,6 @@ class Board(QWidget):
         self._action_insert.triggered.connect(self.insert_point)
         self._menu.addAction(self._action_insert)
 
-        #   _translate("Board", "Delete Ref Point"), # 11
-        #   _translate("Board", "Delete Color Box"), # 18
-        self._action_delete = QAction(self)
-        self._action_delete.triggered.connect(self.delete_point)
-        self._menu.addAction(self._action_delete)
-
         #   _translate("Board", "Fix Ref Point (DK)"), # 12
         #   _translate("Board", "Un-Fix Ref Point (DK)"), # 13
         self._action_fix_pt = QAction(self)
@@ -1561,6 +1555,12 @@ class Board(QWidget):
         self._action_rev_insert = QAction(self)
         self._action_rev_insert.triggered.connect(self.act_rev_insert_color_box)
         self._menu.addAction(self._action_rev_insert)
+
+        #   _translate("Board", "Delete Ref Point"), # 11
+        #   _translate("Board", "Delete Color Box"), # 18
+        self._action_delete = QAction(self)
+        self._action_delete.triggered.connect(self.delete_point)
+        self._menu.addAction(self._action_delete)
 
         #   _translate("Board", "Insert Color Box (Shift+DK)"), # 16
         self._action_insert_beside = QAction(self)
@@ -1577,10 +1577,11 @@ class Board(QWidget):
         self._action_switch.triggered.connect(self.switch_point)
         self._menu.addAction(self._action_switch)
 
-        #   _translate("Board", "Show Detail"), # 20
-        self._action_detail = QAction(self)
-        self._action_detail.triggered.connect(self.detail_point)
-        self._menu.addAction(self._action_detail)
+        #   _translate("Board", "Show Points"), # 26
+        #   _translate("Board", "Hide Points"), # 27
+        self._action_hide_pt = QAction(self)
+        self._action_hide_pt.triggered.connect(self.show_or_hide_points)
+        self._menu.addAction(self._action_hide_pt)
 
         #   _translate("Board", "Link with Result (Ctrl+DK)"), # 21
         #   _translate("Board", "Un-Link with Result (Ctrl+DK)"), # 22
@@ -1599,11 +1600,10 @@ class Board(QWidget):
         self._action_ref_board.triggered.connect(self.clear_or_gen_assit_color_list)
         self._menu.addAction(self._action_ref_board)
 
-        #   _translate("Board", "Show Points"), # 26
-        #   _translate("Board", "Hide Points"), # 27
-        self._action_hide_pt = QAction(self)
-        self._action_hide_pt.triggered.connect(self.show_or_hide_points)
-        self._menu.addAction(self._action_hide_pt)
+        #   _translate("Board", "Show Detail"), # 20
+        self._action_detail = QAction(self)
+        self._action_detail.triggered.connect(self.detail_point)
+        self._menu.addAction(self._action_detail)
 
     def show_menu(self):
         """

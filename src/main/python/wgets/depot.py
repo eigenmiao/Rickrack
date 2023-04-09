@@ -19,9 +19,9 @@ import sys
 import json
 import time
 import numpy as np
-from PySide2.QtWidgets import QWidget, QGridLayout, QScrollArea, QFrame, QShortcut, QMenu, QAction, QDialog, QDialogButtonBox, QPushButton, QApplication, QMessageBox
-from PySide2.QtCore import Qt, Signal, QCoreApplication, QMimeData, QPoint, QUrl
-from PySide2.QtGui import QPainter, QPen, QBrush, QColor, QCursor, QKeySequence, QPixmap, QImage, QIcon, QDrag
+from PyQt5.QtWidgets import QWidget, QGridLayout, QScrollArea, QFrame, QShortcut, QMenu, QAction, QDialog, QDialogButtonBox, QPushButton, QApplication, QMessageBox
+from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QMimeData, QPoint, QUrl
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QCursor, QKeySequence, QPixmap, QImage, QIcon, QDrag
 from cguis.design.info_dialog import Ui_InfoDialog
 from cguis.resource import view_rc
 from ricore.color import FakeColor, Color
@@ -441,15 +441,15 @@ class Depot(QWidget):
     Depot object based on QWidget. Init a color set depot in workarea.
     """
 
-    ps_update = Signal(bool)
-    ps_export = Signal(int)
-    ps_status_changed = Signal(tuple)
-    ps_dropped = Signal(tuple)
-    ps_appended = Signal(tuple)
-    ps_linked = Signal(bool)
-    ps_history_backup = Signal(bool)
-    ps_undo = Signal(bool)
-    ps_open_image_url = Signal(tuple)
+    ps_update = pyqtSignal(bool)
+    ps_export = pyqtSignal(int)
+    ps_status_changed = pyqtSignal(tuple)
+    ps_dropped = pyqtSignal(tuple)
+    ps_appended = pyqtSignal(tuple)
+    ps_linked = pyqtSignal(bool)
+    ps_history_backup = pyqtSignal(bool)
+    ps_undo = pyqtSignal(bool)
+    ps_open_image_url = pyqtSignal(tuple)
 
     def __init__(self, wget, args):
         """
@@ -1441,6 +1441,11 @@ class Depot(QWidget):
         self._action_redo.triggered.connect(lambda: self.ps_undo.emit(False))
         self._menu.addAction(self._action_redo)
 
+        #   _translate("Depot", "Paste"), # 5
+        self._action_paste = QAction(self)
+        self._action_paste.triggered.connect(self.clipboard_in)
+        self._menu.addAction(self._action_paste)
+
         #   _translate("Depot", "Copy RGB"), # 2
         #   _translate("Depot", "Copy HSV"), # 3
         #   _translate("Depot", "Copy Hex Code"), # 4
@@ -1455,11 +1460,6 @@ class Depot(QWidget):
         self._action_copy_hec = QAction(self)
         self._action_copy_hec.triggered.connect(self.clipboard_cur("hec"))
         self._menu.addAction(self._action_copy_hec)
-
-        #   _translate("Depot", "Paste"), # 5
-        self._action_paste = QAction(self)
-        self._action_paste.triggered.connect(self.clipboard_in)
-        self._menu.addAction(self._action_paste)
 
         #   _translate("Depot", "Zoom In"), # 6
         #   _translate("Depot", "Zoom Out"), # 7
@@ -1501,16 +1501,16 @@ class Depot(QWidget):
         self._action_delete.triggered.connect(self.delete_set)
         self._menu.addAction(self._action_delete)
 
-        #   _translate("Depot", "Show Detail"), # 13
-        self._action_detail = QAction(self)
-        self._action_detail.triggered.connect(self.detail_set)
-        self._menu.addAction(self._action_detail)
-
         #   _translate("Depot", "Link with Result (Ctrl+DK)"), # 14
         #   _translate("Depot", "Un-Link with Result (Ctrl+DK)"), # 15
         self._action_link = QAction(self)
         self._action_link.triggered.connect(lambda: self.link_set(not self._args.sys_link_colors[1]))
         self._menu.addAction(self._action_link)
+
+        #   _translate("Depot", "Show Detail"), # 13
+        self._action_detail = QAction(self)
+        self._action_detail.triggered.connect(self.detail_set)
+        self._menu.addAction(self._action_detail)
 
     def show_menu(self):
         """

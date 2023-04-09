@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.7.25-x2d3s3-stable
+v2.7.26-x2d3s3-stable
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-March 12, 2023
+April 9, 2023
 """
 
 __HELP__ = """
@@ -142,12 +142,11 @@ import time
 import hashlib
 import numpy as np
 from getopt import getopt
-from fbs_runtime.application_context.PySide2 import ApplicationContext
-from PySide2 import __version__ as PYQT_VERSION_STR
-from PySide2.QtCore import __version__ as QT_VERSION_STR
-from PySide2.QtWidgets import QWidget, QMainWindow, QApplication, QGridLayout, QMessageBox, QShortcut, QPushButton, QSizePolicy
-from PySide2.QtCore import Qt, QCoreApplication, QTemporaryDir, QUrl, QTranslator, QByteArray, QSettings
-from PySide2.QtGui import QIcon, QPixmap, QImage, QDesktopServices, QKeySequence, QFontDatabase
+from fbs_runtime.application_context.PyQt5 import ApplicationContext
+from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QGridLayout, QMessageBox, QShortcut, QPushButton, QSizePolicy
+from PyQt5.QtCore import Qt, QCoreApplication, QTemporaryDir, QUrl, QTranslator, QSettings, QT_VERSION_STR
+from PyQt5.Qt import PYQT_VERSION_STR
+from PyQt5.QtGui import QIcon, QPixmap, QImage, QDesktopServices, QKeySequence, QFontDatabase
 from cguis.design.main_window import Ui_MainWindow
 from cguis.resource import view_rc
 from clibs.server import ResultServer
@@ -384,14 +383,14 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             cur_in_window = False
 
             for sc_idx in range(scr_count):
-                scr_geometry = QApplication.screens()[sc_idx].availableGeometry()
+                scr_geometry = QApplication.desktop().availableGeometry(sc_idx)
 
                 if scr_geometry.x() < cur_geometry.x() < scr_geometry.x() + scr_geometry.width() and scr_geometry.y() < cur_geometry.y() < scr_geometry.y() + scr_geometry.height():
                     cur_in_window = True
                     break
 
             if not cur_in_window:
-                scr_geometry = QApplication.primaryScreen().availableGeometry()
+                scr_geometry = QApplication.desktop().availableGeometry(0)
 
                 new_x = (scr_geometry.width() - cur_geometry.width()) / 2
                 new_y = (scr_geometry.height() - cur_geometry.height()) / 2
@@ -1860,7 +1859,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("Rickrack", "Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the GNU General Public License 3.0 (GPL 3.0) for more details."),
             _translate("Rickrack", "OK"),
             _translate("Rickrack", "Visit Website"),
-            _translate("Rickrack", "Rickrack uses Qt version {} (PySide version {}) licensed under GNU General Public License. Please see qt.io/licensing for an overview of Qt licensing."),
+            _translate("Rickrack", "Rickrack uses Qt version {} (PyQt version {}) licensed under GNU General Public License. Please see qt.io/licensing for an overview of Qt licensing."),
             _translate("Rickrack", "All images, documents and translations in Rickrack code repository are licensed under Creative Commons Attribution-NonCommercial-ShareAlike License 4.0 (CC BY-NC-SA 4.0) unless stating additionally."),
             _translate("Rickrack", "Rickrack default uses Noto Serif (SC) fonts and Noto Sans (SC) fonts for interface display, which are designed by Google and published in website Google Fonts."),
             _translate("Rickrack", "Support Rickrack!"),

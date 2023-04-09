@@ -2,11 +2,11 @@
 
 # Form implementation generated from reading ui file 'src\main\python\cguis\design\main_window.ui'
 #
-# Created by: PySide2 UI code generator 5.12.1
+# Created by: PyQt5 UI code generator 5.12.1
 #
 # WARNING! All changes made in this file will be lost!
 
-from PySide2 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_MainWindow(object):

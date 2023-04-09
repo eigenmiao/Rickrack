@@ -13,8 +13,8 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PySide2.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QCheckBox
-from PySide2.QtCore import Qt, Signal, QSize, QCoreApplication
+from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QCheckBox
+from PyQt5.QtCore import Qt, pyqtSignal, QSize, QCoreApplication
 from wgets.general import SlideText, RGBHSVCkb
 
 
@@ -23,11 +23,11 @@ class Transformation(QWidget):
     Transformation object based on QWidget. Init a transformation in transformation.
     """
 
-    ps_move = Signal(tuple)
-    ps_zoom = Signal(float)
-    ps_home = Signal(bool)
-    ps_replace = Signal(tuple)
-    ps_enhance = Signal(tuple)
+    ps_move = pyqtSignal(tuple)
+    ps_zoom = pyqtSignal(float)
+    ps_home = pyqtSignal(bool)
+    ps_replace = pyqtSignal(tuple)
+    ps_enhance = pyqtSignal(tuple)
 
     def __init__(self, wget, args):
         """
