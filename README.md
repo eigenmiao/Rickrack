@@ -11,12 +11,12 @@ Generate Harmonious Colors Freely.<br/>自由自在生成和谐色彩。
 # Rickrack
 In the age of digital creativity, the color palette has become an indispensable tool for designers. A good color palette can make a design more attractive and coordinated. Rickrack is designed for you if you are looking for an excellent color palette software! Rickrack has various color mixing functions and is suitable for various scenes. Rickrack is easy to use, and more importantly, it's completely free without networking or registration required.
 
-Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works.
+Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. What’s more, you can export them into individual files and import them into other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack can run normally on operating systems such as Windows, Linux, and macOS.
 
 # 焰火十二卷
 在数字创意的时代，调色板成为了设计师不可或缺的工具。一个好的调色板可以让设计更加有吸引力和协调性。如果你正在寻找一款优秀的调色板软件，那就试试焰火十二卷吧！焰火十二卷具有多种配色功能，适用于多种场景。焰火十二卷简单易上手，更重要的是，它完全免费，无需联网或注册。
 
-焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。
+焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。此外，你也可以将色彩组或者色彩仓库导出为单独的色彩文档并导入其他软件中（如 Adobe Photoshop、GIMP、Krita、Pencil 2D 以及优动漫 Paint 等）。焰火十二卷可以在 Windows、Linux、macOS 等操作系统上正常运行。
 
 # Table of Content
 * [Feature](#feature)
@@ -124,7 +124,7 @@ https://github.com/eigenmiao/Rickrack
 
 # Installation
 ## Current Release
-The latest preview version is [v2.7.25](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.25).
+The latest preview version is [v2.7.26](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.26).
 
 ## Install Software
 ### Recommend: Install on Windows 10 or 11 via WinGet tool
@@ -133,7 +133,7 @@ winget install rickrack
 ```
 
 ## Install on other platforms
-Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.25) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.7.25/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
+Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.26) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.7.26/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 

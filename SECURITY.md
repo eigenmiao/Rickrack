@@ -4,7 +4,8 @@ These versions of Rickrack are currently being supported with security updates.
 
 | Version               | Supported          |
 | --------------------- | ------------------ |
-| v2.7.25-x2d3s3-stable | :white_check_mark: |
+| v2.7.26-x2d3s3-stable | :white_check_mark: |
+| v2.7.25-x2d3s3-stable | :x:                |
 | v2.7.23-x2d3s3-pre    | :x:                |
 | v2.6.6-x2d2s2-pre     | :x:                |
 | v2.6.5-x2d2s2-pre     | :x:                |

@@ -55,3 +55,13 @@
 5. Switch to PySide2 to reduce the installation package size.
 6. Make the stab col in depot view change with the size of interface.
 8. Add image record in desc.
+
+# v2.7.26
+* Date: April 9, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.26
+* Comments:
+1. Fix close error in the Rickrack module.
+2. Update sequence of menu list.
+3. Switch to PyQt5 for some unknown bugs in PySide2.
+4. When determining the region, redirect Esperanto ("eo") to English ("en") because Esperanto is not a dialect of any region.
+5. Update languages.
