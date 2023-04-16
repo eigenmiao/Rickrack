@@ -63,5 +63,7 @@
 1. Fix close error in the Rickrack module.
 2. Update sequence of menu list.
 3. Switch to PyQt5 for some unknown bugs in PySide2.
-4. When determining the region, redirect Esperanto ("eo") to English ("en") because Esperanto is not a dialect of any region.
-5. Update languages.
+4. Update languages.
+5. Fix lang error on mac.
+6. Fix hidpi error on mac.
+7. Update installation background on mac.
