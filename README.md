@@ -244,5 +244,6 @@ Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif)
 * The Rickrack software is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
 * The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
 * The code repository is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
+* The cover image is taken from [Pixabay, created by martynaszulist](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/) and published under [Pixabay License](https://pixabay.com/zh/service/terms/).
 
 <div align="right"><a href="#rickrack">[-> Back to Top <-]</a> <a href="#table-of-content">[-> Back to TOC <-]</a></div>

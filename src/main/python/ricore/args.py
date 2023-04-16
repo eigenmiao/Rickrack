@@ -187,23 +187,23 @@ class Args(object):
 
         # load default language.
         try:
-            default_locale = str(locale.getdefaultlocale()[0])
+            default_locale = locale.getdefaultlocale()[0]
 
         except Exception as err:
             default_locale = ""
 
-        if default_locale.startswith("eo"):
-            default_locale = ""
+        default_locale = str(default_locale).lower() if default_locale else ""
+        user_prefer_locale = "en"
 
         if len(default_locale) > 1:
-            self.lang = default_locale[:2].lower()
+            self.lang = default_locale[:2]
 
         else:
-            self.lang = "en"
+            self.lang = user_prefer_locale
 
         if self.lang not in [x[1] for x in self.usr_langs]:
-            if "en" in [x[1] for x in self.usr_langs]:
-                self.lang = "en"
+            if user_prefer_locale in [x[1] for x in self.usr_langs]:
+                self.lang = user_prefer_locale
 
             else:
                 self.lang = "default"
