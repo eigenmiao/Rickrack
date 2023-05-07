@@ -240,6 +240,27 @@ All images, documents and translations in Rickrack [code repository](https://git
 
 Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif) ([SC](https://fonts.google.com/specimen/Noto+Serif+SC)) fonts and [Noto Sans](https://fonts.google.com/specimen/Noto+Sans) ([SC](https://fonts.google.com/specimen/Noto+Sans+SC)) fonts for interface display, which are designed by Google and published in website [Google Fonts](https://fonts.google.com/). These fonts are open-sourced under [Apache 2.0](http://www.apache.org/licenses/) and [SIL Open Font License 1.1](http://scripts.sil.org/OFL), respectively.
 
+## License for Required Packages
+| Package        | Version  | License          |
+|----------------|----------|------------------|
+| altgraph       | 0.17.2   | MIT              |
+| fbs            | 0.8.9    | GPLv3 or Later   |
+| future         | 0.18.2   | MIT              |
+| lxml           | 4.6.3    | BSD              |
+| macholib       | 1.15.2   | MIT              |
+| numpy          | 1.19.5   | BSD              |
+| pefile         | 2021.9.3 | MIT              |
+| Pillow         | 8.4.0    | HPND             |
+| pip            | 21.3.1   | MIT              |
+| PyInstaller    | 3.4      | GPLv2 or Later   |
+| PyQt5          | 5.12.1   | GPLv3            |
+| PyQt5_sip      | 4.19.19  | SIP              |
+| pywin32        | 302      | PSF              |
+| pywin32-ctypes | 0.2.0    | BSD              |
+| ricore         | 0.0.0    | Not Open-sourced |
+| setuptools     | 40.6.2   | MIT              |
+| swatch         | 0.4.0    | MIT              |
+
 # Acknowledgment
 * The Rickrack software is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
 * The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
