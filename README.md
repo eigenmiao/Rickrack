@@ -28,7 +28,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
   * [Languages and Settings](#languages-and-settings)
 * [Reviews about Rickrack](#reviews-about-rickrack)
 * [Information](#information)
-  * [Homepage](#homepage)
+  * [Website](#website)
   * [Repository](#repository)
   * [Author](#author)
   * [Support](#support)
@@ -47,6 +47,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 * [Copyright](#copyright)
 * [License](#license)
   * [License for Rickrack](#license-for-rickrack)
+  * [License for Required Packages](#license-for-required-packages)
 * [Acknowledgment](#acknowledgment)
 
 # Feature
@@ -108,8 +109,8 @@ Rickrack has several features:
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
 # Information
-## Homepage
-https://eigenmiao.com/rickrack/
+## Website
+https://eigenmiao.com/rickrack
 
 ## Repository
 https://github.com/eigenmiao/Rickrack
@@ -118,7 +119,9 @@ https://github.com/eigenmiao/Rickrack
 [Eigenmiao](mailto:eigenmiao@outlook.com)
 
 ## Support
-[Support the Future of Rickrack!](https://afdian.net/a/eigenmiao)
+Support the continuous development of Rickrack.
+* [爱发电](https://afdian.net/a/eigenmiao)
+* [Ko-fi](https://ko-fi.com/eigenmiao)
 
 <div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
 
