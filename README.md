@@ -41,7 +41,7 @@ Rickrack — бесплатный и удобный редактор цвето�
 [:house: Rickrack](https://eigenmiao.com/yanhuo/ru.html)
 
 # 焰火十二卷（日本語）
-デジタルクリエイティビティの時代において、カラーパレットはデザイナーにとって不可欠なツールとなっています。 優れたカラーパレットは、デザインをより魅力的で調和のとれたものにすることができます。 焰火十二卷は、優れたカラー パレット ソフトウェアをお探しの方のために設計されました。 リックラックは多彩なカラーミキシング機能を備え、さまざまなシーンに最適です。 焰火十二卷は使いやすく、さらに重要なことに、ネットワークや登録は不要で完全に無料です。
+デジタルクリエイティビティの時代において、カラーパレットはデザイナーにとって不可欠なツールとなっています。 優れたカラーパレットは、デザインをより魅力的で調和のとれたものにすることができます。 焰火十二卷は、優れたカラー パレット ソフトウェアをお探しの方のために設計されました。 焰火十二卷は多彩なカラーミキシング機能を備え、さまざまなシーンに最適です。 焰火十二卷は使いやすく、さらに重要なことに、ネットワークや登録は不要で完全に無料です。
 
 焰火十二卷は、無料で使いやすいカラー エディターです。 カラーホイールまたはその他の場所から調和のとれた色のセットを生成するように設計されています。 これらの色を友達と共有したり、クリエイティブな作品に適用したりできます。 さらに、それらを個別のファイルにエクスポートして、Adobe Photoshop、GIMP、Krita、Pencil 2D、Clip Studio Paint などの他のソフトウェアにインポートすることもできます。 焰火十二卷は、Windows、Linux、macOS などのオペレーティング システムで通常どおり実行できます。
 
@@ -151,9 +151,6 @@ Rickrack has several features:
 | :---: | :---: |
 | ![](demo/usage/707.gif) | ![](demo/usage/706.gif) |
 | Support multiple languages, including Chinese, English, Japanese, German, French, Russian, and so on. (Languages except Chinese and English are translated by [Google Translate](https://translate.google.cn/).) | Support multiple interface themes. |
-
-## Notice
-* The interface display in demo uses [LXGWWenKai (SIL Open Font License)](https://lxgw.github.io/2021/01/28/Klee-Simpchin/) font.
 
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
@@ -327,5 +324,7 @@ Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif)
 * The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
 * The code repository is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
 * The cover image is taken from [Pixabay, created by martynaszulist](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/) and published under [Pixabay License](https://pixabay.com/zh/service/terms/).
+* Some of the images used in the demonstration come from Ghibli, and [Ghibli licenses these images to be used freely within the scope of common sense.](https://www.ghibli.jp/info/013409/).
+* In the demo animations, the interface display uses the [LXGWWenKai (SIL Open Font License)](https://lxgw.github.io/2021/01/28/Klee-Simpchin/) font.
 
 <div align="right"><a href="#rickrack">:arrow_up: Back to Top :arrow_up:</a> <a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
