@@ -4,7 +4,7 @@
 Rickrack<br/>焰火十二卷<br/> ----- ----- ----- ----- ----- ----- ----- ----- <br/>
 Generate Harmonious Colors Freely.<br/>自由自在生成和谐色彩。
 <br/><br/>
-[<a href="https://eigenmiao.com/yanhuo/">中文</a>] | [<a href="https://eigenmiao.com/rickrack/">English</a>]
+[<a href="https://eigenmiao.com/rickrack">:globe_with_meridians: English</a>] | [<a href="https://eigenmiao.com/yanhuo">:globe_with_meridians: 中文</a>] | [<a href="https://eigenmiao.com/yanhuo/eo.html">:globe_with_meridians: Esperanto</a>] | [<a href="https://eigenmiao.com/yanhuo/ru.html">:globe_with_meridians: Русский</a>] | [<a href="https://eigenmiao.com/yanhuo/ja.html">:globe_with_meridians: 日本語</a>] | [<a href="https://eigenmiao.com/yanhuo/fr.html">:globe_with_meridians: Français</a>] | [<a href="https://eigenmiao.com/yanhuo/de.html">:globe_with_meridians: Deutsch</a>] | [<a href="https://eigenmiao.com/yanhuo/es.html">:globe_with_meridians: Español</a>]
 <br/><br/>
 </div>
 
@@ -13,10 +13,68 @@ In the age of digital creativity, the color palette has become an indispensable 
 
 Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. What’s more, you can export them into individual files and import them into other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack can run normally on operating systems such as Windows, Linux, and macOS.
 
+[:house: Rickrack](https://eigenmiao.com/rickrack)
+
 # 焰火十二卷
 在数字创意的时代，调色板成为了设计师不可或缺的工具。一个好的调色板可以让设计更加有吸引力和协调性。如果你正在寻找一款优秀的调色板软件，那就试试焰火十二卷吧！焰火十二卷具有多种配色功能，适用于多种场景。焰火十二卷简单易上手，更重要的是，它完全免费，无需联网或注册。
 
 焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。此外，你也可以将色彩组或者色彩仓库导出为单独的色彩文档并导入其他软件中（如 Adobe Photoshop、GIMP、Krita、Pencil 2D 以及优动漫 Paint 等）。焰火十二卷可以在 Windows、Linux、macOS 等操作系统上正常运行。
+
+[:house: 焰火十二卷](https://eigenmiao.com/yanhuo)
+
+# Rickrack (Esperanto)
+En la epoko de cifereca kreemo, la kolora paletro fariĝis nemalhavebla ilo por dezajnistoj. Bona kolora paletro povas fari dezajnon pli alloga kaj kunordigita. Rickrack estas desegnita por vi, se vi serĉas bonegan programaron de kolora paletro! Rickrack havas diversajn kolorajn miksajn funkciojn kaj taŭgas por diversaj scenoj. Rickrack estas facile uzebla, kaj pli grave, ĝi estas tute senpaga sen interkonektado aŭ registriĝo necesa.
+
+Rickrack estas senpaga kaj amika kolorredaktilo. Ĝi estas desegnita por generi aron da harmoniaj koloroj de la kolorrado aŭ aliaj lokoj. Vi povas dividi ĉi tiujn kolorojn kun viaj amikoj, aŭ apliki ilin en viajn kreajn verkojn. Krome, vi povas eksporti ilin en individuajn dosierojn kaj importi ilin en aliajn programojn kiel Adobe Photoshop, GIMP, Krita, Pencil 2D kaj Clip Studio Paint. Rickrack povas funkcii normale per operaciumoj kiel Vindozo, Linukso kaj macOS.
+
+(Tradukoj supre baziĝas sur Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/eo.html)
+
+# Rickrack (Русский)
+В век цифрового творчества цветовая палитра стала незаменимым инструментом для дизайнеров. Хорошая цветовая палитра может сделать дизайн более привлекательным и гармоничным. Rickrack разработан для вас, если вы ищете отличное программное обеспечение для цветовой палитры! Rickrack имеет различные функции смешивания цветов и подходит для различных сцен. Rickrack прост в использовании и, что более важно, совершенно бесплатен, не требует подключения к сети или регистрации.
+
+Rickrack — бесплатный и удобный редактор цветов. Он предназначен для создания набора гармоничных цветов из цветового круга или других мест. Вы можете поделиться этими цветами с друзьями или применить их в своих творческих работах. Более того, вы можете экспортировать их в отдельные файлы и импортировать в другие программы, такие как Adobe Photoshop, GIMP, Krita, Pencil 2D и Clip Studio Paint. Rickrack может нормально работать в таких операционных системах, как Windows, Linux и macOS.
+
+(Переводы выше основаны на Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/ru.html)
+
+# 焰火十二卷（日本語）
+デジタルクリエイティビティの時代において、カラーパレットはデザイナーにとって不可欠なツールとなっています。 優れたカラーパレットは、デザインをより魅力的で調和のとれたものにすることができます。 焰火十二卷は、優れたカラー パレット ソフトウェアをお探しの方のために設計されました。 リックラックは多彩なカラーミキシング機能を備え、さまざまなシーンに最適です。 焰火十二卷は使いやすく、さらに重要なことに、ネットワークや登録は不要で完全に無料です。
+
+焰火十二卷は、無料で使いやすいカラー エディターです。 カラーホイールまたはその他の場所から調和のとれた色のセットを生成するように設計されています。 これらの色を友達と共有したり、クリエイティブな作品に適用したりできます。 さらに、それらを個別のファイルにエクスポートして、Adobe Photoshop、GIMP、Krita、Pencil 2D、Clip Studio Paint などの他のソフトウェアにインポートすることもできます。 焰火十二卷は、Windows、Linux、macOS などのオペレーティング システムで通常どおり実行できます。
+
+（上記の翻訳はGoogle翻訳に基づいています。）
+
+[:house: 焰火十二卷](https://eigenmiao.com/yanhuo/ja.html)
+
+# Rickrack (Français)
+À l'ère de la créativité numérique, la palette de couleurs est devenue un outil indispensable pour les designers. Une bonne palette de couleurs peut rendre un design plus attrayant et coordonné. Rickrack est conçu pour vous si vous recherchez un excellent logiciel de palette de couleurs ! Rickrack a diverses fonctions de mélange de couleurs et convient à diverses scènes. Rickrack est facile à utiliser et, plus important encore, il est entièrement gratuit, sans mise en réseau ni inscription requise.
+
+Rickrack est un éditeur de couleurs gratuit et convivial. Il est conçu pour générer un ensemble de couleurs harmonieuses à partir de la roue chromatique ou d'autres endroits. Vous pouvez partager ces couleurs avec vos amis ou les appliquer dans vos créations. De plus, vous pouvez les exporter dans des fichiers individuels et les importer dans d'autres logiciels tels que Adobe Photoshop, GIMP, Krita, Pencil 2D et Clip Studio Paint. Rickrack peut fonctionner normalement sur des systèmes d'exploitation tels que Windows, Linux et macOS.
+
+(Les traductions ci-dessus sont basées sur Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/fr.html)
+
+# Rickrack (Deutsch)
+Im Zeitalter der digitalen Kreativität ist die Farbpalette zu einem unverzichtbaren Werkzeug für Designer geworden. Eine gute Farbpalette kann ein Design attraktiver und koordinierter machen. Rickrack ist genau das Richtige für Sie, wenn Sie auf der Suche nach einer hervorragenden Farbpalettensoftware sind! Rickrack verfügt über verschiedene Farbmischfunktionen und ist für verschiedene Szenen geeignet. Rickrack ist einfach zu bedienen und, was noch wichtiger ist, es ist völlig kostenlos, ohne dass eine Vernetzung oder Registrierung erforderlich ist.
+
+Rickrack ist ein kostenloser und benutzerfreundlicher Farbeditor. Es wurde entwickelt, um aus dem Farbkreis oder anderen Stellen eine Reihe harmonischer Farben zu erzeugen. Sie können diese Farben mit Ihren Freunden teilen oder sie in Ihren kreativen Arbeiten anwenden. Darüber hinaus können Sie sie in einzelne Dateien exportieren und in andere Softwareprogramme wie Adobe Photoshop, GIMP, Krita, Pencil 2D und Clip Studio Paint importieren. Rickrack kann normal auf Betriebssystemen wie Windows, Linux und macOS ausgeführt werden.
+
+(Die oben genannten Übersetzungen basieren auf Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/de.html)
+
+# Rickrack (Español)
+En la era de la creatividad digital, la paleta de colores se ha convertido en una herramienta indispensable para los diseñadores. Una buena paleta de colores puede hacer que un diseño sea más atractivo y coordinado. ¡Rickrack está diseñado para usted si está buscando un excelente software de paleta de colores! Rickrack tiene varias funciones de mezcla de colores y es adecuado para varias escenas. Rickrack es fácil de usar y, lo que es más importante, es completamente gratuito sin necesidad de redes o registro.
+
+Rickrack es un editor de color gratuito y fácil de usar. Está diseñado para generar un conjunto de colores armoniosos a partir de la rueda de colores u otros lugares. Puede compartir estos colores con sus amigos o aplicarlos en sus trabajos creativos. Además, puede exportarlos a archivos individuales e importarlos a otros programas como Adobe Photoshop, GIMP, Krita, Pencil 2D y Clip Studio Paint. Rickrack puede ejecutarse normalmente en sistemas operativos como Windows, Linux y macOS.
+
+(Las traducciones anteriores se basan en Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/es.html)
 
 # Table of Content
 * [Feature](#feature)
@@ -63,7 +121,7 @@ Rickrack has several features:
 * No function limitations and no registration required.
 * ... and more!
 
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Demo
 ## Basic Functions
@@ -97,7 +155,7 @@ Rickrack has several features:
 ## Notice
 * The interface display in demo uses [LXGWWenKai (SIL Open Font License)](https://lxgw.github.io/2021/01/28/Klee-Simpchin/) font.
 
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Reviews about Rickrack
 > All in all, Rickrack is a comprehensive tool for anything that requires color work. Experienced users have an exhaustive toolset to work with, while a more casual audience can improve the presentation of their art by quickly getting color synergy ideas. -- [Robert Condorache @ Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
@@ -106,7 +164,7 @@ Rickrack has several features:
 
 > ... and more!
 
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Information
 ## Website
@@ -119,11 +177,11 @@ https://github.com/eigenmiao/Rickrack
 [Eigenmiao](mailto:eigenmiao@outlook.com)
 
 ## Support
-Support the continuous development of Rickrack.
-* [爱发电](https://afdian.net/a/eigenmiao)
-* [Ko-fi](https://ko-fi.com/eigenmiao)
+Support the continuous development of Rickrack!
+* [:hugs: 本征喵函数 @ 爱发电](https://afdian.net/a/eigenmiao)
+* [:hugs: Eigenmiao @ Ko-fi](https://ko-fi.com/eigenmiao)
 
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Installation
 ## Current Release
@@ -151,7 +209,7 @@ pip install Rickrack
 rickrack -d "/PATH/TO/RICKRACK/SOFTWARE"
 ```
 
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Usage
 ## How to Use the Software
@@ -190,7 +248,7 @@ rr.run(dp_argv=dp_argv, dp_proj=dp_proj)
 * Please read the documents and tutorials when you encounter any difficulties.
 * The socket server is designed for obtaining colors from the Rickrack software in real-time. By default, this server is disabled and can only be started from the command line.
 
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Development
 ## Install Requirement
@@ -225,12 +283,12 @@ cd Rickrack
 python setup.py sdist --formats=gztar,zip
 ```
 
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Copyright
 Copyright (c) 2019-2023 [Eigenmiao](mailto:eigenmiao@outlook.com). All Rights Reserved.
 
-<div align="right"><a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Contributing
 This project welcomes contributions of all types. Recommending Rickrack to people you know, writing reviews for Rickrack on websites, help spec'ing, design, documentation, finding bugs, etc. can all help the project grow better.
@@ -270,4 +328,4 @@ Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif)
 * The code repository is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
 * The cover image is taken from [Pixabay, created by martynaszulist](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/) and published under [Pixabay License](https://pixabay.com/zh/service/terms/).
 
-<div align="right"><a href="#rickrack">[-> Back to Top <-]</a> <a href="#table-of-content">[-> Back to TOC <-]</a></div>
+<div align="right"><a href="#rickrack">:arrow_up: Back to Top :arrow_up:</a> <a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
