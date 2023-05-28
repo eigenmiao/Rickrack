@@ -144,7 +144,7 @@ Rickrack has several features:
 | ![](demo/usage/204.gif) | ![](demo/usage/205.gif) |
 | Convert: gradient palette &harr; fixed palette. | Convert: gradient palette &harr; reference palette. |
 | ![](demo/usage/700.gif) | ![](demo/usage/701.gif) |
-| Fixed palette: Chinese Traditional Colors. (Color Names: [Copyright (c) China Science Publishing & Media Ltd.](http://zhongguose.com/), Non-Commercial Usage) | Fixed palette: Nippon Traditional Colors. (Color Names: [Copyright (c) PIE BOOKS.](http://nipponcolors.com/), Non-Commercial Usage) |
+| Fixed palette: [Chinese Traditional Colors](http://zhongguose.com/). | Fixed palette: [Nippon Traditional Colors](http://nipponcolors.com/). |
 
 ## Languages and Settings
 |     |     |
