@@ -15,6 +15,8 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 
 [:house: Rickrack](https://eigenmiao.com/rickrack)
 
+[:arrow_down: Translation of Introduction in Other Languages :arrow_down:](#introduction-translations)
+
 # 焰火十二卷
 在数字创意的时代，调色板成为了设计师不可或缺的工具。一个好的调色板可以让设计更加有吸引力和协调性。如果你正在寻找一款优秀的调色板软件，那就试试焰火十二卷吧！焰火十二卷具有多种配色功能，适用于多种场景。焰火十二卷简单易上手，更重要的是，它完全免费，无需联网或注册。
 
@@ -22,61 +24,10 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 
 [:house: 焰火十二卷](https://eigenmiao.com/yanhuo)
 
-# Rickrack (Esperanto)
-En la epoko de cifereca kreemo, la kolora paletro fariĝis nemalhavebla ilo por dezajnistoj. Bona kolora paletro povas fari dezajnon pli alloga kaj kunordigita. Rickrack estas desegnita por vi, se vi serĉas bonegan programaron de kolora paletro! Rickrack havas diversajn kolorajn miksajn funkciojn kaj taŭgas por diversaj scenoj. Rickrack estas facile uzebla, kaj pli grave, ĝi estas tute senpaga sen interkonektado aŭ registriĝo necesa.
-
-Rickrack estas senpaga kaj amika kolorredaktilo. Ĝi estas desegnita por generi aron da harmoniaj koloroj de la kolorrado aŭ aliaj lokoj. Vi povas dividi ĉi tiujn kolorojn kun viaj amikoj, aŭ apliki ilin en viajn kreajn verkojn. Krome, vi povas eksporti ilin en individuajn dosierojn kaj importi ilin en aliajn programojn kiel Adobe Photoshop, GIMP, Krita, Pencil 2D kaj Clip Studio Paint. Rickrack povas funkcii normale per operaciumoj kiel Vindozo, Linukso kaj macOS.
-
-(Tradukoj supre baziĝas sur Google Translate.)
-
-[:house: Rickrack](https://eigenmiao.com/yanhuo/eo.html)
-
-# Rickrack (Русский)
-В век цифрового творчества цветовая палитра стала незаменимым инструментом для дизайнеров. Хорошая цветовая палитра может сделать дизайн более привлекательным и гармоничным. Rickrack разработан для вас, если вы ищете отличное программное обеспечение для цветовой палитры! Rickrack имеет различные функции смешивания цветов и подходит для различных сцен. Rickrack прост в использовании и, что более важно, совершенно бесплатен, не требует подключения к сети или регистрации.
-
-Rickrack — бесплатный и удобный редактор цветов. Он предназначен для создания набора гармоничных цветов из цветового круга или других мест. Вы можете поделиться этими цветами с друзьями или применить их в своих творческих работах. Более того, вы можете экспортировать их в отдельные файлы и импортировать в другие программы, такие как Adobe Photoshop, GIMP, Krita, Pencil 2D и Clip Studio Paint. Rickrack может нормально работать в таких операционных системах, как Windows, Linux и macOS.
-
-(Переводы выше основаны на Google Translate.)
-
-[:house: Rickrack](https://eigenmiao.com/yanhuo/ru.html)
-
-# 焰火十二卷（日本語）
-デジタルクリエイティビティの時代において、カラーパレットはデザイナーにとって不可欠なツールとなっています。 優れたカラーパレットは、デザインをより魅力的で調和のとれたものにすることができます。 焰火十二卷は、優れたカラー パレット ソフトウェアをお探しの方のために設計されました。 焰火十二卷は多彩なカラーミキシング機能を備え、さまざまなシーンに最適です。 焰火十二卷は使いやすく、さらに重要なことに、ネットワークや登録は不要で完全に無料です。
-
-焰火十二卷は、無料で使いやすいカラー エディターです。 カラーホイールまたはその他の場所から調和のとれた色のセットを生成するように設計されています。 これらの色を友達と共有したり、クリエイティブな作品に適用したりできます。 さらに、それらを個別のファイルにエクスポートして、Adobe Photoshop、GIMP、Krita、Pencil 2D、Clip Studio Paint などの他のソフトウェアにインポートすることもできます。 焰火十二卷は、Windows、Linux、macOS などのオペレーティング システムで通常どおり実行できます。
-
-（上記の翻訳はGoogle翻訳に基づいています。）
-
-[:house: 焰火十二卷](https://eigenmiao.com/yanhuo/ja.html)
-
-# Rickrack (Français)
-À l'ère de la créativité numérique, la palette de couleurs est devenue un outil indispensable pour les designers. Une bonne palette de couleurs peut rendre un design plus attrayant et coordonné. Rickrack est conçu pour vous si vous recherchez un excellent logiciel de palette de couleurs ! Rickrack a diverses fonctions de mélange de couleurs et convient à diverses scènes. Rickrack est facile à utiliser et, plus important encore, il est entièrement gratuit, sans mise en réseau ni inscription requise.
-
-Rickrack est un éditeur de couleurs gratuit et convivial. Il est conçu pour générer un ensemble de couleurs harmonieuses à partir de la roue chromatique ou d'autres endroits. Vous pouvez partager ces couleurs avec vos amis ou les appliquer dans vos créations. De plus, vous pouvez les exporter dans des fichiers individuels et les importer dans d'autres logiciels tels que Adobe Photoshop, GIMP, Krita, Pencil 2D et Clip Studio Paint. Rickrack peut fonctionner normalement sur des systèmes d'exploitation tels que Windows, Linux et macOS.
-
-(Les traductions ci-dessus sont basées sur Google Translate.)
-
-[:house: Rickrack](https://eigenmiao.com/yanhuo/fr.html)
-
-# Rickrack (Deutsch)
-Im Zeitalter der digitalen Kreativität ist die Farbpalette zu einem unverzichtbaren Werkzeug für Designer geworden. Eine gute Farbpalette kann ein Design attraktiver und koordinierter machen. Rickrack ist genau das Richtige für Sie, wenn Sie auf der Suche nach einer hervorragenden Farbpalettensoftware sind! Rickrack verfügt über verschiedene Farbmischfunktionen und ist für verschiedene Szenen geeignet. Rickrack ist einfach zu bedienen und, was noch wichtiger ist, es ist völlig kostenlos, ohne dass eine Vernetzung oder Registrierung erforderlich ist.
-
-Rickrack ist ein kostenloser und benutzerfreundlicher Farbeditor. Es wurde entwickelt, um aus dem Farbkreis oder anderen Stellen eine Reihe harmonischer Farben zu erzeugen. Sie können diese Farben mit Ihren Freunden teilen oder sie in Ihren kreativen Arbeiten anwenden. Darüber hinaus können Sie sie in einzelne Dateien exportieren und in andere Softwareprogramme wie Adobe Photoshop, GIMP, Krita, Pencil 2D und Clip Studio Paint importieren. Rickrack kann normal auf Betriebssystemen wie Windows, Linux und macOS ausgeführt werden.
-
-(Die oben genannten Übersetzungen basieren auf Google Translate.)
-
-[:house: Rickrack](https://eigenmiao.com/yanhuo/de.html)
-
-# Rickrack (Español)
-En la era de la creatividad digital, la paleta de colores se ha convertido en una herramienta indispensable para los diseñadores. Una buena paleta de colores puede hacer que un diseño sea más atractivo y coordinado. ¡Rickrack está diseñado para usted si está buscando un excelente software de paleta de colores! Rickrack tiene varias funciones de mezcla de colores y es adecuado para varias escenas. Rickrack es fácil de usar y, lo que es más importante, es completamente gratuito sin necesidad de redes o registro.
-
-Rickrack es un editor de color gratuito y fácil de usar. Está diseñado para generar un conjunto de colores armoniosos a partir de la rueda de colores u otros lugares. Puede compartir estos colores con sus amigos o aplicarlos en sus trabajos creativos. Además, puede exportarlos a archivos individuales e importarlos a otros programas como Adobe Photoshop, GIMP, Krita, Pencil 2D y Clip Studio Paint. Rickrack puede ejecutarse normalmente en sistemas operativos como Windows, Linux y macOS.
-
-(Las traducciones anteriores se basan en Google Translate.)
-
-[:house: Rickrack](https://eigenmiao.com/yanhuo/es.html)
+[:arrow_down: 简介的其他语言翻译 :arrow_down:](#introduction-translations)
 
 # Table of Content
+* [Introduction Translations](#introduction-translations)
 * [Feature](#feature)
 * [Demo](#demo)
   * [Basic Functions](#basic-functions)
@@ -107,6 +58,63 @@ Rickrack es un editor de color gratuito y fácil de usar. Está diseñado para g
   * [License for Rickrack](#license-for-rickrack)
   * [License for Required Packages](#license-for-required-packages)
 * [Acknowledgment](#acknowledgment)
+
+# Introduction Translations
+## Rickrack (Esperanto)
+En la epoko de cifereca kreemo, la kolora paletro fariĝis nemalhavebla ilo por dezajnistoj. Bona kolora paletro povas fari dezajnon pli alloga kaj kunordigita. Rickrack estas desegnita por vi, se vi serĉas bonegan programaron de kolora paletro! Rickrack havas diversajn kolorajn miksajn funkciojn kaj taŭgas por diversaj scenoj. Rickrack estas facile uzebla, kaj pli grave, ĝi estas tute senpaga sen interkonektado aŭ registriĝo necesa.
+
+Rickrack estas senpaga kaj amika kolorredaktilo. Ĝi estas desegnita por generi aron da harmoniaj koloroj de la kolorrado aŭ aliaj lokoj. Vi povas dividi ĉi tiujn kolorojn kun viaj amikoj, aŭ apliki ilin en viajn kreajn verkojn. Krome, vi povas eksporti ilin en individuajn dosierojn kaj importi ilin en aliajn programojn kiel Adobe Photoshop, GIMP, Krita, Pencil 2D kaj Clip Studio Paint. Rickrack povas funkcii normale per operaciumoj kiel Vindozo, Linukso kaj macOS.
+
+(Tradukoj supre baziĝas sur Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/eo.html)
+
+## Rickrack (Русский)
+В век цифрового творчества цветовая палитра стала незаменимым инструментом для дизайнеров. Хорошая цветовая палитра может сделать дизайн более привлекательным и гармоничным. Rickrack разработан для вас, если вы ищете отличное программное обеспечение для цветовой палитры! Rickrack имеет различные функции смешивания цветов и подходит для различных сцен. Rickrack прост в использовании и, что более важно, совершенно бесплатен, не требует подключения к сети или регистрации.
+
+Rickrack — бесплатный и удобный редактор цветов. Он предназначен для создания набора гармоничных цветов из цветового круга или других мест. Вы можете поделиться этими цветами с друзьями или применить их в своих творческих работах. Более того, вы можете экспортировать их в отдельные файлы и импортировать в другие программы, такие как Adobe Photoshop, GIMP, Krita, Pencil 2D и Clip Studio Paint. Rickrack может нормально работать в таких операционных системах, как Windows, Linux и macOS.
+
+(Переводы выше основаны на Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/ru.html)
+
+## 焰火十二卷（日本語）
+デジタルクリエイティビティの時代において、カラーパレットはデザイナーにとって不可欠なツールとなっています。 優れたカラーパレットは、デザインをより魅力的で調和のとれたものにすることができます。 焰火十二卷は、優れたカラー パレット ソフトウェアをお探しの方のために設計されました。 焰火十二卷は多彩なカラーミキシング機能を備え、さまざまなシーンに最適です。 焰火十二卷は使いやすく、さらに重要なことに、ネットワークや登録は不要で完全に無料です。
+
+焰火十二卷は、無料で使いやすいカラー エディターです。 カラーホイールまたはその他の場所から調和のとれた色のセットを生成するように設計されています。 これらの色を友達と共有したり、クリエイティブな作品に適用したりできます。 さらに、それらを個別のファイルにエクスポートして、Adobe Photoshop、GIMP、Krita、Pencil 2D、Clip Studio Paint などの他のソフトウェアにインポートすることもできます。 焰火十二卷は、Windows、Linux、macOS などのオペレーティング システムで通常どおり実行できます。
+
+（上記の翻訳はGoogle翻訳に基づいています。）
+
+[:house: 焰火十二卷](https://eigenmiao.com/yanhuo/ja.html)
+
+## Rickrack (Français)
+À l'ère de la créativité numérique, la palette de couleurs est devenue un outil indispensable pour les designers. Une bonne palette de couleurs peut rendre un design plus attrayant et coordonné. Rickrack est conçu pour vous si vous recherchez un excellent logiciel de palette de couleurs ! Rickrack a diverses fonctions de mélange de couleurs et convient à diverses scènes. Rickrack est facile à utiliser et, plus important encore, il est entièrement gratuit, sans mise en réseau ni inscription requise.
+
+Rickrack est un éditeur de couleurs gratuit et convivial. Il est conçu pour générer un ensemble de couleurs harmonieuses à partir de la roue chromatique ou d'autres endroits. Vous pouvez partager ces couleurs avec vos amis ou les appliquer dans vos créations. De plus, vous pouvez les exporter dans des fichiers individuels et les importer dans d'autres logiciels tels que Adobe Photoshop, GIMP, Krita, Pencil 2D et Clip Studio Paint. Rickrack peut fonctionner normalement sur des systèmes d'exploitation tels que Windows, Linux et macOS.
+
+(Les traductions ci-dessus sont basées sur Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/fr.html)
+
+## Rickrack (Deutsch)
+Im Zeitalter der digitalen Kreativität ist die Farbpalette zu einem unverzichtbaren Werkzeug für Designer geworden. Eine gute Farbpalette kann ein Design attraktiver und koordinierter machen. Rickrack ist genau das Richtige für Sie, wenn Sie auf der Suche nach einer hervorragenden Farbpalettensoftware sind! Rickrack verfügt über verschiedene Farbmischfunktionen und ist für verschiedene Szenen geeignet. Rickrack ist einfach zu bedienen und, was noch wichtiger ist, es ist völlig kostenlos, ohne dass eine Vernetzung oder Registrierung erforderlich ist.
+
+Rickrack ist ein kostenloser und benutzerfreundlicher Farbeditor. Es wurde entwickelt, um aus dem Farbkreis oder anderen Stellen eine Reihe harmonischer Farben zu erzeugen. Sie können diese Farben mit Ihren Freunden teilen oder sie in Ihren kreativen Arbeiten anwenden. Darüber hinaus können Sie sie in einzelne Dateien exportieren und in andere Softwareprogramme wie Adobe Photoshop, GIMP, Krita, Pencil 2D und Clip Studio Paint importieren. Rickrack kann normal auf Betriebssystemen wie Windows, Linux und macOS ausgeführt werden.
+
+(Die oben genannten Übersetzungen basieren auf Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/de.html)
+
+## Rickrack (Español)
+En la era de la creatividad digital, la paleta de colores se ha convertido en una herramienta indispensable para los diseñadores. Una buena paleta de colores puede hacer que un diseño sea más atractivo y coordinado. ¡Rickrack está diseñado para usted si está buscando un excelente software de paleta de colores! Rickrack tiene varias funciones de mezcla de colores y es adecuado para varias escenas. Rickrack es fácil de usar y, lo que es más importante, es completamente gratuito sin necesidad de redes o registro.
+
+Rickrack es un editor de color gratuito y fácil de usar. Está diseñado para generar un conjunto de colores armoniosos a partir de la rueda de colores u otros lugares. Puede compartir estos colores con sus amigos o aplicarlos en sus trabajos creativos. Además, puede exportarlos a archivos individuales e importarlos a otros programas como Adobe Photoshop, GIMP, Krita, Pencil 2D y Clip Studio Paint. Rickrack puede ejecutarse normalmente en sistemas operativos como Windows, Linux y macOS.
+
+(Las traducciones anteriores se basan en Google Translate.)
+
+[:house: Rickrack](https://eigenmiao.com/yanhuo/es.html)
+
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Feature
 Rickrack has several features:
