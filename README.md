@@ -321,10 +321,10 @@ Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif)
 
 # Acknowledgment
 * The Rickrack software is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
-* The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
 * The code repository is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
-* The cover image is taken from [Pixabay, created by martynaszulist](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/) and published under [Pixabay License](https://pixabay.com/zh/service/terms/).
-* Some of the images used in the demonstration come from Ghibli, and [Ghibli licenses these images to be used freely within the scope of common sense.](https://www.ghibli.jp/info/013409/).
-* In the demo animations, the interface display uses the [LXGWWenKai (SIL Open Font License)](https://lxgw.github.io/2021/01/28/Klee-Simpchin/) font.
+* The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
+* The cover image is [created by martynaszulist and published on Pixabay](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/).
+* In some demonstration animations, [images of Ghibli](https://www.ghibli.jp/info/013409/) were used.
+* In the demo animations, the interface display uses the [LXGWWenKai font](https://lxgw.github.io/2021/01/28/Klee-Simpchin/).
 
 <div align="right"><a href="#rickrack">:arrow_up: Back to Top :arrow_up:</a> <a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
