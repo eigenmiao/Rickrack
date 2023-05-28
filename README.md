@@ -15,7 +15,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 
 [:house: Rickrack](https://eigenmiao.com/rickrack)
 
-[:arrow_down: Translation of Introduction in Other Languages :arrow_down:](#introduction-translations)
+[:arrow_down: Translations of the Introduction in Other Languages :arrow_down:](#introduction-translations)
 
 # 焰火十二卷
 在数字创意的时代，调色板成为了设计师不可或缺的工具。一个好的调色板可以让设计更加有吸引力和协调性。如果你正在寻找一款优秀的调色板软件，那就试试焰火十二卷吧！焰火十二卷具有多种配色功能，适用于多种场景。焰火十二卷简单易上手，更重要的是，它完全免费，无需联网或注册。
