@@ -20,7 +20,8 @@ import numpy as np
 from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QFileDialog, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
 from ricore.export import export_list, export_text, export_swatch, export_ase, export_gpl, export_xml, import_text, import_swatch, import_ase, import_gpl, import_xml
-from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values, norm_im_time
+from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values
+from ricore.check import fmt_im_time
 from ricore.color import Color
 
 
@@ -174,13 +175,13 @@ class Operation(QWidget):
 
         self.dp_open(cb_file[0])
 
-    def dp_open(self, depot_file, direct_dict=False):
+    def dp_open(self, depot_file, direct_dict=False, dp_path=""):
         """
         Open a color depot file.
         """
 
         color_dict = {}
-        curr_path = ""
+        curr_path = str(dp_path)
 
         if direct_dict:
             color_dict = depot_file
@@ -188,17 +189,17 @@ class Operation(QWidget):
         else:
             curr_path = os.path.dirname(depot_file)
 
-            with open(depot_file, "r", encoding="utf-8") as f:
-                try:
+            try:
+                with open(depot_file, "r", encoding="utf-8") as f:
                     color_dict = json.load(f)
 
-                except Exception as err:
-                    self.warning(self._operation_errs[1] + "\n{}\n{}".format(self._operation_errs[17], err))
-                    return
+            except Exception as err:
+                self.warning(self._operation_errs[1] + "\n{}\n{}".format(self._operation_errs[17], err))
+                return
 
-                if not isinstance(color_dict, dict):
-                    self.warning(self._operation_errs[2])
-                    return
+            if not isinstance(color_dict, dict):
+                self.warning(self._operation_errs[2])
+                return
 
         if "version" in color_dict:
             vid = self._args.check_version_d(color_dict["version"])
@@ -227,95 +228,127 @@ class Operation(QWidget):
             self.warning(self._operation_errs[12] + "\n{}\n{}".format(self._operation_errs[17], "type; palettes"))
             return
 
-        color_list = []
         finished_errs = []
+        color_list = []
 
-        try:
-            for color_idx in range(len(color_palettes)):
-                color = color_palettes[color_idx]
-                hsv_set = []
-
-                try:
-                    for i in range(5):
-                        if "hsv" in color["color_{}".format(i)]:
-                            hsv_set.append(tuple(Color.fmt_hsv(color["color_{}".format(i)]["hsv"]).tolist()))
-
-                        elif "rgb" in color["color_{}".format(i)]:
-                            hsv_set.append(tuple(Color.rgb2hsv(color["color_{}".format(i)]["rgb"]).tolist()))
-
-                        elif "hex_code" in color["color_{}".format(i)]:
-                            hsv_set.append(tuple(Color.hec2hsv(color["color_{}".format(i)]["hex_code"]).tolist()))
-
-                        elif "hex code" in color["color_{}".format(i)]:
-                            hsv_set.append(tuple(Color.hec2hsv(color["color_{}".format(i)]["hex code"]).tolist()))
-
-                        else:
-                            finished_errs.append("[id {}] hsv value is not found.".format(color_idx + 1))
-
-                    if "name" in color:
-                        cr_name = str(color["name"])
-
-                    else:
-                        cr_name = ""
-
-                    if "desc" in color:
-                        cr_desc = str(color["desc"])
-                        cr_desc = cr_desc.replace("$curr_path$", curr_path)
-                        cr_desc = cr_desc.replace("$os_sep$", os.sep)
-
-                    else:
-                        cr_desc = ""
-
-                    if "time" in color:
-                        cr_time = norm_im_time(color["time"])
-
-                    else:
-                        cr_time = (0, 0)
-
-                    if "grid_locations" in color and "grid_assitlocs" in color:
-                        grid_locations = color["grid_locations"]
-                        grid_assitlocs = color["grid_assitlocs"]
-
-                    else:
-                        grid_locations = []
-                        grid_assitlocs = []
-
-                    if "grid_list" in color:
-                        grid_list = color["grid_list"]
-
-                    else:
-                        grid_list = []
-
-                    if "grid_values" in color:
-                        grid_values = color["grid_values"]
-
-                    else:
-                        grid_values = {}
-
-                    grid_locations, grid_assitlocs = norm_grid_locations(grid_locations, grid_assitlocs)
-                    grid_list = norm_grid_list(grid_list)
-                    grid_values = norm_grid_values(grid_values)
-
-                    if len(hsv_set) == 5:
-                        if "rule" in color:
-                            if color["rule"] in self._args.global_hm_rules:
-                                color_list.append((tuple(hsv_set), color["rule"], cr_name, cr_desc, cr_time, grid_locations, grid_assitlocs, grid_list, grid_values))
-
-                            else:
-                                finished_errs.append("[id {}] unknown rule: {}.".format(color_idx + 1, color["rule"]))
-
-                        else:
-                            finished_errs.append("[id {}] rule value is not found.".format(color_idx + 1))
-
-                    else:
-                        finished_errs.append("[id {}] colors are not complete.".format(color_idx + 1))
-
-                except Exception as err:
-                    finished_errs.append("[id {}] {}".format(color_idx + 1, str(err)))
-
-        except Exception as err:
-            self.warning(self._operation_errs[13] + "\n{}\n{}".format(self._operation_errs[17], err))
+        if not isinstance(color_palettes, (tuple, list)):
+            self.warning(self._operation_errs[13] + "\n{}\n{}".format(self._operation_errs[17], "\"{}\" is not a list.".format(str(color_palettes)[:100] + " ...")))
             return
+
+        for color_idx in range(len(color_palettes)):
+            color = color_palettes[color_idx]
+            hsv_set = []
+            broken_errs = []
+
+            if not isinstance(color, dict):
+                broken_errs.append("[id {}] {}".format(color_idx + 1, "\"{}\" is not a dict.".format(str(color)[25] + " ...")))
+
+            if broken_errs:
+                finished_errs += list(broken_errs)
+                continue
+
+            for i in range(5):
+                if broken_errs:
+                    break
+
+                if "color_{}".format(i) in color:
+                    hsv_tuple = (0.0, 0.0, 1.0)
+
+                    if "hsv" in color["color_{}".format(i)]:
+                        try:
+                            hsv_tuple = Color.fmt_hsv(color["color_{}".format(i)]["hsv"]).tolist()
+
+                        except Exception as err:
+                            broken_errs.append("[id {}] {}".format(color_idx + 1, str(err)))
+
+                    elif "rgb" in color["color_{}".format(i)]:
+                        try:
+                            hsv_tuple = Color.rgb2hsv(color["color_{}".format(i)]["rgb"]).tolist()
+
+                        except Exception as err:
+                            broken_errs.append("[id {}] {}".format(color_idx + 1, str(err)))
+
+                    elif "hex_code" in color["color_{}".format(i)]:
+                        try:
+                            hsv_tuple = Color.hec2hsv(color["color_{}".format(i)]["hex_code"]).tolist()
+
+                        except Exception as err:
+                            broken_errs.append("[id {}] {}".format(color_idx + 1, str(err)))
+
+                    elif "hex code" in color["color_{}".format(i)]:
+                        try:
+                            hsv_tuple = Color.hec2hsv(color["color_{}".format(i)]["hex code"]).tolist()
+
+                        except Exception as err:
+                            broken_errs.append("[id {}] {}".format(color_idx + 1, str(err)))
+
+                    else:
+                        broken_errs.append("[id {}] hsv value is not found.".format(color_idx + 1))
+
+                    hsv_set.append(tuple(hsv_tuple))
+
+                else:
+                    broken_errs.append("[id {}] {}".format(color_idx + 1, "\"color_{}\" is not found in color dict.".format(i)))
+
+            if broken_errs:
+                finished_errs += list(broken_errs)
+                continue
+
+            if "name" in color:
+                cr_name = str(color["name"])
+
+            else:
+                cr_name = ""
+
+            if "desc" in color:
+                cr_desc = str(color["desc"])
+                cr_desc = cr_desc.replace("$curr_path$", curr_path)
+                cr_desc = cr_desc.replace("$os_sep$", os.sep)
+
+            else:
+                cr_desc = ""
+
+            if "time" in color:
+                cr_time = fmt_im_time(color["time"])
+
+            else:
+                cr_time = (0, 0)
+
+            if "grid_locations" in color and "grid_assitlocs" in color:
+                grid_locations = color["grid_locations"]
+                grid_assitlocs = color["grid_assitlocs"]
+
+            else:
+                grid_locations = []
+                grid_assitlocs = []
+
+            if "grid_list" in color:
+                grid_list = color["grid_list"]
+
+            else:
+                grid_list = []
+
+            if "grid_values" in color:
+                grid_values = color["grid_values"]
+
+            else:
+                grid_values = {}
+
+            grid_locations, grid_assitlocs = norm_grid_locations(grid_locations, grid_assitlocs)
+            grid_list = norm_grid_list(grid_list)
+            grid_values = norm_grid_values(grid_values)
+
+            if len(hsv_set) == 5:
+                if "rule" in color and color["rule"] in self._args.global_hm_rules:
+                    color_list.append((tuple(hsv_set), color["rule"], cr_name, cr_desc, cr_time, grid_locations, grid_assitlocs, grid_list, grid_values))
+
+                else:
+                    broken_errs.append("[id {}] color rule is not found.".format(color_idx + 1))
+
+            else:
+                broken_errs.append("[id {}] colors are not complete.".format(color_idx + 1))
+
+            finished_errs += list(broken_errs)
 
         if finished_errs:
             self.warning(self._operation_errs[14] + "\n{}\n{}".format(self._operation_errs[17], "; ".join(finished_errs)))
@@ -360,10 +393,10 @@ class Operation(QWidget):
 
         # process start.
         if depot_file.split(".")[-1].lower() in ("dpc", "json", "temp"):
-            try:
-                color_dict = {"version": self._args.info_version_en, "site": self._args.info_main_site, "type": "depot"}
-                color_dict["palettes"] = export_list(color_list)
+            color_dict = {"version": self._args.info_version_en, "site": self._args.info_main_site, "type": "depot"}
+            color_dict["palettes"] = export_list(color_list)
 
+            try:
                 with open(depot_file, "w", encoding="utf-8") as f:
                     json.dump(color_dict, f, indent=4, ensure_ascii=False)
 
@@ -598,10 +631,12 @@ class Operation(QWidget):
 
         for i in range(5):
             if "color_{}".format(i) in color_dict:
+                curr_color = Color((0.0, 0.0, 1.0), tp="hsv")
+
                 if "hsv" in color_dict["color_{}".format(i)]:
                     try:
                         hsv = color_dict["color_{}".format(i)]["hsv"]
-                        color_set.append(Color(hsv, tp="hsv", overflow=self._args.sys_color_set.get_overflow()))
+                        curr_color = Color(hsv, tp="hsv", overflow=self._args.sys_color_set.get_overflow())
 
                     except Exception as err:
                         self.warning(self._operation_errs[5] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -610,7 +645,7 @@ class Operation(QWidget):
                 elif "rgb" in color_dict["color_{}".format(i)]:
                     try:
                         hsv = color_dict["color_{}".format(i)]["rgb"]
-                        color_set.append(Color(hsv, tp="rgb", overflow=self._args.sys_color_set.get_overflow()))
+                        curr_color = Color(hsv, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
 
                     except Exception as err:
                         self.warning(self._operation_errs[5] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -619,7 +654,7 @@ class Operation(QWidget):
                 elif "hex_code" in color_dict["color_{}".format(i)]:
                     try:
                         hsv = color_dict["color_{}".format(i)]["hex_code"]
-                        color_set.append(Color(hsv, tp="hec", overflow=self._args.sys_color_set.get_overflow()))
+                        curr_color = Color(hsv, tp="hec", overflow=self._args.sys_color_set.get_overflow())
 
                     except Exception as err:
                         self.warning(self._operation_errs[5] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -628,7 +663,7 @@ class Operation(QWidget):
                 elif "hex code" in color_dict["color_{}".format(i)]:
                     try:
                         hsv = color_dict["color_{}".format(i)]["hex code"]
-                        color_set.append(Color(hsv, tp="hec", overflow=self._args.sys_color_set.get_overflow()))
+                        curr_color = Color(hsv, tp="hec", overflow=self._args.sys_color_set.get_overflow())
 
                     except Exception as err:
                         self.warning(self._operation_errs[5] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -637,6 +672,8 @@ class Operation(QWidget):
                 else:
                     self.warning(self._operation_errs[6] + "\n{}\n{}".format(self._operation_errs[17], "hsv"))
                     return
+
+                color_set.append(curr_color)
 
             else:
                 self.warning(self._operation_errs[7] + "\n{}\n{}".format(self._operation_errs[17], "color_{}".format(i)))
@@ -649,41 +686,33 @@ class Operation(QWidget):
                 grid_list = []
                 grid_values = {}
 
-                try:
-                    if "grid_locations" in color_dict and "grid_assitlocs" in color_dict:
-                        grid_locations = color_dict["grid_locations"]
-                        grid_assitlocs = color_dict["grid_assitlocs"]
+                if "grid_locations" in color_dict and "grid_assitlocs" in color_dict:
+                    grid_locations = color_dict["grid_locations"]
+                    grid_assitlocs = color_dict["grid_assitlocs"]
 
-                    if "grid_list" in color_dict:
-                        grid_list = color_dict["grid_list"]
+                if "grid_list" in color_dict:
+                    grid_list = color_dict["grid_list"]
 
-                    if "grid_values" in color_dict:
-                        grid_values = color_dict["grid_values"]
+                if "grid_values" in color_dict:
+                    grid_values = color_dict["grid_values"]
 
-                    grid_locations, grid_assitlocs = norm_grid_locations(grid_locations, grid_assitlocs)
-                    grid_list = norm_grid_list(grid_list)
-                    grid_values = norm_grid_values(grid_values)
-
-                except Exception as err:
-                    pass
+                grid_locations, grid_assitlocs = norm_grid_locations(grid_locations, grid_assitlocs)
+                grid_list = norm_grid_list(grid_list)
+                grid_values = norm_grid_values(grid_values)
 
                 if return_set:
                     set_name = ""
                     set_desc = ""
                     set_time = (0, 0)
 
-                    try:
-                        if "name" in color_dict:
-                            set_name = str(color_dict["name"])
+                    if "name" in color_dict:
+                        set_name = str(color_dict["name"])
 
-                        if "desc" in color_dict:
-                            set_desc = str(color_dict["desc"])
+                    if "desc" in color_dict:
+                        set_desc = str(color_dict["desc"])
 
-                        if "time" in color_dict:
-                            set_time = norm_im_time(color_dict["time"])
-
-                    except Exception as err:
-                        pass
+                    if "time" in color_dict:
+                        set_time = fmt_im_time(color_dict["time"])
 
                     return (color_set, color_dict["rule"], set_name, set_desc, set_time, grid_locations, grid_assitlocs, grid_list, grid_values)
 
@@ -763,10 +792,14 @@ class Operation(QWidget):
 
         # process start.
         if set_file.split(".")[-1].lower() in ("dps", "json", "temp"):
-            try:
-                color_dict = {"version": self._args.info_version_en, "site": self._args.info_main_site, "type": "set"}
-                color_dict["palettes"] = export_list(color_list)
+            color_dict = {"version": self._args.info_version_en, "site": self._args.info_main_site, "type": "set"}
+            color_dict["palettes"] = export_list(color_list)
 
+            # delete the time of palette in color set temp file. for hash compare in main.py.
+            if set_file.split(".")[-1].lower() == "temp":
+                color_dict["palettes"][0]["time"] = [0, 0]
+
+            try:
                 with open(set_file, "w", encoding="utf-8") as f:
                     json.dump(color_dict, f, indent=4, ensure_ascii=False)
 

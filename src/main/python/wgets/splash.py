@@ -38,11 +38,8 @@ class DPSplash(QSplashScreen):
                 display_lang = "zh"
 
         else:
-            try:
-                default_locale = str(locale.getdefaultlocale()[0])
-
-            except Exception as err:
-                default_locale = ""
+            default_locale = locale.getdefaultlocale()[0]
+            default_locale = str(default_locale).lower() if default_locale else ""
 
             if len(default_locale) > 1 and default_locale[:2].lower() in ("zh", "ja", "ko"):
                 display_lang = "zh"
@@ -52,11 +49,11 @@ class DPSplash(QSplashScreen):
                     with open(os.sep.join((resources, "settings.json")), "r", encoding="utf-8") as sf:
                         uss = json.load(sf)
 
-                    if isinstance(uss, dict) and "lang" in uss and str(uss["lang"])[:2].lower() in ("zh", "ja", "ko"):
-                        display_lang = "zh"
-
                 except Exception as err:
-                    pass
+                    uss = None
+
+                if isinstance(uss, dict) and "lang" in uss and str(uss["lang"])[:2].lower() in ("zh", "ja", "ko"):
+                    display_lang = "zh"
 
         super().__init__()
 

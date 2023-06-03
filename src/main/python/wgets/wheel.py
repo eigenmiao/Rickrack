@@ -389,6 +389,7 @@ class Wheel(QWidget):
             if already_accepted or (self._args.press_move and np.linalg.norm(point - self._center) < self._radius):
                 self._pressed_in_wheel = True
 
+                """
                 if self._args.sys_activated_assit_idx < 0:
                     color = Color(self._backup[self._args.sys_activated_idx], tp="color", overflow=self._backup[0].get_overflow())
                     color.s = np.linalg.norm(point - self._center) / self._radius
@@ -411,6 +412,7 @@ class Wheel(QWidget):
                         self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][3] = assit_s
 
                 self.ps_color_changed.emit(True)
+                """
 
                 event.accept()
                 # self.update() is completed by 
@@ -421,6 +423,7 @@ class Wheel(QWidget):
                 if np.linalg.norm(point - self._cir_1_center) < self._v_tag_radius or self._args.press_move:
                     self._pressed_in_bar_1 = True
 
+                    """
                     v = (point[1] - self._bar_1_box[1]) / self._bar_1_box[3]
 
                     if self._args.sys_activated_assit_idx < 0:
@@ -439,6 +442,7 @@ class Wheel(QWidget):
                             self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][4] = v
 
                     self.ps_color_changed.emit(True)
+                    """
 
                     event.accept()
 
@@ -449,6 +453,7 @@ class Wheel(QWidget):
                 if np.linalg.norm(point - self._cir_2_center) < self._v_tag_radius or self._args.press_move:
                     self._pressed_in_bar_2 = True
 
+                    """
                     v = (point[1] - self._bar_2_box[1]) / self._bar_2_box[3]
 
                     if self._args.sys_activated_assit_idx < 0:
@@ -467,6 +472,7 @@ class Wheel(QWidget):
                             self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][4] = v
 
                     self.ps_color_changed.emit(True)
+                    """
 
                     event.accept()
 

@@ -33,7 +33,7 @@ class Ui_ScrollCube(object):
         self.le_hec.setMaximumSize(QtCore.QSize(80, 16777215))
         self.le_hec.setFocusPolicy(QtCore.Qt.StrongFocus)
         self.le_hec.setContextMenuPolicy(QtCore.Qt.NoContextMenu)
-        self.le_hec.setMaxLength(6)
+        self.le_hec.setMaxLength(100)
         self.le_hec.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.le_hec.setObjectName("le_hec")
         self.gridLayout.addWidget(self.le_hec, 1, 2, 1, 1)

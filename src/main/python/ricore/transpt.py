@@ -142,3 +142,31 @@ def get_link_tag(box):
     line_end = np.array((shift_box[0] + shift_box[2] * 3 / 4, shift_box[1] + shift_box[3] / 2))
 
     return square_left, square_right, shift, line_start, line_end
+
+def snap_point(pt, wid):
+    """
+    Snap point on special locations, such as (1, 1) or (0.5, 0.5).
+
+    Args:
+        pt (tuple or list): point before snap.
+        wid (float): box width (or half widh if snap (0.5, 0.5)).
+
+    Returns:
+        point after snap.
+    """
+
+    x, y = pt
+
+    if (x % wid) < wid * 0.15:
+        x = (x // wid) * wid
+
+    elif (x % wid) > wid * 0.85:
+        x = (x // wid + 1) * wid
+
+    if (y % wid) < wid * 0.15:
+        y = (y // wid) * wid
+
+    elif (y % wid) > wid * 0.85:
+        y = (y // wid + 1) * wid
+
+    return [x, y]

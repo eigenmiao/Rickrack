@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.7.26-x2d3s3-stable
+v2.8.5-x2d3s3-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-April 9, 2023
+May 21, 2023
 """
 
 __HELP__ = """
@@ -289,25 +289,25 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._load_last_work()
 
         if self._sys_argv["input"]:
-            try:
-                if self._sys_argv["input"].split(".")[-1].lower() in ("png", "bmp", "jpg", "jpeg", "tif", "tiff", "webp"):
-                    self._inner_locate(False)(False)
-                    self._wget_image.open_image(self._sys_argv["input"])
+            if self._sys_argv["input"].split(".")[-1].lower() in ("png", "bmp", "jpg", "jpeg", "tif", "tiff", "webp"):
+                self._inner_locate(False)(False)
+                self._wget_image.open_image(self._sys_argv["input"])
 
-                else:
+            else:
+                try:
                     with open(self._sys_argv["input"], "r", encoding="utf-8") as f:
                         color_dict = json.load(f)
 
-                        if isinstance(color_dict, dict) and "type" in color_dict:
-                            if color_dict["type"] == "depot":
-                                self._inner_attach(False)(False)
-                                self._wget_operation.dp_open(self._sys_argv["input"])
+                except Exception as err:
+                    color_dict = None
 
-                            elif color_dict["type"] == "set":
-                                self._wget_operation.dp_import(self._sys_argv["input"])
+                if isinstance(color_dict, dict) and "type" in color_dict:
+                    if color_dict["type"] == "depot":
+                        self._inner_attach(False)(False)
+                        self._wget_operation.dp_open(color_dict, direct_dict=True, dp_path=os.path.dirname(os.path.abspath(self._sys_argv["input"])))
 
-            except Exception as err:
-                pass
+                    elif color_dict["type"] == "set":
+                        self._wget_operation.dp_import(color_dict, direct_dict=True)
 
         # show args loading errors.
         if self._args.load_settings_failed:
@@ -460,6 +460,9 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_image.ps_status_changed.connect(_image_status)
         self._wget_board.ps_status_changed.connect(_board_status)
         self._wget_depot.ps_status_changed.connect(_depot_status)
+
+        self._wget_board.ps_transfer_image.connect(lambda x: self._inner_locate(False)(False))
+        self._wget_board.ps_transfer_image.connect(lambda x: self._wget_image.open_image(x, direct=True))
 
         self._wget_wheel.show()
         self._wget_image.hide()
@@ -614,7 +617,9 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_script.ps_filter.connect(lambda x: self._wget_image.open_image("", script=x))
         self._wget_script.ps_crop.connect(self._wget_image.crop_image)
         self._wget_script.ps_freeze.connect(self._wget_image.freeze_image)
+        self._wget_script.ps_freeze.connect(self._wget_board.freeze_image)
         self._wget_script.ps_print.connect(self._wget_image.print_image)
+        self._wget_script.ps_print.connect(self._wget_board.print_image)
         self._wget_script.ps_extract.connect(self._wget_image.extract_image)
 
     def _setup_channel(self):
@@ -734,52 +739,6 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         if not os.path.isdir(os.sep.join((store_path, "MyColors"))):
             os.makedirs(os.sep.join((store_path, "MyColors")))
 
-        if not os.path.isfile(os.sep.join((store_path, "depot.json"))):
-            data = {"version": self._args.info_version_en, "site": self._args.info_main_site, "type": "set"}
-            data_palettes = []
-
-            # don't use tag "%B".
-            # it would use chinese characters in some systems.
-            cur_time = time.time() # time.mktime(time.strptime(self._args.info_date_en, "%B %d, %Y"))
-
-            for recommend_idx in range(2):
-                with open(os.sep.join((self._args.resources, "colors", ("chinese_colors.json", "nippon_colors.json")[recommend_idx])), "r", encoding="utf-8") as cf:
-                    cf_data = json.load(cf)
-                    fm_data = {
-                        "rule": "custom",
-                        "name": self._recommend_descs[recommend_idx],
-                        "desc": self._recommend_descs[2].format(self._recommend_descs[0], cf_data["website"], cf_data["reference"], cf_data["publisher"]),
-                        "time": (cur_time, cur_time),
-                        "color_2": {"hex_code": cf_data["colors"][0],},
-                        "color_1": {"hex_code": cf_data["colors"][1],},
-                        "color_0": {"hex_code": cf_data["colors"][2],},
-                        "color_3": {"hex_code": cf_data["colors"][3],},
-                        "color_4": {"hex_code": cf_data["colors"][4],},
-                        "grid_list": (cf_data["colors"], [self._recommend_descs[3].format(i[0], i[1]) for i in zip(cf_data["names"], cf_data["pronunciations"])]),
-                        "grid_values": {"col": np.ceil(np.sqrt(len(cf_data["colors"]))),},
-                    }
-
-                data["palettes"] = [fm_data,]
-                data_palettes.append(fm_data)
-
-                try:
-                    with open(os.sep.join((store_path, "MyColors", ("chinese_colors.dps", "nippon_colors.dps")[recommend_idx])), "w", encoding="utf-8") as df:
-                        json.dump(data, df, indent=4, ensure_ascii=False)
-
-                except Exception as err:
-                    pass
-
-            if len(self._args.stab_ucells) <= 1:
-                data["type"] = "depot"
-                data["palettes"] = data_palettes
-
-                try:
-                    with open(os.sep.join((store_path, "depot.json")), "w", encoding="utf-8") as df:
-                            json.dump(data, df, indent=4, ensure_ascii=False)
-
-                except Exception as err:
-                    pass
-
         # loading deopt.
         if os.path.isfile(os.sep.join((store_path, "depot.json"))) and self._sys_argv["reset"] not in ("depot", "work", "all"):
             self._wget_operation.dp_open(os.sep.join((store_path, "depot.json")))
@@ -850,8 +809,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 if self.rule_dock_widget.isVisible():
                     self.rule_dock_widget.raise_()
 
-                if self.operation_dock_widget.isVisible():
-                    self.operation_dock_widget.raise_()
+                # if self.operation_dock_widget.isVisible():
+                #     self.operation_dock_widget.raise_()
 
                 if self.mode_dock_widget.isVisible():
                     self.mode_dock_widget.raise_()
@@ -919,8 +878,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 if self.rule_dock_widget.isVisible():
                     self.rule_dock_widget.raise_()
 
-                if self.operation_dock_widget.isVisible():
-                    self.operation_dock_widget.raise_()
+                # if self.operation_dock_widget.isVisible():
+                #     self.operation_dock_widget.raise_()
 
                 if self.mode_dock_widget.isVisible():
                     self.mode_dock_widget.raise_()
@@ -953,8 +912,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 if self.rule_dock_widget.isVisible():
                     self.rule_dock_widget.raise_()
 
-                if self.operation_dock_widget.isVisible():
-                    self.operation_dock_widget.raise_()
+                # if self.operation_dock_widget.isVisible():
+                #     self.operation_dock_widget.raise_()
 
                 if self.transformation_dock_widget.isVisible():
                     self.transformation_dock_widget.raise_()
@@ -1103,14 +1062,14 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
             if self._sys_argv["port"]:
                 port_info = "端口：{}".format(self._sys_argv["port"])
-                main_info = self._recommend_descs[3].format(main_info, port_info)
+                main_info = self._info_descs[12].format(main_info, port_info)
 
         else:
             main_info = "Rickrack {}".format("-".join((self._args.info_version_en.split("-")[0], self._args.info_version_en.split("-")[2])))
 
             if self._sys_argv["port"]:
                 port_info = "Port: {}".format(self._sys_argv["port"])
-                main_info = self._recommend_descs[3].format(main_info, port_info)
+                main_info = self._info_descs[12].format(main_info, port_info)
 
         self.setWindowTitle(main_info)
 
@@ -1511,33 +1470,11 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 json_hash = ""
                 temp_hash = ""
 
-                with open(os.sep.join((store_path, "set.json")), "r", encoding="utf-8") as frp:
-                    color_dict = {}
+                with open(os.sep.join((store_path, "set.json")), "rb") as frp:
+                    json_hash = hashlib.md5(frp.read()).hexdigest()
 
-                    try:
-                        color_dict = json.load(frp)
-                        color_dict["palettes"][0].pop("time")
-                        color_dict["palettes"][0].pop("name")
-                        color_dict["palettes"][0].pop("desc")
-
-                    except Exception as err:
-                        pass
-
-                    json_hash = hashlib.md5(str(color_dict).encode("utf-8")).hexdigest()
-
-                with open(os.sep.join((store_path, "set.temp")), "r", encoding="utf-8") as frp:
-                    color_dict = {}
-
-                    try:
-                        color_dict = json.load(frp)
-                        color_dict["palettes"][0].pop("time")
-                        color_dict["palettes"][0].pop("name")
-                        color_dict["palettes"][0].pop("desc")
-
-                    except Exception as err:
-                        pass
-
-                    temp_hash = hashlib.md5(str(color_dict).encode("utf-8")).hexdigest()
+                with open(os.sep.join((store_path, "set.temp")), "rb") as frp:
+                    temp_hash = hashlib.md5(frp.read()).hexdigest()
 
                 if json_hash != temp_hash or (not json_hash) or (not temp_hash):
                     for backup_file in os.listdir(os.sep.join((store_path, "History", "Sets"))):
@@ -1863,6 +1800,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("Rickrack", "All images, documents and translations in Rickrack code repository are licensed under Creative Commons Attribution-NonCommercial-ShareAlike License 4.0 (CC BY-NC-SA 4.0) unless stating additionally."),
             _translate("Rickrack", "Rickrack default uses Noto Serif (SC) fonts and Noto Sans (SC) fonts for interface display, which are designed by Google and published in website Google Fonts."),
             _translate("Rickrack", "Support Rickrack!"),
+            _translate("Rickrack", "{} ({})"),
             )
 
         self._status_descs = (
@@ -1896,13 +1834,6 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("Rickrack", "Cyan"),
             _translate("Rickrack", "Blue"),
             _translate("Rickrack", "Magenta"),
-        )
-
-        self._recommend_descs = (
-            _translate("Rickrack", "Chinese Traditional Colors"),
-            _translate("Rickrack", "Nippon Traditional Colors"),
-            _translate("Rickrack", "This file contains {} from website {}. Reference: '{}'. Copyright (c) {}."),
-            _translate("Rickrack", "{} ({})"),
         )
 
         _QColorDialog = (
