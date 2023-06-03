@@ -18,13 +18,15 @@ import re
 import json
 import time
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QShortcut, QMenu, QAction, QLabel, QDialog, QGridLayout, QPushButton, QDialogButtonBox, QColorDialog, QApplication, QMessageBox
+from PIL import ImageQt
+from PIL.PpmImagePlugin import PpmImageFile
+from PyQt5.QtWidgets import QWidget, QShortcut, QMenu, QAction, QLabel, QDialog, QGridLayout, QPushButton, QDialogButtonBox, QColorDialog, QApplication, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QPoint, QMimeData, QUrl
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag
 from cguis.design.box_dialog import Ui_BoxDialog
 from ricore.color import Color
-from ricore.transpt import get_outer_box, get_link_tag, rotate_point
-from ricore.grid import gen_color_grid, norm_grid_locations, norm_grid_values, snap_point, gen_assit_color
+from ricore.transpt import get_outer_box, get_link_tag, rotate_point, snap_point
+from ricore.grid import gen_color_grid, norm_grid_locations, norm_grid_values, gen_assit_color
 from ricore.export import export_list
 
 
@@ -280,52 +282,15 @@ class BoxSqr(QWidget):
     # ---------- ---------- ---------- Public Funcs ---------- ---------- ---------- #
 
     def change_color(self, hec_color):
-        hec_value = None
+        """
+        Find colors in info box.
+        """
 
-        try:
-            hec_value = Color.fmt_hec(str(hec_color)[-6:])
+        color = Color.stri2color(hec_color)
 
-        except Exception as err:
-            pass
-
-        if hec_value:
-            self.color = Color(hec_value, tp="hec")
+        if color:
+            self.color = color
             self.update()
-
-        else:
-            list_color = re.split(r"[\v\a\f\n\r\t\[\]\(\),;:#]", str(hec_color.replace("【", "[").replace("】", "]").replace("（", "(").replace("）", ")").replace("。", ".").replace("，", ",").replace("、", ",").replace("；", ";").replace("：", ":")))
-
-            while "" in list_color:
-                list_color.remove("")
-
-            if len(list_color) >= 3:
-                list_color = list_color[-3:]
-
-                if "." in list_color[0] or "." in list_color[1] or "." in list_color[2]:
-                    hsv_color = None
-
-                    try:
-                        hsv_color = Color.fmt_hsv([float(x) for x in list_color])
-
-                    except Exception as err:
-                        pass
-
-                    if isinstance(hsv_color, np.ndarray):
-                        self.color = Color(hsv_color, tp="hsv")
-                        self.update()
-
-                else:
-                    rgb_color = None
-
-                    try:
-                        rgb_color = Color.fmt_rgb([int(x) for x in list_color])
-
-                    except Exception as err:
-                        pass
-
-                    if isinstance(rgb_color, np.ndarray):
-                        self.color = Color(rgb_color, tp="rgb")
-                        self.update()
 
 
 class Board(QWidget):
@@ -342,6 +307,7 @@ class Board(QWidget):
     ps_assit_pt_changed = pyqtSignal(bool)
     ps_history_backup = pyqtSignal(bool)
     ps_undo = pyqtSignal(bool)
+    ps_transfer_image = pyqtSignal(PpmImageFile)
 
     def __init__(self, wget, args):
         """
@@ -727,6 +693,7 @@ class Board(QWidget):
             if event.button() == Qt.LeftButton:
                 # main points.
                 if (self._args.press_move and not self._last_moving and not already_accept_assi and self._cs_box[0] < point[0] < self._cs_box[0] + self._cs_box[2] and self._cs_box[1] < point[1] < self._cs_box[1] + self._cs_box[3]) or already_accept_main:
+                    """
                     loc = [(point[0] - self._cs_box[0]) / self._cs_wid, (point[1] - self._cs_box[1]) / self._cs_wid]
                     loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
                     loc[0] = 0.0 if loc[0] < 0.0 else loc[0]
@@ -735,6 +702,7 @@ class Board(QWidget):
                     loc[1] = 1.0 if loc[1] > 1.0 else loc[1]
 
                     self._args.sys_grid_locations[self._args.sys_activated_idx] = tuple(loc)
+                    """
 
                     self._moving_maintp = True
                     self._last_moving = 0
@@ -744,6 +712,7 @@ class Board(QWidget):
 
                 # assit points.
                 elif self._args.sys_grid_assitlocs[self._args.sys_activated_idx] and (self._args.press_move and self._last_moving and not already_accept_main and self._cs_box[0] < point[0] < self._cs_box[0] + self._cs_box[2] and self._cs_box[1] < point[1] < self._cs_box[1] + self._cs_box[3]) or already_accept_assi:
+                    """
                     loc = [(point[0] - self._cs_box[0]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][0], (point[1] - self._cs_box[1]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][1]]
                     loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
                     loc[0] = -1.0 if loc[0] < -1.0 else loc[0]
@@ -753,6 +722,7 @@ class Board(QWidget):
 
                     self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][0] = loc[0]
                     self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][1] = loc[1]
+                    """
 
                     self._moving_assitp = True
                     self._last_moving = 1
@@ -959,7 +929,7 @@ class Board(QWidget):
         if not self.isVisible():
             return
 
-        if self._args.rev_direct:
+        if True: # self._args.rev_direct:
             if ratio > 1 and self._args.sys_grid_values["col"] >= 2:
                 self._args.sys_grid_values["col"] = int(self._args.sys_grid_values["col"] - 1)
 
@@ -1387,6 +1357,45 @@ class Board(QWidget):
         self.ps_history_backup.emit(True)
         self.update()
 
+    def freeze_image(self, value):
+        """
+        Freeze current image.
+        """
+
+        if not self.isVisible():
+            return
+
+        grid_img = QImage(self._color_grid, self._color_grid.shape[1], self._color_grid.shape[0], self._color_grid.shape[1] * 3, QImage.Format_RGB888)
+        grid_img = grid_img.scaled(self._cs_box[2], self._cs_box[3], Qt.KeepAspectRatio)
+        grid_img = ImageQt.fromqimage(grid_img)
+
+        self.ps_transfer_image.emit(grid_img)
+
+    def print_image(self, value):
+        """
+        Exec print image.
+        """
+
+        if not self.isVisible():
+            return
+
+        grid_img = QImage(self._color_grid, self._color_grid.shape[1], self._color_grid.shape[0], self._color_grid.shape[1] * 3, QImage.Format_RGB888)
+        grid_img = grid_img.scaled(self._cs_box[2], self._cs_box[3], Qt.KeepAspectRatio)
+
+        name = "{}".format(time.strftime("Rickrack_Image_%Y_%m_%d.png", time.localtime()))
+
+        cb_filter = "{} (*.png *.bmp *.jpg *.jpeg *.tif *.tiff *.webp);; {} (*.png);; {} (*.bmp);; {} (*.jpg *.jpeg);; {} (*.tif *.tiff);; {} (*.webp)".format(*self._extend_descs)
+        cb_file = QFileDialog.getSaveFileName(None, self._open_descs[2], os.sep.join((self._args.usr_image, name)), filter=cb_filter)
+
+        if cb_file[0]:
+            self._args.usr_image = os.path.dirname(os.path.abspath(cb_file[0]))
+
+        else:
+            # closed without open a file.
+            return
+
+        grid_img.save(cb_file[0])
+
     def clipboard_in(self):
         """
         Load set from clipboard. Sync to wheel.py. May exist difference.
@@ -1528,6 +1537,16 @@ class Board(QWidget):
         self._action_copy_img = QAction(self)
         self._action_copy_img.triggered.connect(self.clipboard_img)
         self._menu.addAction(self._action_copy_img)
+
+        #   _translate("Board", "Freeze Image"), # 28
+        #   _translate("Board", "Print Image"), # 29
+        self._action_freeze_img = QAction(self)
+        self._action_freeze_img.triggered.connect(self.freeze_image)
+        self._menu.addAction(self._action_freeze_img)
+
+        self._action_print_img = QAction(self)
+        self._action_print_img.triggered.connect(self.print_image)
+        self._menu.addAction(self._action_print_img)
 
         #   _translate("Board", "Zoom In"), # 8
         #   _translate("Board", "Zoom Out"), # 9
@@ -1917,6 +1936,11 @@ class Board(QWidget):
         else:
             self._action_hide_pt.setText(self._action_descs[26])
 
+        #   _translate("Board", "Freeze Image"), # 28
+        #   _translate("Board", "Print Image"), # 29
+        self._action_freeze_img.setText(self._action_descs[28])
+        self._action_print_img.setText(self._action_descs[29])
+
     def update_text(self):
         self.update_action_text()
 
@@ -1957,10 +1981,8 @@ class Board(QWidget):
             _translate("Board", "Make Ref Board"), # 25
             _translate("Board", "Show Points"), # 26
             _translate("Board", "Hide Points"), # 27
-        )
-
-        self._recommend_descs = (
-            _translate("Rickrack", "{} ({})"),
+            _translate("Image", "Freeze Image"), # 28
+            _translate("Image", "Print Image"), # 29
         )
 
         self._tip_descs = (
@@ -1978,4 +2000,20 @@ class Board(QWidget):
             _translate("Info", "Cancel"),
             _translate("Info", "The selected color box will be removed from board."),
             _translate("Info", "The selected assistant point will be removed from board."),
+        )
+
+        self._open_descs = (
+            _translate("Image", "Double click here to open an image."),
+            _translate("Image", "Open"),
+            _translate("Image", "Print"),
+            _translate("Image", "Cover"),
+        )
+
+        self._extend_descs = (
+            _translate("Image", "All Acceptable Images"),
+            _translate("Image", "PNG Image"),
+            _translate("Image", "BMP Image"),
+            _translate("Image", "JPG Image"),
+            _translate("Image", "TIF Image"),
+            _translate("Image", "WEBP Image"),
         )

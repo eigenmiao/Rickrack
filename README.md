@@ -28,7 +28,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 
 # Table of Content
 * [Introduction Translations](#introduction-translations)
-* [Feature](#feature)
+* [Features](#features)
 * [Demo](#demo)
   * [Basic Functions](#basic-functions)
   * [Reference Colors](#reference-colors)
@@ -57,6 +57,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 * [License](#license)
   * [License for Rickrack](#license-for-rickrack)
   * [License for Required Packages](#license-for-required-packages)
+* [More Information](#more-information)
 * [Acknowledgment](#acknowledgment)
 
 # Introduction Translations
@@ -116,7 +117,7 @@ Rickrack es un editor de color gratuito y fácil de usar. Está diseñado para g
 
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
-# Feature
+# Features
 Rickrack has several features:
 * A strong and free color editor.
 * Create a set of colors from the color wheel.
@@ -135,29 +136,29 @@ Rickrack has several features:
 ## Basic Functions
 |     |     |
 | :---: | :---: |
-| ![](demo/usage/000.gif) | ![](demo/usage/109.gif) |
+| ![](demo/00_usage/000.gif) | ![](demo/00_usage/109.gif) |
 | Create a set of colors from the color wheel. | Pick-up a set of colors from an image. (Image inside: [Copyright (c) 2001 Studio Ghibli](https://www.ghibli.jp/works/chihiro/), Non-Commercial Usage) |
-| ![](demo/usage/202.gif) | ![](demo/usage/300.gif) |
+| ![](demo/00_usage/202.gif) | ![](demo/00_usage/300.gif) |
 | Generate a gradient color board from the color set. | Attach the color set and color board into the depot. |
 
 ## Reference Colors
 |     |     |
 | :---: | :---: |
-| ![](demo/usage/018.gif) | ![](demo/usage/110.gif) |
+| ![](demo/00_usage/018.gif) | ![](demo/00_usage/110.gif) |
 | Add reference colors in the color wheel. | Add reference colors from the image. (Image inside: [Copyright (c) 2001 Studio Ghibli](https://www.ghibli.jp/works/chihiro/), Non-Commercial Usage) |
 
 ## Color Palettes
 |     |     |
 | :---: | :---: |
-| ![](demo/usage/204.gif) | ![](demo/usage/205.gif) |
+| ![](demo/00_usage/204.gif) | ![](demo/00_usage/205.gif) |
 | Convert: gradient palette &harr; fixed palette. | Convert: gradient palette &harr; reference palette. |
-| ![](demo/usage/700.gif) | ![](demo/usage/701.gif) |
+| ![](demo/00_usage/700.gif) | ![](demo/00_usage/701.gif) |
 | Fixed palette: [Chinese Traditional Colors](http://zhongguose.com/). | Fixed palette: [Nippon Traditional Colors](http://nipponcolors.com/). |
 
 ## Languages and Settings
 |     |     |
 | :---: | :---: |
-| ![](demo/usage/707.gif) | ![](demo/usage/706.gif) |
+| ![](demo/00_usage/707.gif) | ![](demo/00_usage/706.gif) |
 | Support multiple languages, including Chinese, English, Japanese, German, French, Russian, and so on. (Languages except Chinese and English are translated by [Google Translate](https://translate.google.cn/).) | Support multiple interface themes. |
 
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
@@ -190,7 +191,7 @@ Support the continuous development of Rickrack!
 
 # Installation
 ## Current Release
-The latest preview version is [v2.7.26](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.26).
+The latest preview version is [v2.8.5](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.5).
 
 ## Install Software
 ### Recommend: Install on Windows 10 or 11 via WinGet tool
@@ -199,7 +200,7 @@ winget install rickrack
 ```
 
 ## Install on other platforms
-Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.7.26) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.7.26/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
+Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.5) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.5/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 
@@ -327,12 +328,57 @@ Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif)
 | setuptools     | 40.6.2   | MIT              |
 | swatch         | 0.4.0    | MIT              |
 
-# Acknowledgment
-* The Rickrack software is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
-* The code repository is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
+
+# More Information
+* Rickrack is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
+* The code repository of Rickrack is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
 * The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
-* The cover image is [created by martynaszulist and published on Pixabay](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/).
-* In some demonstration animations, [images of Ghibli](https://www.ghibli.jp/info/013409/) were used.
-* In the demo animations, the interface display uses the [LXGWWenKai font](https://lxgw.github.io/2021/01/28/Klee-Simpchin/).
+* The cover image uses images from [Pixabay, which is created by martynaszulist](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/).
+* In some demo animations, [images of Ghibli](https://www.ghibli.jp/info/013409/) were used.
+* The interface display in demo animations uses the [LXGWWenKai font](https://lxgw.github.io/2021/01/28/Klee-Simpchin/).
+
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
+
+# Acknowledgment
+## Publicity & Promotion
+<table>
+  <tbody>
+    <tr>
+    <td align="center" valign="top" width="20%"><a href="https://www.youtube.com/watch?v=OUnktTCtv3E"><img src="https://yt3.googleusercontent.com/ytc/AGIKgqPSY98ka46AxjcUBDDntl1NHA8lL4PFMZt6g75TFA=s176-c-k-c0x00ffffff-no-rj" width="90px;"/><br /><sub><b>TJ&nbsp;FREE@Youtube</b></sub></a></td>
+    <td align="center" valign="top" width="20%"><a href="https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml"><img src="https://cdnssl.softpedia.com/_img/editors/Robert%20Condorache.jpg?v=2020" width="90px;"/><br /><sub><b>Robert&nbsp;Condorache@Softpedia</b></sub></a></td>
+    <td align="center" valign="top" width="20%"><a href="https://sspai.com/u/eigenmiao/updates"><img src="https://cdn.sspai.com/2023/01/14/eab0a38256bc3a045f8d5bf76dd30072.png?imageMogr2/auto-orient/quality/95/thumbnail/!200x200r/gravity/Center/crop/200x200/interlace/1" width="90px;"/><br /><sub><b>本征喵函数@少数派</b></sub></a></td>
+    </tr>
+  </tbody>
+</table>
+
+## l10n & i18n
+<table>
+  <tbody>
+    <tr>
+    <td align="center" valign="top" width="20%"><a href="https://poeditor.com/join/project?hash=kBeQjfxCES"><img src="https://avatars.githubusercontent.com/u/59333735?v=4" width="90px;"/><br /><sub><b>Eigenmiao@POEditor</b></sub></a></td>
+    </tr>
+  </tbody>
+</table>
+
+## Feature Implementation & Bug Fix
+<table>
+  <tbody>
+    <tr>
+    <td align="center" valign="top" width="20%"><a href="https://github.com/eigenmiao"><img src="https://avatars.githubusercontent.com/u/59333735?v=4" width="90px;"/><br /><sub><b>Eigenmiao@Github</b></sub></a></td>
+    </tr>
+  </tbody>
+</table>
+
+## Software Dependency
+<table>
+  <tbody>
+    <tr>
+    <td align="center" valign="top" width="20%"><a href="https://github.com/eigenmiao"><img src="https://avatars.githubusercontent.com/u/59333735?v=4" width="90px;"/><br /><sub><b>Eigenmiao@Github</b></sub></a></td>
+    <td align="center" valign="top" width="20%"><a href="https://github.com/vedantmgoyal2009"><img src="https://avatars.githubusercontent.com/u/83997633?v=4" width="90px;"/><br /><sub><b>Vedantmgoyal2009@Github</b></sub></a></td>
+    <td align="center" valign="top" width="20%"><a href="https://github.com/apps/dependabot"><img src="https://avatars.githubusercontent.com/in/29110?s=64&v=4" width="90px;"/><br /><sub><b>Dependabot@Github</b></sub></a></td>
+    </tr>
+  </tbody>
+</table>
 
 <div align="right"><a href="#rickrack">:arrow_up: Back to Top :arrow_up:</a> <a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>

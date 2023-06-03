@@ -17,6 +17,7 @@ import os
 import sys
 import time
 import numpy as np
+from PIL import ImageQt
 from PIL import Image as PImage
 from PyQt5.QtWidgets import QWidget, QLabel, QProgressBar, QMessageBox, QFileDialog, QShortcut, QMenu, QAction, QApplication
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QRect, QPoint, QMimeData
@@ -520,6 +521,7 @@ class Image(QWidget):
 
                 # select.
                 if event.button() == Qt.LeftButton and (((self._args.press_move or select_main_color or select_assit_colors) and self._resized_img_pos[0] < point[0] < self._resized_img_pos[0] + self._resized_img_pos[2] and self._resized_img_pos[1] < point[1] < self._resized_img_pos[1] + self._resized_img_pos[3]) or already_accept):
+                    """
                     loc = [(point[0] - self._resized_img_pos[0]) / self._resized_img_pos[2], (point[1] - self._resized_img_pos[1]) / self._resized_img_pos[3]]
                     loc[0] = 0.0 if loc[0] < 0.0 else loc[0]
                     loc[0] = 1.0 if loc[0] > 1.0 else loc[0]
@@ -533,6 +535,7 @@ class Image(QWidget):
                         self._args.sys_assit_color_locs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx] = tuple(loc)
 
                     self.modify_color_loc()
+                    """
 
                     self._locating_colors = True
 
@@ -866,12 +869,12 @@ class Image(QWidget):
             # closed without open a file.
             return
 
-    def open_image(self, image, script="", with_full_locs=[]):
+    def open_image(self, image, script="", with_full_locs=[], direct=False):
         """
         Open a image.
         """
 
-        if isinstance(script, tuple) and (not self.isVisible()):
+        if isinstance(script, tuple) and (not self.isVisible() or direct):
             return
 
         if script and (not self._image3c.img_data):
@@ -886,12 +889,16 @@ class Image(QWidget):
             return
 
         if not isinstance(script, tuple):
-            try:
-                img_data = PImage.open(image)
+            if direct:
+                img_data = image
 
-            except Exception as err:
-                self.warning(self._image_errs[4] + "\n{}\n{}".format(self._image_errs[8], err))
-                return
+            else:
+                try:
+                    img_data = PImage.open(image)
+
+                except Exception as err:
+                    self.warning(self._image_errs[4] + "\n{}\n{}".format(self._image_errs[8], err))
+                    return
 
             self._image3c.img_data = img_data
             self._args.sys_image_url = image
@@ -1373,10 +1380,10 @@ class Image(QWidget):
             self.warning(self._image_errs[1])
             return
 
-        load_image = self._image3c.save_load_data(self._image3c.display)
+        load_image = ImageQt.fromqimage(self._image3c.display)
 
         if load_image:
-            self.open_image(load_image)
+            self.open_image(load_image, direct=True)
 
         else:
             self.warning(self._image_errs[5])
@@ -1494,6 +1501,16 @@ class Image(QWidget):
         self._action_copy_img.triggered.connect(self.clipboard_img)
         self._menu.addAction(self._action_copy_img)
 
+        #   _translate("Board", "Freeze Image"), # 8
+        #   _translate("Board", "Print Image"), # 9
+        self._action_freeze_img = QAction(self)
+        self._action_freeze_img.triggered.connect(self.freeze_image)
+        self._menu.addAction(self._action_freeze_img)
+
+        self._action_print_img = QAction(self)
+        self._action_print_img.triggered.connect(self.print_image)
+        self._menu.addAction(self._action_print_img)
+
         #   _translate("Image", "Zoom In"), # 6
         #   _translate("Image", "Zoom Out"), # 7
         self._action_zoom_in = QAction(self)
@@ -1516,12 +1533,16 @@ class Image(QWidget):
             self._action_copy_img.setVisible(True)
             self._action_zoom_in.setVisible(True)
             self._action_zoom_out.setVisible(True)
+            self._action_freeze_img.setVisible(True)
+            self._action_print_img.setVisible(True)
 
         else:
             self._action_reset.setVisible(False)
             self._action_copy_img.setVisible(False)
             self._action_zoom_in.setVisible(False)
             self._action_zoom_out.setVisible(False)
+            self._action_freeze_img.setVisible(False)
+            self._action_print_img.setVisible(False)
 
         self._menu.exec_(QCursor.pos())
 
@@ -1579,6 +1600,11 @@ class Image(QWidget):
         self._action_zoom_in.setText(self._action_descs[6])
         self._action_zoom_out.setText(self._action_descs[7])
 
+        #   _translate("Board", "Freeze Image"), # 8
+        #   _translate("Board", "Print Image"), # 9
+        self._action_freeze_img.setText(self._action_descs[8])
+        self._action_print_img.setText(self._action_descs[9])
+
     def _func_tr_(self):
         _translate = QCoreApplication.translate
 
@@ -1591,6 +1617,8 @@ class Image(QWidget):
             _translate("Board", "Reset"), # 5
             _translate("Board", "Zoom In"), # 6
             _translate("Board", "Zoom Out"), # 7
+            _translate("Image", "Freeze Image"), # 8
+            _translate("Image", "Print Image"), # 9
         )
 
         self._open_descs = (

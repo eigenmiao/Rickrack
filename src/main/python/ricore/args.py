@@ -18,6 +18,7 @@ import json
 import re
 import time
 import locale
+import shutil
 import unittest
 from ricore.color_set import ColorSet
 from ricore.check import check_key, check_file_name, check_nonempt_str_lst
@@ -34,12 +35,12 @@ class Args(object):
         """
 
         # software version.
-        self.info_version_zh = "v2.7.26-x2d3s3-稳定版"
-        self.info_version_en = "v2.7.26-x2d3s3-stable"
+        self.info_version_zh = "v2.8.5-x2d3s3-预览版"
+        self.info_version_en = "v2.8.5-x2d3s3-pre"
 
         # update date.
-        self.info_date_zh = "2023年4月9日"
-        self.info_date_en = "April 9, 2023"
+        self.info_date_zh = "2023年5月21日"
+        self.info_date_en = "May 21, 2023"
 
         # temporary dir.
         self.global_temp_dir = None
@@ -186,13 +187,9 @@ class Args(object):
         """
 
         # load default language.
-        try:
-            default_locale = locale.getdefaultlocale()[0]
-
-        except Exception as err:
-            default_locale = ""
-
+        default_locale = locale.getdefaultlocale()[0]
         default_locale = str(default_locale).lower() if default_locale else ""
+
         user_prefer_locale = "en"
 
         if len(default_locale) > 1:
@@ -225,11 +222,11 @@ class Args(object):
                 with open(os.sep.join((self.resources, "settings.json")), "r", encoding="utf-8") as sf:
                     uss = json.load(sf)
 
-                    if isinstance(uss, dict) and "store_loc" in uss:
-                        self.store_loc = bool(uss["store_loc"])
-
             except Exception as err:
-                pass
+                uss = None
+
+            if isinstance(uss, dict) and "store_loc" in uss:
+                self.store_loc = bool(uss["store_loc"])
 
         # need verify and mkdirs.
         if self.store_loc:
@@ -542,15 +539,10 @@ class Args(object):
         Parse directory path.
         """
 
-        try:
-            ans = str(value)
+        ans = str(value)
 
-            if os.path.isdir(ans):
-                return ans
-
-        except Exception as err:
-            if self.global_log:
-                print(err)
+        if os.path.isdir(ans):
+            return ans
 
         return default
 
@@ -562,12 +554,11 @@ class Args(object):
         try:
             ans = (dtype(value[0]), dtype(value[1]))
 
-            if scope[0] <= ans[0] <= scope[1] and scope[0] <= ans[1] <= scope[1] and ans[0] <= ans[1]:
-                return ans
-
         except Exception as err:
-            if self.global_log:
-                print(err)
+            ans = None
+
+        if ans != None and scope[0] <= ans[0] <= scope[1] and scope[0] <= ans[1] <= scope[1] and ans[0] <= ans[1]:
+            return ans
 
         return default
 
@@ -576,15 +567,10 @@ class Args(object):
         Parse string in list.
         """
 
-        try:
-            ans = str(value)
+        ans = str(value)
 
-            if ans in lst:
-                return ans
-
-        except Exception as err:
-            if self.global_log:
-                print(err)
+        if ans in lst:
+            return ans
 
         return default
 
@@ -596,12 +582,11 @@ class Args(object):
         try:
             ans = dtype(value)
 
-            if scope[0] <= ans <= scope[1]:
-                return ans
-
         except Exception as err:
-            if self.global_log:
-                print(err)
+            ans = None
+
+        if ans != None and scope[0] <= ans <= scope[1]:
+            return ans
 
         return default
 
@@ -613,11 +598,11 @@ class Args(object):
         try:
             ans = dtype(value)
 
-            return ans
-
         except Exception as err:
-            if self.global_log:
-                print(err)
+            ans = None
+
+        if ans != None:
+            return ans
 
         return default
 
@@ -640,8 +625,7 @@ class Args(object):
         if name_stri:
             return name_stri
 
-        else:
-            return default
+        return default
 
     def pfmt_rgb_color(self, value, default):
         """
@@ -651,12 +635,11 @@ class Args(object):
         try:
             ans = (int(value[0]), int(value[1]), int(value[2]))
 
-            if 0 <= ans[0] <= 255 and 0 <= ans[2] <= 255 and 0 <= ans[2] <= 255:
-                return ans
-
         except Exception as err:
-            if self.global_log:
-                print(err)
+            ans = None
+
+        if ans != None and  0 <= ans[0] <= 255 and 0 <= ans[2] <= 255 and 0 <= ans[2] <= 255:
+            return ans
 
         return default
 
@@ -753,19 +736,15 @@ class Args(object):
         Check if settings file version is compatible.
         """
 
-        try:
-            ans = re.match(r"^v.+?-x(\d+)d.+?s.+-.*", version)
-            if ans:
-                return int(ans.group(1))
+        ans = re.match(r"^v.+?-x(\d+)d.+?s.+-.*", str(version))
 
-            elif re.match(r"^v2\.[12].*", version):
-                return 1
+        if ans:
+            return int(ans.group(1))
 
-            else:
-                return 0
+        elif re.match(r"^v2\.[12].*", str(version)):
+            return 1
 
-        except Exception as err:
-            # print(err)
+        else:
             return 0
 
     @classmethod
@@ -774,19 +753,15 @@ class Args(object):
         Check if color depot file version is compatible.
         """
 
-        try:
-            ans = re.match(r"^v.+?-x.+?d(\d+)s.+-.*", version)
-            if ans:
-                return int(ans.group(1))
+        ans = re.match(r"^v.+?-x.+?d(\d+)s.+-.*", str(version))
 
-            elif re.match(r"^v2\.[12].*", version):
-                return 1
+        if ans:
+            return int(ans.group(1))
 
-            else:
-                return 0
+        elif re.match(r"^v2\.[12].*", str(version)):
+            return 1
 
-        except Exception as err:
-            # print(err)
+        else:
             return 0
 
     @classmethod
@@ -795,19 +770,15 @@ class Args(object):
         Check if color set file version is compatible.
         """
 
-        try:
-            ans = re.match(r"^v.+?-x.+?d.+?s(\d+).*-.*", version)
-            if ans:
-                return int(ans.group(1))
+        ans = re.match(r"^v.+?-x.+?d.+?s(\d+).*-.*", str(version))
 
-            elif re.match(r"^v2\.[12].*", version):
-                return 1
+        if ans:
+            return int(ans.group(1))
 
-            else:
-                return 0
+        elif re.match(r"^v2\.[12].*", str(version)):
+            return 1
 
-        except Exception as err:
-            # print(err)
+        else:
             return 0
 
     def check_temp_dir(self):
@@ -830,14 +801,10 @@ class Args(object):
 
         if os.path.isdir(temp_dir):
             try:
-                for doc in os.listdir(temp_dir):
-                    os.remove(os.sep.join((temp_dir, doc)))
-
-                os.rmdir(temp_dir)
+                shutil.rmtree(temp_dir, ignore_errors=True)
 
             except Exception as err:
-                if self.global_log:
-                    print(err)
+                pass
 
 
 class TestArgs(unittest.TestCase):

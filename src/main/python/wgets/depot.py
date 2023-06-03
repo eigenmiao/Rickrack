@@ -15,7 +15,6 @@ Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 
 import re
 import os
-import sys
 import json
 import time
 import numpy as np
@@ -27,8 +26,8 @@ from cguis.resource import view_rc
 from ricore.color import FakeColor, Color
 from ricore.export import export_list
 from ricore.transpt import get_link_tag
-from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values, norm_im_time
-from ricore.check import check_image_desc
+from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values
+from ricore.check import check_image_desc, fmt_im_time
 
 
 class Info(QDialog, Ui_InfoDialog):
@@ -335,7 +334,7 @@ class UnitCell(QWidget):
         self.name = name_stri
         self.desc = desc_stri
 
-        self.cr_time = norm_im_time(cr_time)
+        self.cr_time = fmt_im_time(cr_time)
 
         self.update_colors(hsv_set, hm_rule, grid_locations, grid_assitlocs, grid_list, grid_values, update_time=False)
 
@@ -364,7 +363,7 @@ class UnitCell(QWidget):
             self.grid_values = {}
 
         if update_time:
-            self.cr_time = norm_im_time((self.cr_time[0], time.time()))
+            self.cr_time = fmt_im_time((self.cr_time[0], time.time()))
 
     # ---------- ---------- ---------- Paint Funcs ---------- ---------- ---------- #
 
@@ -952,7 +951,7 @@ class Depot(QWidget):
 
         stab_column = self._args.stab_column
 
-        if self._args.rev_direct:
+        if True: # self._args.rev_direct:
             if ratio > 1:
                 stab_column = stab_column - 1
 
@@ -1232,10 +1231,8 @@ class Depot(QWidget):
             unit_cell = UnitCell(self._scroll_contents, self._args, hsv_set, color_list[1], color_list[2], color_list[3], color_list[4], color_list[5], color_list[6], color_list[7], color_list[8])
 
         else:
-            atc_name = ""
-            atc_desc = ""
             hsv_set = tuple(self._args.sys_color_set[i].hsv for i in range(5))
-            unit_cell = UnitCell(self._scroll_contents, self._args, hsv_set, self._args.hm_rule, atc_name, atc_desc, (time.time(), time.time()), self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values)
+            unit_cell = UnitCell(self._scroll_contents, self._args, hsv_set, self._args.hm_rule, "", "", (time.time(), time.time()), self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values)
 
         self._scroll_grid_layout.addWidget(unit_cell)
 
