@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.7.26-x2d3s3-stable
+v2.8.5-x2d3s3-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-April 9, 2023
+May 21, 2023
 """
 
 __HELP__ = """
@@ -787,13 +787,7 @@ class Rickrack(object):
 
         elif os.path.isfile(os.sep.join([os.path.abspath(os.path.dirname(__file__)), "data.json"])):
             with open(os.sep.join([os.path.abspath(os.path.dirname(__file__)), "data.json"]), "r", encoding="utf-8") as f:
-                try:
-                    data = json.load(f)
-
-                except Exception as err:
-                    print("Load project data faild:\n{}".format(err))
-
-                    data = {}
+                data = json.load(f)
 
             if "dp_proj" in data and data["dp_proj"]:
                 dirname, basename = para_dir(data["dp_proj"])
@@ -815,12 +809,8 @@ class Rickrack(object):
 
         os.chdir(dirname)
 
-        try:
-            with open(os.sep.join([os.path.abspath(os.path.dirname(__file__)), "data.json"]), "w", encoding="utf-8") as f:
-                json.dump({"dp_proj": dirname, "dp_exec": basename}, f, indent=4, ensure_ascii=False)
-
-        except Exception as err:
-            print("Dump project data faild:\n{}".format(err))
+        with open(os.sep.join([os.path.abspath(os.path.dirname(__file__)), "data.json"]), "w", encoding="utf-8") as f:
+            json.dump({"dp_proj": dirname, "dp_exec": basename}, f, indent=4, ensure_ascii=False)
 
         # run project.
         sdp_argv = dict()
@@ -1017,13 +1007,7 @@ class Rickrack(object):
                         rt_gcol = len(color_line)
 
                         for i in range(len(color_line)):
-                            try:
-                                color_line[i] = Color.fmt_hec(color_line[i])
-
-                            except Exception as err:
-                                print("Parse colors in grid faild:\n{}".format(color_line[i]))
-
-                                color_line[i] = self._default_color
+                            color_line[i] = Color.fmt_hec(color_line[i])
 
                         rt_cgrd += color_line
 
@@ -1033,13 +1017,7 @@ class Rickrack(object):
                         color_line = line[4:].split(" ")
 
                         for i in range(len(color_line)):
-                            try:
-                                color_line[i] = Color.fmt_hec(color_line[i])
-
-                            except Exception as err:
-                                print("Parse colors in grid faild:\n{}".format(color_line[i]))
-
-                                color_line[i] = self._default_color
+                            color_line[i] = Color.fmt_hec(color_line[i])
 
                         rt_refs = color_line
 
@@ -1048,13 +1026,7 @@ class Rickrack(object):
                         if line[2] == "*":
                             rt_cidx = int(line[4])
 
-                        try:
-                            rt_cset[int(line[4])] = Color.fmt_hec(line[3:].split()[7])
-
-                        except Exception as err:
-                            print("Parse colors for id {} faild:\n{}".format(line[4], err))
-
-                            rt_cset[int(line[4])] = self._default_color
+                        rt_cset[int(line[4])] = Color.fmt_hec(line[3:].split()[7])
 
                     elif line[4:8] == "Rule":
                         rt_rule = line[10:].lstrip().rstrip()
@@ -1084,36 +1056,16 @@ class Rickrack(object):
                         data_grid_name = data_grid_name[1:-1].split('" "')
 
                     for i in range(5):
-                        try:
-                            rt_cset[(2, 1, 0, 3, 4)[i]] = Color.fmt_hec(data_set[i])
-
-                        except Exception as err:
-                            print("Parse colors for id {} faild:\n{}".format(i, err))
-
-                            rt_cset[i] = self._default_color
+                        rt_cset[(2, 1, 0, 3, 4)[i]] = Color.fmt_hec(data_set[i])
 
                     for i in range(len(data_set) - 6):
-                        try:
-                            rt_refs.append(Color.fmt_hec(data_set[i + 6]))
-
-                        except Exception as err:
-                            print("Parse ref colors for id {} faild:\n{}".format(i, err))
-
-                            rt_refs.append(self._default_color)
-                            rt_refs_name.append("RR")
+                        rt_refs.append(Color.fmt_hec(data_set[i + 6]))
 
                     for i in range(len(data_grid)):
-                        try:
-                            rt_cgrd.append(Color.fmt_hec(data_grid[i]))
+                        rt_cgrd.append(Color.fmt_hec(data_grid[i]))
 
-                            if data_grid_name:
-                                rt_cgrd_name.append(data_grid_name[i])
-
-                        except Exception as err:
-                            print("Parse color grid for id {} faild:\n{}".format(i, err))
-
-                            rt_cgrd.append(self._default_color)
-                            rt_cgrd_name.append("RR")
+                        if data_grid_name:
+                            rt_cgrd_name.append(data_grid_name[i])
 
         rt_cset = Grid(rt_cset, rt_cset_name, 5)
         rt_refs = Grid(rt_refs, rt_refs_name, len(rt_refs))

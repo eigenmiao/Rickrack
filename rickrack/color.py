@@ -13,6 +13,7 @@ infomation about DigitalPalette.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
+import re
 import unittest
 import numpy as np
 
@@ -544,18 +545,13 @@ class Color(object):
             standard hex code (hec) color.
         """
 
-        if not isinstance(hec, str):
-            raise ValueError("expect hex code (hec) in str type: {}.".format(hec))
+        _hec = re.match(r"[0-9A-F]+", str(hec).upper())
 
-        if len(hec) == 6:
-            for stri in hec.upper():
-                if stri not in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"):
-                    raise ValueError("expect code in hex type: {}.".format(hec))
+        if _hec and len(_hec[0]) == 6:
+            return _hec[0]
 
         else:
-            raise ValueError("expect hex code (hec) in length 6: {}.".format(hec))
-
-        return hec.upper()
+            raise ValueError("expect hec color in hex type and length 6: {}.".format(hec))
 
     @classmethod
     def fmt_lab(cls, lab):
@@ -607,6 +603,73 @@ class Color(object):
 
         else:
             raise ValueError("expect cmyk color in length 4 and float: {}.".format(cmyk))
+
+    @classmethod
+    def findall_hec_lst(cls, hec):
+        """
+        Class method. Format item to standard hex code (hec) color.
+
+        Args:
+            hec (str): color item to be formated.
+
+        Returns:
+            standard hex code (hec) color.
+        """
+
+        _hec = re.findall(r"[0-9A-F]+", str(hec).upper())
+        _hec = ["" if len(i) < 6 else i[:6] for i in _hec]
+
+        while "" in _hec:
+            _hec.remove("")
+
+        return _hec
+
+    @classmethod
+    def stri2color(cls, stri):
+        """
+        Find the first possible color in string.
+
+        Args:
+            stri (str): rgb, hsv or hec color string.
+
+        Returns:
+            color.
+        """
+
+        _stri = re.findall(r"[0-9A-F\.]+", str(stri).upper())
+
+        if len(_stri) > 2:
+            _num = re.findall(r"[0-9\.]+", str(stri))
+
+            if len(_num) > 2:
+                _a, _b, _c = _num[:3]
+                _a = float(".".join(_a.split(".")[:2])) if "." in _a else int(_a)
+                _b = float(".".join(_b.split(".")[:2])) if "." in _b else int(_b)
+                _c = float(".".join(_c.split(".")[:2])) if "." in _c else int(_c)
+
+                if _a > 255:
+                    return Color((_a, _b, _c), tp="hsv")
+
+                elif _b > 1.0 or _c > 1.0:
+                    return Color((_a, _b, _c), tp="rgb")
+
+                elif isinstance(_a, float) or isinstance(_b, float) or isinstance(_c, float):
+                    return Color((_a, _b, _c), tp="hsv")
+
+                else:
+                    return Color((_a, _b, _c), tp="rgb")
+
+            else:
+                return None
+
+        elif len(_stri) > 0:
+            if len(_stri[0]) > 5:
+                return Color(Color.fmt_hec(_stri[0]), tp="hec")
+
+            return None
+
+        else:
+            return None
 
     @classmethod
     def rgb2hsv(cls, rgb):
@@ -974,11 +1037,11 @@ class Color(object):
             rgb color.
         """
 
-        lab = cls.fmt_lab(lab)
+        l, a, b = cls.fmt_lab(lab)
 
-        y = (lab[0] + 16) / 116
-        x = lab[1] / 500 + y
-        z = y - lab[2] / 200
+        y = (l + 16) / 116
+        x = a / 500 + y
+        z = y - b / 200
 
         normed_xyz = [i ** 3 if i > 0.008856 else (i - 16 / 116) / 7.787 for i in (x, y, z)]
         xyz = np.array(normed_xyz) * white_ref / 100.0

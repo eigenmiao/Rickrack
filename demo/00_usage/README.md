@@ -2,16 +2,7 @@
 
 [中文](https://eigenmiao.com/yanhuo/) | [English](https://eigenmiao.com/rickrack/)
 
-This directory contains a color palette with colors from several pictures. Use [Rickrack](https://github.com/eigenmiao/Rickrack) to open or edit the color palette. This demo is published for learning and communication purpose only.
-
-Steps:
-1. Install the Rickrack software.
-
-2. Click "Open" and find this color palette.
-![Open the palette.](../usage/800.gif)
-
-4. Check the color palette.
-![Check the palette.](../usage/801.gif)
+This directory contains the usage demo for [Rickrack](https://github.com/eigenmiao/Rickrack). The demo pictures are published for learning and communication purpose only.
 
 Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the [GNU General Public License 3.0 (GPL 3.0)](https://www.gnu.org/licenses/) for more details.
 

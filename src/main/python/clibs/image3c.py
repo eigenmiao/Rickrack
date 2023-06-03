@@ -621,14 +621,21 @@ class Image3C(QThread):
         if os.path.isfile(img_path):
             try:
                 img_data = Image.open(img_path).convert("RGB")
+
+            except Exception as err:
+                img_data = None
+
+            if img_data:
                 self.ori_display_data = np.array(img_data, dtype=np.uint8)
                 self.display = QImage(self.ori_display_data, self.ori_display_data.shape[1], self.ori_display_data.shape[0], self.ori_display_data.shape[1] * 3, QImage.Format_RGB888)
 
                 self.res_display_data = self.ori_display_data
                 self.rev_display_data = None
 
-            except Exception as err:
+            else:
                 self.display = None
+                self.res_display_data = None
+                self.rev_display_data = None
 
         else:
             self.display = None
@@ -911,15 +918,17 @@ class Image3C(QThread):
                 data = Image.open(path).convert("RGB")
                 data = np.array(data, dtype=np.uint8)
 
+            except Exception as err:
+                data = None
+                self.ps_enhanced.emit(3)
+
+            if isinstance(data, np.ndarray):
                 if data.shape == display_data.shape:
                     for k in reg:
                         display_data[:, :, k] = data[:, :, k]
 
                 else:
                     self.ps_enhanced.emit(2)
-
-            except Exception as err:
-                self.ps_enhanced.emit(3)
 
         else:
             self.ps_enhanced.emit(3)
@@ -958,6 +967,11 @@ class Image3C(QThread):
                 data = Image.open(path).convert("RGB")
                 data = np.array(data, dtype=np.uint8)
 
+            except Exception as err:
+                data = None
+                self.ps_enhanced.emit(3)
+
+            if isinstance(data, np.ndarray):
                 if data.shape == display_data.shape:
                     data = Color.rgb2hsv_array(data)
 
@@ -966,9 +980,6 @@ class Image3C(QThread):
 
                 else:
                     self.ps_enhanced.emit(2)
-
-            except Exception as err:
-                self.ps_enhanced.emit(3)
 
         else:
             self.ps_enhanced.emit(3)

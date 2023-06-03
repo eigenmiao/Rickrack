@@ -294,25 +294,10 @@ def norm_grid_list(grid_list):
             name_tran = grid_list[1]
 
         for grid_item_idx in range(len(grid_tran)):
-            grid_stri = str(grid_tran[grid_item_idx]).upper()
-            not_a_hec = False
+            color = Color.stri2color(grid_tran[grid_item_idx])
 
-            if len(grid_stri) == 6:
-                for stri in grid_stri:
-                    if stri not in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"):
-                        not_a_hec = True
-
-                        break
-
-            else:
-                not_a_hec = True
-
-            if not_a_hec:
-                cr_colr_list.append("FFFFFF")
-                cr_name_list.append("")
-
-            else:
-                cr_colr_list.append(grid_stri)
+            if color:
+                cr_colr_list.append(color.hec)
 
                 if len(name_tran) > grid_item_idx:
                     name_stri = re.split(r"[\v\a\f\n\r\t]", str(name_tran[grid_item_idx]))
@@ -330,6 +315,10 @@ def norm_grid_list(grid_list):
 
                 else:
                     cr_name_list.append("")
+
+            else:
+                cr_colr_list.append("FFFFFF")
+                cr_name_list.append("")
 
     cr_grid_list = [cr_colr_list, cr_name_list]
 
@@ -413,88 +402,6 @@ def norm_grid_values(grid_values):
                 cr_grid_values["rev_grid"] = bool(value)
 
     return cr_grid_values
-
-def norm_im_time(im_time):
-    """
-    Verify and normalize value im_time.
-
-    Args:
-        im_time (tuple or list): default value.
-
-    Returns:
-        corrected time.
-    """
-
-    current_time = time.time()
-
-    init_time = 0
-    modify_time = 0
-
-    if isinstance(im_time, (tuple, list)):
-        if len(im_time) > 1:
-            init_time, modify_time = im_time[:2]
-
-        else:
-            init_time = im_time[0]
-            modify_time = 0
-
-    elif isinstance(im_time, (float, int)):
-        init_time = im_time
-        modify_time = 0
-
-    else:
-        init_time = 0
-        modify_time = 0
-
-    if isinstance(init_time, (int, float)):
-        init_time = float(init_time)
-    else:
-        init_time = 0
-
-    if isinstance(modify_time, (int, float)):
-        modify_time = float(modify_time)
-    else:
-        modify_time = 0
-
-    init_time = 0 if init_time < 0 else init_time
-    init_time = current_time if init_time > current_time else init_time
-
-    modify_time = 0 if modify_time < 0 else modify_time
-    modify_time = current_time if modify_time > current_time else modify_time
-
-    modify_time = init_time if modify_time < init_time else modify_time
-
-    cr_time = (init_time, modify_time)
-
-    return cr_time
-
-def snap_point(pt, wid):
-    """
-    Snap point on special locations, such as (1, 1) or (0.5, 0.5).
-
-    Args:
-        pt (tuple or list): point before snap.
-        wid (float): box width (or half widh if snap (0.5, 0.5)).
-
-    Returns:
-        point after snap.
-    """
-
-    x, y = pt
-
-    if (x % wid) < wid * 0.15:
-        x = (x // wid) * wid
-
-    elif (x % wid) > wid * 0.85:
-        x = (x // wid + 1) * wid
-
-    if (y % wid) < wid * 0.15:
-        y = (y // wid) * wid
-
-    elif (y % wid) > wid * 0.85:
-        y = (y // wid + 1) * wid
-
-    return [x, y]
 
 def gen_assit_color(curr_color, assit_h, assit_s, assit_v, relativity):
     """

@@ -13,63 +13,14 @@ infomation about DigitalPalette.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-import re
 import time
 import struct
 import swatch
 from lxml import etree
 from ricore.color import Color
 from ricore.grid import gen_color_grid, gen_assit_color
+from ricore.check import fmt_name
 
-
-def fmt_num(stri):
-    """
-    Get num in string.
-    """
-
-    if isinstance(stri, (int, float)):
-        return stri
-
-    num_lst = [str(i) for i in range(10)]
-    dot_num = 0
-
-    for s in str(stri):
-        if s == ".":
-            dot_num = dot_num + 1
-
-        elif s not in num_lst:
-            dot_num = 2
-            break
-
-    if dot_num > 1:
-        return None
-
-    elif dot_num == 1:
-        return float(str(stri))
-
-    else:
-        return int(str(stri))
-
-def fmt_name(name):
-    """
-    Delete prefix and endfix of name.
-    """
-
-    stri = str(name).lstrip().rstrip()
-    stri_prefix = ("Rickrack ", "Rickrack-", "Rickrack:")
-    stri_endfix = tuple([str(i) for i in range(10)] + ["-", ":", " "])
-
-    while len(stri) >= 9 and stri[:9] in stri_prefix:
-        stri = stri[9:].lstrip()
-
-    while len(stri) >= 1 and stri[-1] in stri_endfix:
-        stri = stri[:-1]
-
-    if stri:
-        return stri
-
-    else:
-        return "Rickrack"
 
 def get_export_color_list(color_list, export_grid=False, max_len=65535):
     """
@@ -443,21 +394,18 @@ def import_gpl(file_path):
         items = line.split()
 
         if len(items) >= 3:
-            r = fmt_num(items[0])
-            g = fmt_num(items[1])
-            b = fmt_num(items[2])
+            color_text = ", ".join(items[:3])
+            color = Color.stri2color(color_text)
+            color = color.hec if color else "#FFFFFF"
 
-            if isinstance(r, int) and isinstance(g, int) and isinstance(b, int):
-                color = Color.rgb2hec((r, g, b))
+            if len(items) > 3:
+                name = " ".join(items[3:])
 
-                if len(items) > 3:
-                    name = " ".join(items[3:])
+            else:
+                name = ""
 
-                else:
-                    name = ""
-
-                grid_list.append(color)
-                name_list.append(name)
+            grid_list.append(color)
+            name_list.append(name)
 
     return grid_list, name_list
 
@@ -508,52 +456,37 @@ def import_xml(file_path):
     color_xmls = html.xpath("//color")
 
     for color_xml in colour_xmls + color_xmls:
+        color_text = ""
         color = None
 
         r = color_xml.xpath("@red")
+        r = r if r else color_xml.xpath("@r")
         g = color_xml.xpath("@green")
+        g = g if g else color_xml.xpath("@g")
         b = color_xml.xpath("@blue")
+        b = b if b else color_xml.xpath("@b")
 
-        if not (r and g and b):
-            r = color_xml.xpath("@r")
-            g = color_xml.xpath("@g")
-            b = color_xml.xpath("@b")
+        h = color_xml.xpath("@hue")
+        h = h if h else color_xml.xpath("@h")
+        s = color_xml.xpath("@saturation")
+        s = s if s else color_xml.xpath("@s")
+        v = color_xml.xpath("@value")
+        v = v if v else color_xml.xpath("@v")
+
+        rgb = color_xml.xpath("@rgb")
 
         if r and g and b:
-            r = fmt_num(r[0])
-            g = fmt_num(g[0])
-            b = fmt_num(b[0])
+            color_text = "{}, {}, {}".format(r[0], g[0], b[0])
 
-            if isinstance(r, (int, float)) and isinstance(g, (int, float)) and isinstance(b, (int, float)):
-                color = Color.rgb2hec((r, g, b))
+        elif h and s and v:
+            color_text = "{}, {}, {}".format(h[0], s[0], v[0])
 
-        else:
-            rgb = color_xml.xpath("@rgb")
+        elif rgb:
+            color_text = rgb[0]
 
-            if rgb:
-                rgb = re.split(r"[[\]\(\),;:#]", rgb[0])
-
-                while "" in rgb:
-                    rgb.remove("")
-
-                if len(rgb[0]) == 6:
-                    is_a_hec = True
-
-                    for stri in rgb[0].upper():
-                        if stri not in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"):
-                            is_a_hec = False
-                            break
-
-                    if is_a_hec:
-                        color = rgb[0].upper()
-
-                if len(rgb) >= 3:
-                    r = fmt_num(rgb[0])
-                    g = fmt_num(rgb[1])
-                    b = fmt_num(rgb[2])
-
-                    if isinstance(r, (int, float)) and isinstance(g, (int, float)) and isinstance(b, (int, float)):
-                        color = Color.rgb2hec((r, g, b))
+        if color_text:
+            color = Color.stri2color(color_text)
+            color = color.hec if color else "#FFFFFF"
 
         if color:
             name = color_xml.xpath("@name")
@@ -654,21 +587,7 @@ def import_text(file_path):
     with open(file_path, "r", encoding="utf-8") as df:
         data = df.read()
 
-    for line in data.split("\n"):
-        items = line.split()
-
-        for item in items:
-            if item[0] == "#" and len(item) == 7:
-                is_a_hec = True
-
-                for stri in item[1:].upper():
-                    if stri not in ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"):
-                        is_a_hec = False
-                        break
-
-                if is_a_hec:
-                    grid_list.append(item[1:].upper())
-
+    grid_list = Color.findall_hec_lst(data)
     name_list = ["",] * len(grid_list)
 
     return grid_list, name_list

@@ -284,21 +284,27 @@ class CubeTable(QWidget):
             scroll_horizontal_layout.addWidget(self._cubes[idx])
             self._cubes[idx].square.ps_color_changed.connect(lambda x: self.update_color())
             self._cubes[idx].square.ps_color_changed.connect(lambda x: self.ps_history_backup.emit(True))
-            self._cubes[idx].square.ps_index_changed.connect(lambda x: self.update_index())
+            self._cubes[idx].square.ps_index_changed.connect(lambda x: self.update_color())
 
             for ctp in ("r", "g", "b"):
+                # horizontal slider.
                 obj = getattr(self._cubes[idx], "hs_rgb_{}".format(ctp))
                 obj.valueChanged.connect(self.modify_color(idx, "direct", ctp))
+
+                # spin box.
                 obj = getattr(self._cubes[idx], "sp_rgb_{}".format(ctp))
                 obj.valueChanged.connect(self.modify_color(idx, "frdire", ctp))
 
             for ctp in ("h", "s", "v"):
+                # horizontal slider.
                 obj = getattr(self._cubes[idx], "hs_hsv_{}".format(ctp))
                 obj.valueChanged.connect(self.modify_color(idx, "indire", ctp))
+
+                # double spin box.
                 obj = getattr(self._cubes[idx], "dp_hsv_{}".format(ctp))
                 obj.valueChanged.connect(self.modify_color(idx, "frdire", ctp))
 
-            self._cubes[idx].le_hec.textChanged.connect(self.modify_color(idx, "direct", "hec"))
+            self._cubes[idx].le_hec.textChanged.connect(self.modify_color(idx, "frdire", "hec"))
 
         self.modify_box_visibility()
 
@@ -344,20 +350,23 @@ class CubeTable(QWidget):
                 return
 
             if ctp == "hec":
-                try:
-                    value = Color.fmt_hec(value)
+                value = Color.stri2color(value)
 
-                except Exception as err:
-                    return
+            if not value:
+                return
 
             self._updated_colors = True
 
             color = Color(self._args.sys_color_set[idx], tp="color", overflow=self._args.sys_color_set.get_overflow())
-            if kword == "direct" or kword == "frdire":
-                color.setti(value, ctp)
+            if ctp == "hec":
+                color.setti(value, tp="color")
 
             else:
-                color.setti(value / 1E3, ctp)
+                if kword == "direct" or kword == "frdire":
+                    color.setti(value, ctp)
+
+                else:
+                    color.setti(value / 1E3, ctp)
 
             self._args.sys_color_set.modify(self._args.hm_rule, idx, color)
 
@@ -379,23 +388,37 @@ class CubeTable(QWidget):
         self._updated_colors = True
 
         for lc_idx in range(5):
+            if lc_idx == self._args.sys_activated_idx and self._args.sys_activated_assit_idx >= 0:
+                curr_color = gen_assit_color(self._args.sys_color_set[lc_idx], *self._args.sys_grid_assitlocs[lc_idx][self._args.sys_activated_assit_idx][2:6])
+
+            else:
+                curr_color = self._args.sys_color_set[lc_idx]
+
+            curr_hec = curr_color.getti("hec")
+            curr_h, curr_s, curr_v = curr_color.getti("hsv")
+
+            # skip same color. no need to update.
+            if curr_hec == self._cubes[lc_idx].le_hec.text() and curr_s > 0.01 and 0.99 > curr_v > 0.01:
+                continue
+
+            if not (skip_dp and skip_dp[0] == lc_idx and skip_dp[1] == "hec"):
+                self._cubes[lc_idx].le_hec.setText(curr_hec)
+
             for lc_ctp in ("r", "g", "b"):
                 obj = getattr(self._cubes[lc_idx], "hs_rgb_{}".format(lc_ctp))
-                obj.setValue(self._args.sys_color_set[lc_idx].getti(lc_ctp))
+                obj.setValue(curr_color.getti(lc_ctp))
 
                 if not (skip_dp and skip_dp[0] == lc_idx and skip_dp[1] == lc_ctp):
                     obj = getattr(self._cubes[lc_idx], "sp_rgb_{}".format(lc_ctp))
-                    obj.setValue(self._args.sys_color_set[lc_idx].getti(lc_ctp))
+                    obj.setValue(curr_color.getti(lc_ctp))
 
             for lc_ctp in ("h", "s", "v"):
                 obj = getattr(self._cubes[lc_idx], "hs_hsv_{}".format(lc_ctp))
-                obj.setValue(self._args.sys_color_set[lc_idx].getti(lc_ctp) * 1E3)
+                obj.setValue(vars()["curr_{}".format(lc_ctp)] * 1E3)
 
                 if not (skip_dp and skip_dp[0] == lc_idx and skip_dp[1] == lc_ctp):
                     obj = getattr(self._cubes[lc_idx], "dp_hsv_{}".format(lc_ctp))
-                    obj.setValue(self._args.sys_color_set[lc_idx].getti(lc_ctp))
-
-            self._cubes[lc_idx].le_hec.setText(self._args.sys_color_set[lc_idx].getti("hec"))
+                    obj.setValue(vars()["curr_{}".format(lc_ctp)])
 
         self.update_index()
 
@@ -403,7 +426,7 @@ class CubeTable(QWidget):
 
     def update_index(self):
         """
-        Update color activated index.
+        Update color activated index. Undertake func update_color.
         """
 
         for lc_idx in range(5):
@@ -416,13 +439,13 @@ class CubeTable(QWidget):
         Modify stored color set by rule selection.
         """
 
-        if True in [bool(i) for i in self._args.sys_grid_assitlocs]:
-            self._args.sys_grid_assitlocs = [[], [], [], [], []]
-            self._args.sys_assit_color_locs = [[], [], [], [], []]
-            self._args.sys_activated_assit_idx = -1
+        """
+        self._args.sys_grid_assitlocs = [[], [], [], [], []]
+        self._args.sys_assit_color_locs = [[], [], [], [], []]
+        self._args.sys_activated_assit_idx = -1
+        """
 
-        else:
-            self._args.sys_color_set.create(self._args.hm_rule)
+        self._args.sys_color_set.create(self._args.hm_rule)
 
         self.update_color()
 

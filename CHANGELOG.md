@@ -67,3 +67,13 @@
 5. Fix lang error on mac.
 6. Fix hidpi error on mac.
 7. Update installation background on mac.
+
+# v2.8.5
+* Date: May 21, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.5
+* Comments:
+1. Change color bars in result window when selecting assit colors.
+2. Make the color tag in wheel only selected and not moved when clicked.
+3. Make the hec text box in result window accept colors from other formats.
+4. Update freeze image method.
+5. Delete rev_direct in board and depot view.

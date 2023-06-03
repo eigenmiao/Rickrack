@@ -14,6 +14,7 @@ Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
 import os
+import time
 
 
 def check_key(name):
@@ -157,3 +158,78 @@ def check_image_desc(desc, parse_full_locs=True):
         return image_url, []
 
     return image_url, full_locs
+
+def fmt_name(name):
+    """
+    Delete prefix and endfix of name.
+    """
+
+    stri = str(name).lstrip().rstrip()
+    stri_prefix = ("Rickrack ", "Rickrack-", "Rickrack:")
+    stri_endfix = tuple([str(i) for i in range(10)] + ["-", ":", " "])
+
+    while len(stri) >= 9 and stri[:9] in stri_prefix:
+        stri = stri[9:].lstrip()
+
+    while len(stri) >= 1 and stri[-1] in stri_endfix:
+        stri = stri[:-1]
+
+    if stri:
+        return stri
+
+    else:
+        return "Rickrack"
+
+def fmt_im_time(im_time):
+    """
+    Verify and normalize value im_time.
+
+    Args:
+        im_time (tuple or list): default value.
+
+    Returns:
+        corrected time.
+    """
+
+    current_time = time.time()
+
+    init_time = 0
+    modify_time = 0
+
+    if isinstance(im_time, (tuple, list)):
+        if len(im_time) > 1:
+            init_time, modify_time = im_time[:2]
+
+        else:
+            init_time = im_time[0]
+            modify_time = 0
+
+    elif isinstance(im_time, (float, int)):
+        init_time = im_time
+        modify_time = 0
+
+    else:
+        init_time = 0
+        modify_time = 0
+
+    if isinstance(init_time, (int, float)):
+        init_time = float(init_time)
+    else:
+        init_time = 0
+
+    if isinstance(modify_time, (int, float)):
+        modify_time = float(modify_time)
+    else:
+        modify_time = 0
+
+    init_time = 0 if init_time < 0 else init_time
+    init_time = current_time if init_time > current_time else init_time
+
+    modify_time = 0 if modify_time < 0 else modify_time
+    modify_time = current_time if modify_time > current_time else modify_time
+
+    modify_time = init_time if modify_time < init_time else modify_time
+
+    cr_time = (init_time, modify_time)
+
+    return cr_time
