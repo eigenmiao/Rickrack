@@ -88,6 +88,7 @@ class Rule(QWidget):
         scroll_grid_layout.addWidget(self._synchronization_gbox, 1, 1, 1, 1)
 
         self._synchronization_btns = []
+
         for i in range(7):
             btn = QRadioButton(self._synchronization_gbox)
             gbox_grid_layout.addWidget(btn, i, 0, 1, 1)

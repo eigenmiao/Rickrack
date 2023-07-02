@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.8.5-x2d3s3-pre
+v2.8.27-x2d3s3-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-May 21, 2023
+June 25, 2023
 """
 
 __HELP__ = """

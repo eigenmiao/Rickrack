@@ -314,6 +314,6 @@ class Script(QWidget):
         )
 
         self._snap_descs = (
-            _translate("Script", "Freeze"),
-            _translate("Script", "Print"),
+            _translate("Script", "Freeze Image"),
+            _translate("Script", "Save Image"),
         )

@@ -13,7 +13,7 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QWidget, QCheckBox, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy
+from PyQt5.QtWidgets import QWidget, QCheckBox, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QRadioButton
 from PyQt5.QtCore import Qt, QSize, pyqtSignal, QCoreApplication
 from wgets.general import SlideText, RGBHSVCkb
 
@@ -25,6 +25,8 @@ class Mode(QWidget):
 
     ps_mode_changed = pyqtSignal(bool)
     ps_assistp_changed = pyqtSignal(bool)
+    ps_info_changed = pyqtSignal(bool)
+    ps_color_sys_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args):
         """
@@ -62,13 +64,64 @@ class Mode(QWidget):
         scroll_grid_layout.setVerticalSpacing(12)
         scroll_area.setWidget(scroll_contents)
 
+        # color sys functional region.
+        self._color_sys_gbox = QGroupBox(scroll_contents)
+        gbox_grid_layout = QGridLayout(self._color_sys_gbox)
+        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
+        gbox_grid_layout.setHorizontalSpacing(3)
+        gbox_grid_layout.setVerticalSpacing(12)
+        scroll_grid_layout.addWidget(self._color_sys_gbox, 0, 1, 1, 1)
+
+        self._color_sys_btns = []
+
+        for i in range(4):
+            btn = QRadioButton(self._color_sys_gbox)
+            gbox_grid_layout.addWidget(btn, i, 1, 1, 1)
+
+            btn.clicked.connect(self.modify_color_sys(i))
+            self._color_sys_btns.append(btn)
+
+        self._color_sys_btns[self._args.color_sys].setChecked(True)
+
+        spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        gbox_grid_layout.addItem(spacer, 4, 1, 1, 1)
+        spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        gbox_grid_layout.addItem(spacer, 4, 0, 1, 1)
+        spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        gbox_grid_layout.addItem(spacer, 4, 2, 1, 1)
+
+        # info functional region.
+        self._info_gbox = QGroupBox(scroll_contents)
+        gbox_grid_layout = QGridLayout(self._info_gbox)
+        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
+        gbox_grid_layout.setHorizontalSpacing(3)
+        gbox_grid_layout.setVerticalSpacing(12)
+        scroll_grid_layout.addWidget(self._info_gbox, 1, 1, 1, 1)
+
+        self._cbox_major = QCheckBox(self._info_gbox)
+        self._cbox_major.setText("Major")
+        gbox_grid_layout.addWidget(self._cbox_major, 0, 1, 1, 1)
+        self._cbox_major.stateChanged.connect(lambda x: self.ps_info_changed.emit(x))
+
+        self._cbox_minor = QCheckBox(self._info_gbox)
+        self._cbox_minor.setText("Minor")
+        gbox_grid_layout.addWidget(self._cbox_minor, 1, 1, 1, 1)
+        self._cbox_minor.stateChanged.connect(lambda x: self.ps_info_changed.emit(x))
+
+        spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        gbox_grid_layout.addItem(spacer, 2, 1, 1, 1)
+        spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        gbox_grid_layout.addItem(spacer, 2, 0, 1, 1)
+        spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
+
         # display functional region.
         self._display_gbox = QGroupBox(scroll_contents)
         gbox_grid_layout = QGridLayout(self._display_gbox)
         gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
         gbox_grid_layout.setHorizontalSpacing(3)
         gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._display_gbox, 0, 1, 1, 1)
+        scroll_grid_layout.addWidget(self._display_gbox, 2, 1, 1, 1)
 
         self._cbox_rgb = QCheckBox(self._display_gbox)
         self._cbox_rgb.setText("RGB")
@@ -87,40 +140,13 @@ class Mode(QWidget):
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
 
-        """
-        -> Tag: This segment is deleted.
-
-        # assistant functional region.
-        self._assistp_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._assistp_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._assistp_gbox, 1, 1, 1, 1)
-
-        self.rhc_covalue = RGBHSVCkb(self._assistp_gbox, oneline_mode=False)
-        gbox_grid_layout.addWidget(self.rhc_covalue, 0, 1, 1, 1)
-        self.rhc_covalue.ps_value_changed.connect(self.emit_assistp)
-
-        self.sdt_covalue = SlideText(self._assistp_gbox, num_range=(-1.0, 1.0), maxlen=360000, interval=36000)
-        gbox_grid_layout.addWidget(self.sdt_covalue, 1, 1, 1, 1)
-        self.sdt_covalue.ps_value_changed.connect(self.emit_assistp)
-
-        spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        gbox_grid_layout.addItem(spacer, 2, 1, 1, 1)
-        spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        gbox_grid_layout.addItem(spacer, 2, 0, 1, 1)
-        spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
-        """
-
         # grid functional region.
         self._gridvls_gbox = QGroupBox(scroll_contents)
         gbox_grid_layout = QGridLayout(self._gridvls_gbox)
         gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
         gbox_grid_layout.setHorizontalSpacing(3)
         gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._gridvls_gbox, 2, 1, 1, 1)
+        scroll_grid_layout.addWidget(self._gridvls_gbox, 3, 1, 1, 1)
 
         self.rhc_govalue = RGBHSVCkb(self._gridvls_gbox, oneline_mode=True)
         gbox_grid_layout.addWidget(self.rhc_govalue, 0, 1, 1, 1)
@@ -180,6 +206,37 @@ class Mode(QWidget):
 
         self._cbox_rgb.setChecked(self._args.show_rgb)
         self._cbox_hsv.setChecked(self._args.show_hsv)
+        self._color_sys_btns[self._args.color_sys].setChecked(True)
+
+    def modify_color_sys(self, idx):
+        """
+        Modify stored color system by btn.
+        """
+
+        def _func_(value):
+            self._args.modify_settings("color_sys", idx)
+            self.ps_color_sys_changed.emit(True)
+
+        return _func_
+
+    def get_info(self):
+        """
+        Get value of cbox of self._args.show_info_pts.
+        """
+
+        return int(self._cbox_major.isChecked()) + int(self._cbox_minor.isChecked()) * 2
+
+    def update_info(self, major, minor):
+        """
+        Update mode cbox by self._args.show_info_pts.
+        """
+
+        self._cbox_major.stateChanged.disconnect()
+        self._cbox_minor.stateChanged.disconnect()
+        self._cbox_major.setChecked(major)
+        self._cbox_minor.setChecked(minor)
+        self._cbox_major.stateChanged.connect(lambda x: self.ps_info_changed.emit(x))
+        self._cbox_minor.stateChanged.connect(lambda x: self.ps_info_changed.emit(x))
 
     def modify_grid_value(self, name, dtype=float):
         """
@@ -209,6 +266,11 @@ class Mode(QWidget):
     def update_text(self):
         self._display_gbox.setTitle(self._gbox_descs[0])
         self._gridvls_gbox.setTitle(self._gbox_descs[2])
+        self._info_gbox.setTitle(self._gbox_descs[3])
+        self._color_sys_gbox.setTitle(self._gbox_descs[4])
+
+        self._cbox_major.setText(self._info_descs[0])
+        self._cbox_minor.setText(self._info_descs[1])
 
         self.rhc_govalue.set_prefix_text((self._assistp_descs[0], self._assistp_descs[1]))
         self.sdt_col.set_text(self._assistp_descs[3])
@@ -216,6 +278,9 @@ class Mode(QWidget):
         self.sdt_dim_factor.set_text(self._assistp_descs[5])
         self.sdt_assist_factor.set_text(self._assistp_descs[6])
         self.ckb_rev_grid.setText(self._assistp_descs[7])
+
+        for i in range(4):
+            self._color_sys_btns[i].setText(self._color_sys_descs[i])
 
         self.update_mode()
 
@@ -226,6 +291,20 @@ class Mode(QWidget):
             _translate("Mode", "Display"),
             _translate("Mode", "Assistant"),
             _translate("Mode", "Grid"),
+            _translate("Mode", "Info"),
+            _translate("Mode", "Color Space"),
+        )
+
+        self._info_descs = (
+            _translate("Mode", "Show Major Info"),
+            _translate("Mode", "Show Minor Info"),
+        )
+
+        self._color_sys_descs = (
+            _translate("Mode", "RGB Space"),
+            _translate("Mode", "Rev RGB Space"),
+            _translate("Mode", "RYB Space"),
+            _translate("Mode", "Rev RYB Space"),
         )
 
         self._assistp_descs = (

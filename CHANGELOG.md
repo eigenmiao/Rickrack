@@ -77,3 +77,34 @@
 3. Make the hec text box in result window accept colors from other formats.
 4. Update freeze image method.
 5. Delete rev_direct in board and depot view.
+
+# v2.8.27-x2d3s3
+* Date: June 25, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27
+* Comments:
+1. Add prompt tags to the wheel view for quickly adding, deleting and fixing ref colors.
+2. Add prompt tags to the image view.
+3. Add prompt tags to the board view.
+4. Add show and hide prompt tag botton in mode window.
+5. Add show and hide prompt tag botton in settings dialog.
+6. Change default theme to black.
+7. Change operation botton actions.
+8. Change actions.
+9. Delete press_act switch.
+10. Add operation shortcut actions.
+11. Fix image moving method error.
+12. Adjust the display order of prompt tags.
+13. Add history steps to image view.
+14. Set the color locations randomly when clicking on More Colors.
+15. Change botton icons.
+16. Change workarea background to black, grey or white.
+17. Limit the number of reference colors (max 30).
+18. Fix mouse tracking switch.
+19. Optimize the distance judgment method.
+20. Add a reversed color wheel.
+20. Add a ryb color wheel.
+21. Add settings for color system.
+22. Update color names.
+23. Update color rule and relation under ryb system.
+24. Optimize data type.
+25. Change default font to LXGW WenKai.

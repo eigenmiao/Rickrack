@@ -35,12 +35,12 @@ class Args(object):
         """
 
         # software version.
-        self.info_version_zh = "v2.8.5-x2d3s3-预览版"
-        self.info_version_en = "v2.8.5-x2d3s3-pre"
+        self.info_version_zh = "v2.8.27-x2d3s3-预览版"
+        self.info_version_en = "v2.8.27-x2d3s3-pre"
 
         # update date.
-        self.info_date_zh = "2023年5月21日"
-        self.info_date_en = "May 21, 2023"
+        self.info_date_zh = "2023年6月25日"
+        self.info_date_en = "June 25, 2023"
 
         # temporary dir.
         self.global_temp_dir = None
@@ -122,8 +122,7 @@ class Args(object):
         self.usr_langs = tuple(lang_paths)
 
         # software information.
-        self.info_main_site = "https://eigenmiao.github.io/rickrack/"
-        self.info_aucc_site = "https://eigenmiao.github.io/rickrack/support.html"
+        self.info_main_site = "https://eigenmiao.com/rickrack"
         self.info_update_site = "https://github.com/eigenmiao/Rickrack/releases"
 
         # author information.
@@ -141,7 +140,15 @@ class Args(object):
         self.stab_ucells = tuple()
         self.stab_column = 3
 
+        # special system settings.
+        self.sys_activated_idx = 0
+        self.sys_activated_assit_idx = -1
+        self.sys_color_set = ColorSet(self.h_range, self.s_range, self.v_range, overflow=self.overflow, dep_wtp=self.dep_wtp)
+        self.sys_color_set.create(self.hm_rule)
+
         # load settings.
+        self.geometry_args = None
+
         if not resetall:
             if self.store_loc:
                 self.load_settings(os.sep.join((self.resources, "settings.json")))
@@ -155,11 +162,6 @@ class Args(object):
             self.modify_settings("lang", uselang)
 
         # special system settings.
-        self.sys_activated_idx = 0
-        self.sys_activated_assit_idx = -1
-        self.sys_color_set = ColorSet(self.h_range, self.s_range, self.v_range, overflow=self.overflow)
-        self.sys_color_set.create(self.hm_rule)
-
         self.sys_category = 0
         self.sys_channel = 0
 
@@ -206,15 +208,15 @@ class Args(object):
                 self.lang = "default"
 
         if self.lang == "zh":
-            self.info_main_site = "https://eigenmiao.github.io/yanhuo/"
-            self.info_aucc_site = "https://eigenmiao.github.io/yanhuo/support.html"
+            self.info_main_site = "https://eigenmiao.com/yanhuo"
+
+        elif self.lang in ("eo", "ru", "ja", "fr", "de", "es"):
+            self.info_main_site = "https://eigenmiao.com/yanhuo/{}.html".format(self.lang)
 
         else:
-            self.info_main_site = "https://eigenmiao.github.io/rickrack/"
-            self.info_aucc_site = "https://eigenmiao.github.io/rickrack/support.html"
+            self.info_main_site = "https://eigenmiao.com/rickrack"
 
         # load local store tag.
-        self.press_act = False
         self.store_loc = False
 
         if os.path.isfile(os.sep.join((self.resources, "settings.json"))):
@@ -246,8 +248,10 @@ class Args(object):
         self.hm_rule = "analogous"
         self.overflow = "return"
         self.press_move = True
+        self.color_sys = 0
         self.show_rgb = True
         self.show_hsv = True
+        self.show_info_pts = [3, 3, 3]
 
         self.h_range = (0.0, 360.0)
         self.s_range = (0.2, 0.5)
@@ -274,9 +278,9 @@ class Args(object):
         self.negative_wid = 3
         self.wheel_ed_wid = 3
 
-        self.positive_color = (122, 229, 221)
-        self.negative_color = ( 32,  18,  74)
-        self.wheel_ed_color = (  7,   3,  28)
+        self.positive_color = (255, 255, 255)
+        self.negative_color = ( 59,  59,  59)
+        self.wheel_ed_color = ( 64,  64,  64)
 
         # self.main_win_state = ""
         # self.main_win_geometry = ""
@@ -295,9 +299,9 @@ class Args(object):
 
         self.font_size = 12
         self.font_weight = 6
-        self.font_family = ("Noto Sans", "Noto Sans SC", "Noto Sans JP")
-        self.bakgd_id = 15
-        self.style_id = 8
+        self.font_family = ("LXGW WenKai",)
+        self.bakgd_id = 0
+        self.style_id = 4
 
         self.white_illuminant = 5
         self.white_observer = 0
@@ -364,6 +368,17 @@ class Args(object):
             ("Shift+Z", "Z",         ), # 56 "Redo"
         )
 
+        self.info_aucc_site = "https://afdian.net/a/eigenmiao"
+
+        # dependent args.
+        self.dep_circle_dist_2 = self.circle_dist ** 2
+        self.dep_circle_dist_wid = self.circle_dist + (self.positive_wid + self.negative_wid) * 2
+        self.dep_circle_dist_wid_2 = self.dep_circle_dist_wid ** 2
+        self.dep_rtp = self.color_sys % 2
+        self.dep_wtp = self.color_sys // 2
+        self.dep_wtp_s, self.dep_wtp_n = (("s", 1), ("v", 2))[self.dep_rtp]
+        self.dep_wtp_rev_s, self.dep_wtp_rev_n = (("v", 2), ("s", 1))[self.dep_rtp]
+
     def save_settings(self):
         """
         Save settings to file.
@@ -377,8 +392,8 @@ class Args(object):
         }
 
         items = (
-            "usr_color", "usr_image", "press_act", "store_loc", "hm_rule", "overflow", "lang", "press_move",
-            "show_rgb", "show_hsv", "h_range", "s_range", "v_range",
+            "usr_color", "usr_image", "store_loc", "hm_rule", "overflow", "lang", "press_move", "color_sys",
+            "show_rgb", "show_hsv", "show_info_pts", "h_range", "s_range", "v_range",
             "wheel_ratio", "volum_ratio", "cubic_ratio", "coset_ratio",
             "rev_direct", "s_tag_radius", "v_tag_radius", "zoom_step", "move_step", "rand_num", "circle_dist",
             "positive_wid", "negative_wid", "wheel_ed_wid",
@@ -424,14 +439,15 @@ class Args(object):
         items = {
             "usr_color": lambda vl: self.pfmt_path(vl, self.usr_color),
             "usr_image": lambda vl: self.pfmt_path(vl, self.usr_image),
-            "press_act": lambda vl: self.pfmt_value(vl, bool, self.press_act),
             "store_loc": lambda vl: self.pfmt_value(vl, bool, self.store_loc),
             "hm_rule": lambda vl: self.pfmt_str_in_list(vl, self.global_hm_rules, self.hm_rule),
             "overflow": lambda vl: self.pfmt_str_in_list(vl, self.global_overflows, self.overflow),
             "lang": lambda vl: self.pfmt_str_in_list(vl, [x[1] for x in self.usr_langs], self.lang),
             "press_move": lambda vl: self.pfmt_value(vl, bool, self.press_move),
+            "color_sys": lambda vl: self.pfmt_num_in_scope(vl, (0, 3), int, self.color_sys),
             "show_rgb": lambda vl: self.pfmt_value(vl, bool, self.show_rgb),
             "show_hsv": lambda vl: self.pfmt_value(vl, bool, self.show_hsv),
+            "show_info_pts": lambda vl: self.pfmt_info_list(vl, self.show_hsv),
             "h_range": lambda vl: self.pfmt_num_pair_in_scope(vl, (0.0, 360.0), float, self.h_range),
             "s_range": lambda vl: self.pfmt_num_pair_in_scope(vl, (0.0, 1.0), float, self.s_range),
             "v_range": lambda vl: self.pfmt_num_pair_in_scope(vl, (0.0, 1.0), float, self.v_range),
@@ -478,6 +494,31 @@ class Args(object):
 
         if item in items:
             setattr(self, item, items[item](value))
+
+            if item in ("circle_dist", "positive_wid", "negative_wid"):
+                self.dep_circle_dist_2 = self.circle_dist ** 2
+                self.dep_circle_dist_wid = self.circle_dist + (self.positive_wid + self.negative_wid) * 2
+                self.dep_circle_dist_wid_2 = self.dep_circle_dist_wid ** 2
+
+            elif item == "color_sys":
+                self.dep_rtp = self.color_sys % 2
+                self.dep_wtp = self.color_sys // 2
+                self.dep_wtp_s, self.dep_wtp_n = (("s", 1), ("v", 2))[self.dep_rtp]
+                self.dep_wtp_rev_s, self.dep_wtp_rev_n = (("v", 2), ("s", 1))[self.dep_rtp]
+                self.sys_color_set.set_color_system(self.dep_wtp)
+
+            elif item == "lang":
+                if self.lang == "zh":
+                    self.info_main_site = "https://eigenmiao.com/yanhuo"
+                    self.info_aucc_site = "https://afdian.net/a/eigenmiao"
+
+                elif self.lang in ("eo", "ru", "ja", "fr", "de", "es"):
+                    self.info_main_site = "https://eigenmiao.com/yanhuo/{}.html".format(self.lang)
+                    self.info_aucc_site = "https://ko-fi.com/eigenmiao"
+
+                else:
+                    self.info_main_site = "https://eigenmiao.com/rickrack"
+                    self.info_aucc_site = "https://ko-fi.com/eigenmiao"
 
     def backup_settings(self, settings_file):
         """
@@ -543,6 +584,27 @@ class Args(object):
 
         if os.path.isdir(ans):
             return ans
+
+        return default
+
+    def pfmt_info_list(self, value, default):
+        """
+        [0-3, 0-3, 0-3]
+        """
+
+        if isinstance(value, (tuple, list)) and len(value) > 2:
+            w, i, b = value[:3]
+
+            if not (isinstance(w, int) and 0 <= w < 4):
+                w = default[0]
+
+            if not (isinstance(i, int) and 0 <= i < 4):
+                i = default[1]
+
+            if not (isinstance(b, int) and 0 <= b < 4):
+                b = default[2]
+
+            return [w, i, b]
 
         return default
 

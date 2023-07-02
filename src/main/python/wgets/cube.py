@@ -45,7 +45,7 @@ class Square(QWidget):
 
     def paintEvent(self, event):
         # norm assit point index.
-        if self._args.sys_activated_assit_idx > len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]):
+        if False: # self._args.sys_activated_assit_idx > len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]):
             self._args.sys_activated_assit_idx = -1
 
         rto = (1.0 - self._args.cubic_ratio) / 2
@@ -451,12 +451,12 @@ class CubeTable(QWidget):
 
         self.ps_history_backup.emit(True)
 
-    def create_set(self):
+    def create_set(self, direct=False):
         """
         Create stored color set by create button.
         """
 
-        if True in [bool(i) for i in self._args.sys_grid_assitlocs]:
+        if not direct and True in [bool(i) for i in self._args.sys_grid_assitlocs]:
             self._args.sys_grid_assitlocs = [[], [], [], [], []]
             self._args.sys_assit_color_locs = [[], [], [], [], []]
             self._args.sys_activated_assit_idx = -1

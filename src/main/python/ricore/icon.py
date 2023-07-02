@@ -22,7 +22,7 @@ Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
 
 __SVG_FMT__ = """
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="100mm" height="100mm" viewBox="0 0 100 100" version="1.1">
+<svg width="100mm" height="100mm" viewBox="0 0 {size} {size}" version="1.1">
 {context}
 </svg>
 """
@@ -154,6 +154,12 @@ __SVG_ABOUT__ = """
   </g>
 """
 
+__SVG_INFO__ = """
+  <g>
+    <path d="M20.2426 4.75736C22.5053 7.02472 22.583 10.637 20.4786 12.993L11.9999 21.485L3.52138 12.993C1.41705 10.637 1.49571 7.01901 3.75736 4.75736C6.02157 2.49315 9.64519 2.41687 12.001 4.52853C14.35 2.42 17.98 2.49 20.2426 4.75736ZM5.17157 6.17157C3.68183 7.66131 3.60704 10.0473 4.97993 11.6232L11.9999 18.6543L19.0201 11.6232C20.3935 10.0467 20.319 7.66525 18.827 6.1701C17.3397 4.67979 14.9458 4.60806 13.3743 5.98376L9.17157 10.1869L7.75736 8.77264L10.582 5.946L10.5002 5.87701C8.92545 4.61197 6.62322 4.71993 5.17157 6.17157Z" fill="#{forecolor}"></path>
+  </g>
+"""
+
 __SVG_SETTINGS__ = """
   <g>
     <path
@@ -205,6 +211,48 @@ __SVG_UPDATE__ = """
   </g>
 """
 
+__SVG_UP__ = """
+  <g>
+    <path d="M11.9997 10.8284L7.04996 15.7782L5.63574 14.364L11.9997 8L18.3637 14.364L16.9495 15.7782L11.9997 10.8284Z" fill="#{forecolor}"></path>
+  </g>
+"""
+
+__SVG_DOWN__ = """
+  <g>
+    <path d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z" fill="#{forecolor}"></path>
+  </g>
+"""
+
+__SVG_LEFT__ = """
+  <g>
+    <path d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z" fill="#{forecolor}"></path>
+  </g>
+"""
+
+__SVG_RIGHT__ = """
+  <g>
+    <path d="M13.1714 12.0007L8.22168 7.05093L9.63589 5.63672L15.9999 12.0007L9.63589 18.3646L8.22168 16.9504L13.1714 12.0007Z" fill="#{forecolor}"></path>
+  </g>
+"""
+
+__SVG_ZOOM_IN__ = """
+  <g>
+    <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748ZM10 10V7H12V10H15V12H12V15H10V12H7V10H10Z" fill="#{forecolor}"></path>
+  </g>
+"""
+
+__SVG_ZOOM_OUT__ = """
+  <g>
+    <path d="M18.031 16.6168L22.3137 20.8995L20.8995 22.3137L16.6168 18.031C15.0769 19.263 13.124 20 11 20C6.032 20 2 15.968 2 11C2 6.032 6.032 2 11 2C15.968 2 20 6.032 20 11C20 13.124 19.263 15.0769 18.031 16.6168ZM16.0247 15.8748C17.2475 14.6146 18 12.8956 18 11C18 7.1325 14.8675 4 11 4C7.1325 4 4 7.1325 4 11C4 14.8675 7.1325 18 11 18C12.8956 18 14.6146 17.2475 15.8748 16.0247L16.0247 15.8748ZM7 10H15V12H7V10Z" fill="#{forecolor}"></path>
+  </g>
+"""
+
+__SVG_RESET__ = """
+  <g>
+    <path d="M12 4C9.25144 4 6.82508 5.38626 5.38443 7.5H8V9.5H2V3.5H4V5.99936C5.82381 3.57166 8.72764 2 12 2C17.5228 2 22 6.47715 22 12H20C20 7.58172 16.4183 4 12 4ZM4 12C4 16.4183 7.58172 20 12 20C14.7486 20 17.1749 18.6137 18.6156 16.5H16V14.5H22V20.5H20V18.0006C18.1762 20.4283 15.2724 22 12 22C6.47715 22 2 17.5228 2 12H4Z" fill="#{forecolor}"></path>
+  </g>
+"""
+
 import os
 from PyQt5.QtGui import QIcon
 
@@ -216,18 +264,31 @@ def get_icon(name, forecolor, backcolor, temp_dir, default):
         "board": __SVG_BOARD__,
         "depot": __SVG_DEPOT__,
         "about": __SVG_ABOUT__,
+        "info": __SVG_INFO__,
         "settings": __SVG_SETTINGS__,
         "save": __SVG_SAVE__,
         "open": __SVG_OPEN__,
         "quit": __SVG_QUIT__,
         "home": __SVG_HOME__,
         "update": __SVG_UPDATE__,
+        "up": __SVG_UP__,
+        "down": __SVG_DOWN__,
+        "left": __SVG_LEFT__,
+        "right": __SVG_RIGHT__,
+        "reset": __SVG_RESET__,
+        "zoom_in": __SVG_ZOOM_IN__,
+        "zoom_out": __SVG_ZOOM_OUT__,
     }
+
+    size = "100"
+
+    if name in ("up", "down", "left", "right", "reset", "zoom_in", "zoom_out", "info"):
+      size = "24"
 
     if os.path.isdir(temp_dir) and name in name_dict:
         with open(os.sep.join([temp_dir, "{}.svg".format(name)]), "w") as f:
             context = name_dict[name].format(forecolor=forecolor, backcolor=backcolor, stroke=6, opacity=0.3)
-            f.write(__SVG_FMT__.format(context=context)[1:])
+            f.write(__SVG_FMT__.format(context=context, size=size)[1:])
 
         return QIcon(os.sep.join([temp_dir, "{}.svg".format(name)]))
 
