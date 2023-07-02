@@ -58,6 +58,7 @@ class History(object):
         step_md5 = step_md5 + hashlib.md5(str(self._args.sys_grid_assitlocs).encode("utf-8")).hexdigest()[:10]
         step_md5 = step_md5 + hashlib.md5(str(self._args.sys_grid_list).encode("utf-8")).hexdigest()[:10]
         step_md5 = step_md5 + hashlib.md5(str(self._args.sys_grid_values).encode("utf-8")).hexdigest()[:10]
+        step_md5 = step_md5 + hashlib.md5(str(self._args.sys_color_locs.count(None)).encode("utf-8")).hexdigest()[:10]
         step_md5 = hashlib.md5(step_md5.encode("utf-8")).hexdigest()[:10]
 
         # display info.

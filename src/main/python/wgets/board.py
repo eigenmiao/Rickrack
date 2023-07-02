@@ -22,10 +22,10 @@ from PIL import ImageQt
 from PIL.PpmImagePlugin import PpmImageFile
 from PyQt5.QtWidgets import QWidget, QShortcut, QMenu, QAction, QLabel, QDialog, QGridLayout, QPushButton, QDialogButtonBox, QColorDialog, QApplication, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QPoint, QMimeData, QUrl
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag, QPolygon
 from cguis.design.box_dialog import Ui_BoxDialog
 from ricore.color import Color
-from ricore.transpt import get_outer_box, get_link_tag, rotate_point, snap_point
+from ricore.transpt import get_outer_box, get_link_tag, rotate_point, snap_point, get_outer_circles
 from ricore.grid import gen_color_grid, norm_grid_locations, norm_grid_values, gen_assit_color
 from ricore.export import export_list
 
@@ -347,17 +347,28 @@ class Board(QWidget):
         self._color_box.ps_value_changed.connect(self.update)
         self._color_box.ps_value_changed.connect(lambda: self.ps_history_backup.emit(True))
 
-        self.create_menu()
-        self.update_text()
+        # generate point centers and radii.
+        # self._center = ...
+        # self._radius = ...
+        self._tag_centers = [(-100, -100), (-100, -100), (-100, -100), (-100, -100), (-100, -100)]
+        # self._tag_radii = ...
+        self._assit_tag_centers = [[], [], [], [], []]
+        # self._assit_tag_radii = ...
+
+        # outer circles.
+        self._outer_circles = None
 
         # shortcut is updated by _setup_skey in main.py.
         # self.update_skey()
+
+        self.create_menu()
+        self.update_text()
 
     # ---------- ---------- ---------- Paint Funcs ---------- ---------- ---------- #
 
     def paintEvent(self, event):
         # norm assit point index.
-        if self._args.sys_activated_assit_idx > len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]):
+        if False: # self._args.sys_activated_assit_idx > len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx]):
             self._args.sys_activated_assit_idx = -1
             self.ps_color_changed()
 
@@ -388,7 +399,7 @@ class Board(QWidget):
 
         painter.drawPixmap(*self._cs_box, QPixmap.fromImage(grid_img))
 
-        # draw main points and assistant points.
+        # draw fixed grid.
         if self._args.sys_grid_list[0]:
             if 0 <= self._last_selecting_idx < self._args.sys_grid_values["col"] ** 2:
                 sel_wid = 1.0 / self._args.sys_grid_values["col"] * self._cs_wid
@@ -428,10 +439,14 @@ class Board(QWidget):
             else:
                 self._tool_tip_label.hide()
 
+        # draw main points and assistant points.
         else:
             for idx in idx_seq:
-                pt_xy = np.array((self._args.sys_grid_locations[idx][0] * self._cs_wid + self._cs_box[0], self._args.sys_grid_locations[idx][1] * self._cs_wid + self._cs_box[1]))
+                pt_xy = np.array((self._args.sys_grid_locations[idx][0] * self._cs_wid + self._cs_box[0], self._args.sys_grid_locations[idx][1] * self._cs_wid + self._cs_box[1]), dtype=int)
                 pt_rgb = self._args.sys_color_set[idx].rgb
+
+                self._tag_centers[idx] = pt_xy
+                self._assit_tag_centers[idx] = [None,] * len(self._args.sys_grid_assitlocs[idx])
 
                 # assit sequence. this code is reused in four places.
                 assit_idx_seq = list(range(len(self._args.sys_grid_assitlocs[idx])))
@@ -440,9 +455,11 @@ class Board(QWidget):
 
                 # assistant points.
                 for assit_idx in assit_idx_seq:
-                    assit_pt = pt_xy + np.array(self._args.sys_grid_assitlocs[idx][assit_idx][0:2]) * self._cs_wid
+                    assit_pt = (pt_xy + np.array(self._args.sys_grid_assitlocs[idx][assit_idx][0:2]) * self._cs_wid).astype(int)
                     assit_box = get_outer_box(assit_pt, self._args.circle_dist)
                     assit_frame_color = (255, 255, 255)
+
+                    self._assit_tag_centers[idx][assit_idx] = assit_pt
 
                     if self._show_points:
                         if idx == self._args.sys_activated_idx and assit_idx == self._args.sys_activated_assit_idx:
@@ -475,7 +492,7 @@ class Board(QWidget):
                         painter.drawEllipse(*dot_box)
 
                 # main points.
-                pt_box = get_outer_box(pt_xy, self._args.circle_dist + (self._args.positive_wid + self._args.negative_wid) * 2)
+                pt_box = get_outer_box(pt_xy, self._args.dep_circle_dist_wid)
 
                 if self._show_points:
                     if idx == self._args.sys_activated_idx:
@@ -509,6 +526,64 @@ class Board(QWidget):
 
                 painter.drawEllipse(*pt_box)
 
+            # outer circles.
+            if self._outer_circles:
+                frame_color = self._args.negative_color
+
+                if self._outer_circles[0] == self._args.sys_activated_idx and (self._outer_circles[1] == self._args.sys_activated_assit_idx or self._outer_circles[1] == -1):
+                    frame_color = self._args.positive_color
+
+                # circle 0.
+                if self._outer_circles[5] == 0:
+                    painter.setPen(QPen(QColor(*frame_color, ), self._args.negative_wid * 2/3))
+                    painter.setBrush(QBrush(QColor(*frame_color, 120)))
+
+                else:
+                    painter.setPen(QPen(QColor(*frame_color, 100), self._args.negative_wid * 2/3))
+                    painter.setBrush(Qt.NoBrush)
+
+                outer_circle = self._outer_circles[4][0]
+                painter.drawEllipse(*outer_circle[0])
+
+                for line in outer_circle[1:]:
+                    painter.drawLine(QPoint(*line[0]), QPoint(*line[1]))
+
+                if len(self._outer_circles[4]) > 2:
+                    # circle 1.
+                    if self._outer_circles[5] == 1:
+                        painter.setPen(QPen(QColor(*frame_color, ), self._args.negative_wid * 2/3))
+                        painter.setBrush(QBrush(QColor(*frame_color, 120)))
+
+                    else:
+                        painter.setPen(QPen(QColor(*frame_color, 100), self._args.negative_wid * 2/3))
+                        painter.setBrush(Qt.NoBrush)
+
+                    outer_circle = self._outer_circles[4][1]
+                    painter.drawEllipse(*outer_circle[0])
+
+                    for line in outer_circle[1:]:
+                        painter.drawLine(QPoint(*line[0]), QPoint(*line[1]))
+
+                    # circle 2.
+                    if self._outer_circles[5] == 2:
+                        painter.setPen(QPen(QColor(*frame_color, ), self._args.negative_wid * 2/3))
+                        painter.setBrush(QBrush(QColor(*frame_color, 120)))
+
+                    else:
+                        painter.setPen(QPen(QColor(*frame_color, 100), self._args.negative_wid * 2/3))
+                        painter.setBrush(Qt.NoBrush)
+
+                    outer_circle = self._outer_circles[4][2]
+                    painter.drawEllipse(*outer_circle[0])
+
+                    # relative (move-able) or ref (un-move-able) point tag. assit dot box.
+                    if self._outer_circles[1] < len(self._args.sys_grid_assitlocs[self._outer_circles[0]]) and self._args.sys_grid_assitlocs[self._outer_circles[0]][self._outer_circles[1]][5]:
+                        line = outer_circle[1]
+                        painter.drawLine(QPoint(*line[0]), QPoint(*line[1]))
+
+                    poly = QPolygon([QPoint(*i) for i in outer_circle[2]])
+                    painter.drawPolygon(poly)
+
         painter.end()
 
         if self._args.sys_grid_list[0]:
@@ -523,6 +598,10 @@ class Board(QWidget):
     # ---------- ---------- ---------- Mouse Event Funcs ---------- ---------- ---------- #
 
     def keyPressEvent(self, event):
+        if self._outer_circles:
+            self._outer_circles = None
+            self.update()
+
         if event.key() == Qt.Key_Shift:
             self._press_key = 1
             self.setCursor(QCursor(Qt.PointingHandCursor))
@@ -550,6 +629,10 @@ class Board(QWidget):
             event.ignore()
 
     def keyReleaseEvent(self, event):
+        if self._outer_circles:
+            self._outer_circles = None
+            self.update()
+
         self._press_key = 0
         self.setCursor(QCursor(Qt.ArrowCursor))
         event.ignore()
@@ -580,10 +663,10 @@ class Board(QWidget):
                     # is completed by self.insert_point()
 
             elif self._show_points and self._args.sys_activated_assit_idx >= 0:
-                pt_xy = np.array((self._args.sys_grid_locations[self._args.sys_activated_idx][0] * self._cs_wid + self._cs_box[0], self._args.sys_grid_locations[self._args.sys_activated_idx][1] * self._cs_wid + self._cs_box[1]))
-                assit_pt = pt_xy + np.array(self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][0:2]) * self._cs_wid
+                pt_xy = np.array((self._args.sys_grid_locations[self._args.sys_activated_idx][0] * self._cs_wid + self._cs_box[0], self._args.sys_grid_locations[self._args.sys_activated_idx][1] * self._cs_wid + self._cs_box[1]), dtype=int)
+                assit_pt = (pt_xy + np.array(self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][0:2]) * self._cs_wid).astype(int)
 
-                if np.linalg.norm(point - assit_pt) < self._args.circle_dist:
+                if np.sum((point - assit_pt) ** 2) < self._args.dep_circle_dist_2:
                     self.ps_assit_pt_changed.emit(not self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5])
                     self.ps_color_changed.emit(True)
                     event.accept()
@@ -601,6 +684,10 @@ class Board(QWidget):
 
     def mousePressEvent(self, event):
         point = np.array((event.x(), event.y()))
+        info_pt_pressed = False
+
+        if self._press_key == 0 and self._outer_circles and self._outer_circles[5] > -1 and event.button() == Qt.LeftButton:
+            info_pt_pressed = True
 
         if self._press_key == 1 and event.button() == Qt.LeftButton:
             #
@@ -629,22 +716,52 @@ class Board(QWidget):
 
             event.accept()
 
-        elif self._press_key == 2 and event.button() == Qt.LeftButton:
+        elif info_pt_pressed or (self._press_key == 2 and event.button() == Qt.LeftButton):
             if (not self._args.sys_grid_list[0]) and self._show_points:
-                loc = [(point[0] - self._cs_box[0]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][0], (point[1] - self._cs_box[1]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][1]]
-                loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
-                loc[0] = -1.0 if loc[0] < -1.0 else loc[0]
-                loc[0] =  1.0 if loc[0] >  1.0 else loc[0]
-                loc[1] = -1.0 if loc[1] < -1.0 else loc[1]
-                loc[1] =  1.0 if loc[1] >  1.0 else loc[1]
+                insert_assit_pt_by_info_tag = False
 
-                self._args.sys_activated_assit_idx = len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx])
-                self._args.sys_grid_assitlocs[self._args.sys_activated_idx].append([loc[0], loc[1], 15, 0.0, 0.0, True])
-                self._args.sys_assit_color_locs[self._args.sys_activated_idx].append(None)
+                if info_pt_pressed:
+                    sel_idx, sel_assit_idx, is_in_pt, is_in_assit_pt, circle_locations, sel_info_idx = self._outer_circles
 
-                self._moving_assitp = True
+                    self._args.sys_activated_idx = sel_idx
+                    self._args.sys_activated_assit_idx = sel_assit_idx
 
-                self.ps_value_changed.emit(True)
+                    self.ps_index_changed.emit(True)
+
+                    # add a ref color.
+                    if is_in_pt or (is_in_assit_pt and sel_info_idx == 0):
+                        insert_assit_pt_by_info_tag = True
+
+                    # del the ref color.
+                    elif is_in_assit_pt and sel_info_idx == 1:
+                        self._outer_circles = None
+                        self.delete_point()
+
+                    # fix or unfix the ref color.
+                    else:
+                        self.ps_assit_pt_changed.emit(not self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5])
+
+                else:
+                    insert_assit_pt_by_info_tag = True
+
+                # max assit len 30.
+                assit_len = len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx])
+
+                if insert_assit_pt_by_info_tag and assit_len < 31:
+                    loc = [(point[0] - self._cs_box[0]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][0], (point[1] - self._cs_box[1]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][1]]
+                    loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
+                    loc[0] = -1.0 if loc[0] < -1.0 else loc[0]
+                    loc[0] =  1.0 if loc[0] >  1.0 else loc[0]
+                    loc[1] = -1.0 if loc[1] < -1.0 else loc[1]
+                    loc[1] =  1.0 if loc[1] >  1.0 else loc[1]
+
+                    self._args.sys_activated_assit_idx = assit_len
+                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx].append([loc[0], loc[1], 15, 0.0, 0.0, True])
+                    self._args.sys_assit_color_locs[self._args.sys_activated_idx].append(None)
+
+                    self._moving_assitp = True
+
+                    self.ps_value_changed.emit(True)
 
                 # not use self.insert_point()
 
@@ -669,7 +786,7 @@ class Board(QWidget):
             already_accept_assi = False
 
             for idx in range(5):
-                if np.linalg.norm(point - np.array((self._cs_box[0], self._cs_box[1])) - np.array(self._args.sys_grid_locations[idx]) * self._cs_wid) < self._args.circle_dist + (self._args.positive_wid + self._args.negative_wid) * 2:
+                if np.sum((point - np.array((self._cs_box[0], self._cs_box[1])) - np.array(self._args.sys_grid_locations[idx]) * self._cs_wid) ** 2) < self._args.dep_circle_dist_wid_2:
                     self._args.sys_activated_idx = idx
                     self._args.sys_activated_assit_idx = -1
 
@@ -678,7 +795,7 @@ class Board(QWidget):
 
                 else:
                     for assit_idx in range(len(self._args.sys_grid_assitlocs[idx]))[::-1]:
-                        if np.linalg.norm(point - np.array((self._cs_box[0], self._cs_box[1])) - (np.array(self._args.sys_grid_locations[idx]) + np.array(self._args.sys_grid_assitlocs[idx][assit_idx][0:2])) * self._cs_wid) < self._args.circle_dist:
+                        if np.sum((point - np.array((self._cs_box[0], self._cs_box[1])) - (np.array(self._args.sys_grid_locations[idx]) + np.array(self._args.sys_grid_assitlocs[idx][assit_idx][0:2])) * self._cs_wid) ** 2) < self._args.dep_circle_dist_2:
                             self._args.sys_activated_idx = idx
                             self._args.sys_activated_assit_idx = assit_idx
 
@@ -693,17 +810,6 @@ class Board(QWidget):
             if event.button() == Qt.LeftButton:
                 # main points.
                 if (self._args.press_move and not self._last_moving and not already_accept_assi and self._cs_box[0] < point[0] < self._cs_box[0] + self._cs_box[2] and self._cs_box[1] < point[1] < self._cs_box[1] + self._cs_box[3]) or already_accept_main:
-                    """
-                    loc = [(point[0] - self._cs_box[0]) / self._cs_wid, (point[1] - self._cs_box[1]) / self._cs_wid]
-                    loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
-                    loc[0] = 0.0 if loc[0] < 0.0 else loc[0]
-                    loc[0] = 1.0 if loc[0] > 1.0 else loc[0]
-                    loc[1] = 0.0 if loc[1] < 0.0 else loc[1]
-                    loc[1] = 1.0 if loc[1] > 1.0 else loc[1]
-
-                    self._args.sys_grid_locations[self._args.sys_activated_idx] = tuple(loc)
-                    """
-
                     self._moving_maintp = True
                     self._last_moving = 0
 
@@ -712,18 +818,6 @@ class Board(QWidget):
 
                 # assit points.
                 elif self._args.sys_grid_assitlocs[self._args.sys_activated_idx] and (self._args.press_move and self._last_moving and not already_accept_main and self._cs_box[0] < point[0] < self._cs_box[0] + self._cs_box[2] and self._cs_box[1] < point[1] < self._cs_box[1] + self._cs_box[3]) or already_accept_assi:
-                    """
-                    loc = [(point[0] - self._cs_box[0]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][0], (point[1] - self._cs_box[1]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][1]]
-                    loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
-                    loc[0] = -1.0 if loc[0] < -1.0 else loc[0]
-                    loc[0] =  1.0 if loc[0] >  1.0 else loc[0]
-                    loc[1] = -1.0 if loc[1] < -1.0 else loc[1]
-                    loc[1] =  1.0 if loc[1] >  1.0 else loc[1]
-
-                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][0] = loc[0]
-                    self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][1] = loc[1]
-                    """
-
                     self._moving_assitp = True
                     self._last_moving = 1
 
@@ -743,8 +837,10 @@ class Board(QWidget):
         if not self._show_points:
             return
 
+        point = np.array((event.x(), event.y()))
+
         if self._moving_assitp:
-            point = np.array((event.x(), event.y()))
+            self._outer_circles = None
 
             loc = [(point[0] - self._cs_box[0]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][0], (point[1] - self._cs_box[1]) / self._cs_wid - self._args.sys_grid_locations[self._args.sys_activated_idx][1]]
             loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
@@ -759,8 +855,8 @@ class Board(QWidget):
             event.accept()
             self.update()
 
-        if self._moving_maintp:
-            point = np.array((event.x(), event.y()))
+        elif self._moving_maintp:
+            self._outer_circles = None
 
             loc = [(point[0] - self._cs_box[0]) / self._cs_wid, (point[1] - self._cs_box[1]) / self._cs_wid]
             loc = snap_point(loc, 0.5 / self._args.sys_grid_values["col"])
@@ -775,6 +871,21 @@ class Board(QWidget):
             self.update()
 
         else:
+            # outer circles.
+            if self._args.show_info_pts[2] and self._press_key == 0 and (not self._drop_file) and (not self._args.sys_grid_list[0]): # and (self._cs_box[0] < point[0] < self._cs_box[0] + self._cs_box[2] and self._cs_box[1] < point[1] < self._cs_box[1] + self._cs_box[3]):
+                pts = self._tag_centers
+                major = self._args.show_info_pts[2] in (1, 3)
+                assit_pts = self._assit_tag_centers
+                minor = self._args.show_info_pts[2] > 1
+                last_count = bool(self._outer_circles)
+                self._outer_circles = get_outer_circles(point, self._args.sys_activated_idx, pts, assit_pts, (self._args.dep_circle_dist_wid) * 1.2, self._args.circle_dist * 1.2, self._args.circle_dist, self._outer_circles, major=major, minor=minor)
+
+                if self._outer_circles or last_count:
+                    self.update()
+
+            else:
+                self._outer_circles = None
+
             event.ignore()
 
     def mouseReleaseEvent(self, event):
@@ -790,6 +901,10 @@ class Board(QWidget):
         """
         Sync to wheel.py. May exist difference.
         """
+
+        if self._outer_circles:
+            self._outer_circles = None
+            self.update()
 
         # drag file out from depot.
         if self._drag_file:
@@ -814,6 +929,10 @@ class Board(QWidget):
         """
         Sync to wheel.py. May exist difference.
         """
+
+        if self._outer_circles:
+            self._outer_circles = None
+            self.update()
 
         if self._drop_file:
             self.ps_dropped.emit((self._drop_file, False))
@@ -1194,15 +1313,19 @@ class Board(QWidget):
                         self.link_point(False)
 
         else:
-            # similar to func "insert_assit_point" in wheel.py.
-            #
-            loc_a, loc_b = 0.1, 0.1
+            # max assit len 30.
+            assit_len = len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx])
 
-            self._args.sys_activated_assit_idx = len(self._args.sys_grid_assitlocs[self._args.sys_activated_idx])
-            self._args.sys_grid_assitlocs[self._args.sys_activated_idx].append([loc_a, loc_b, 15, 0.0, 0.0, True])
-            self._args.sys_assit_color_locs[self._args.sys_activated_idx].append(None)
+            if assit_len < 31:
+                # similar to func "insert_assit_point" in wheel.py.
+                #
+                loc_a, loc_b = 0.1, 0.1
 
-            self.ps_color_changed.emit(True)
+                self._args.sys_activated_assit_idx = assit_len
+                self._args.sys_grid_assitlocs[self._args.sys_activated_idx].append([loc_a, loc_b, (15 * np.random.random() + 15) * np.random.choice([1,-1]), 0.3 * np.random.random() - 0.15, 0.0, True])
+                self._args.sys_assit_color_locs[self._args.sys_activated_idx].append(None)
+
+                self.ps_color_changed.emit(True)
 
         self.update()
 
@@ -1357,7 +1480,7 @@ class Board(QWidget):
         self.ps_history_backup.emit(True)
         self.update()
 
-    def freeze_image(self, value):
+    def freeze_image(self, value=None):
         """
         Freeze current image.
         """
@@ -1371,9 +1494,9 @@ class Board(QWidget):
 
         self.ps_transfer_image.emit(grid_img)
 
-    def print_image(self, value):
+    def save_image(self, value=None):
         """
-        Exec print image.
+        Exec save image.
         """
 
         if not self.isVisible():
@@ -1539,14 +1662,14 @@ class Board(QWidget):
         self._menu.addAction(self._action_copy_img)
 
         #   _translate("Board", "Freeze Image"), # 28
-        #   _translate("Board", "Print Image"), # 29
+        #   _translate("Board", "Save Image"), # 29
         self._action_freeze_img = QAction(self)
         self._action_freeze_img.triggered.connect(self.freeze_image)
         self._menu.addAction(self._action_freeze_img)
 
-        self._action_print_img = QAction(self)
-        self._action_print_img.triggered.connect(self.print_image)
-        self._menu.addAction(self._action_print_img)
+        self._action_save_img = QAction(self)
+        self._action_save_img.triggered.connect(self.save_image)
+        self._menu.addAction(self._action_save_img)
 
         #   _translate("Board", "Zoom In"), # 8
         #   _translate("Board", "Zoom Out"), # 9
@@ -1937,9 +2060,9 @@ class Board(QWidget):
             self._action_hide_pt.setText(self._action_descs[26])
 
         #   _translate("Board", "Freeze Image"), # 28
-        #   _translate("Board", "Print Image"), # 29
+        #   _translate("Board", "Save Image"), # 29
         self._action_freeze_img.setText(self._action_descs[28])
-        self._action_print_img.setText(self._action_descs[29])
+        self._action_save_img.setText(self._action_descs[29])
 
     def update_text(self):
         self.update_action_text()
@@ -1982,7 +2105,7 @@ class Board(QWidget):
             _translate("Board", "Show Points"), # 26
             _translate("Board", "Hide Points"), # 27
             _translate("Image", "Freeze Image"), # 28
-            _translate("Image", "Print Image"), # 29
+            _translate("Image", "Save Image"), # 29
         )
 
         self._tip_descs = (
@@ -2005,7 +2128,7 @@ class Board(QWidget):
         self._open_descs = (
             _translate("Image", "Double click here to open an image."),
             _translate("Image", "Open"),
-            _translate("Image", "Print"),
+            _translate("Image", "Save"),
             _translate("Image", "Cover"),
         )
 

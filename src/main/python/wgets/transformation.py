@@ -73,12 +73,12 @@ class Transformation(QWidget):
         gbox_grid_layout.setVerticalSpacing(6)
         scroll_grid_layout.addWidget(self._move_gbox, 0, 1, 1, 1)
 
-        self._move_btns = []
+        self.move_btns = []
 
         btn = QPushButton(self._move_gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
-        self._move_btns.append(btn)
+        self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 0, 2, 1, 1)
         btn.clicked.connect(lambda x: self.move_up())
@@ -86,7 +86,7 @@ class Transformation(QWidget):
         btn = QPushButton(self._move_gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
-        self._move_btns.append(btn)
+        self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 2, 2, 1, 1)
         btn.clicked.connect(lambda x: self.move_down())
@@ -94,7 +94,7 @@ class Transformation(QWidget):
         btn = QPushButton(self._move_gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
-        self._move_btns.append(btn)
+        self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 1, 1, 1, 1)
         btn.clicked.connect(lambda x: self.move_left())
@@ -102,7 +102,7 @@ class Transformation(QWidget):
         btn = QPushButton(self._move_gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
-        self._move_btns.append(btn)
+        self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 1, 3, 1, 1)
         btn.clicked.connect(lambda x: self.move_right())
@@ -110,7 +110,7 @@ class Transformation(QWidget):
         btn = QPushButton(self._move_gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
-        self._move_btns.append(btn)
+        self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 1, 2, 1, 1)
         btn.clicked.connect(lambda x: self.reset_home())
@@ -133,7 +133,7 @@ class Transformation(QWidget):
         btn = QPushButton(self._zoom_gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
-        self._move_btns.append(btn)
+        self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 0, 1, 1, 1)
         btn.clicked.connect(lambda x: self.zoom_in())
@@ -141,7 +141,7 @@ class Transformation(QWidget):
         btn = QPushButton(self._zoom_gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
-        self._move_btns.append(btn)
+        self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 0, 3, 1, 1)
         btn.clicked.connect(lambda x: self.zoom_out())
@@ -461,8 +461,10 @@ class Transformation(QWidget):
         self._move_gbox.setTitle(self._gbox_descs[0])
         self._zoom_gbox.setTitle(self._gbox_descs[1])
 
+        """
         for i in range(7):
-            self._move_btns[i].setText(self._move_descs[i])
+            self.move_btns[i].setText(self._move_descs[i])
+        """
 
         self.sdt_sepr_ehs.set_text(self._enhance_descs[1])
         self.sdt_fact_ehs.set_text(self._enhance_descs[2])

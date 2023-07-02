@@ -18,13 +18,13 @@ from setuptools import setup
 
 setup(
     name="Rickrack",
-    version="2.8.5",
+    version="2.8.27",
     author="Eigenmiao",
     author_email="eigenmiao@outlook.com",
     description="Generate harmonious colors freely.",
     long_description=open("README.md", "r", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
-    url="https://eigenmiao.github.io/rickrack/",
+    url="https://eigenmiao.com/rickrack/",
     classifiers=[
         "Topic :: Multimedia :: Graphics",
         "Topic :: Utilities",

@@ -251,11 +251,11 @@ class Info(QDialog, Ui_InfoDialog):
             _translate("Info", "Rickrack Color Set"),
             _translate("Info", "Unknown"),
             _translate("Info", "This color set includes: {}, {}, {}, {} and {}."),
-            _translate("Info", "From this color set a group of fixed color boxes could be derived, include: {}."),
+            _translate("Info", "A fixed color board is attached, including: {}."),
             _translate("Info", ", "),
             _translate("Info", " and "),
             _translate("Info", " etc."),
-            _translate("Info", "From this color set a group of dynamic color boxes could be derived."),
+            _translate("Info", "A gradient color board is attached."),
             _translate("Info", "Uninitialized Color Set"),
             _translate("Info", "Double Click The Blank Set to Initialize."),
         )
@@ -290,6 +290,8 @@ class Info(QDialog, Ui_InfoDialog):
             _translate("Rickrack", "Cyan"),
             _translate("Rickrack", "Blue"),
             _translate("Rickrack", "Magenta"),
+            _translate("Rickrack", "Orange"),
+            _translate("Rickrack", "Pink"),
         )
 
 
@@ -512,6 +514,9 @@ class Depot(QWidget):
         # stab_column is changed with the changing of interface size. this code is reused.
         self._stab_column_wid = None
 
+        self._pl_wid = 0
+        self._tot_rows = 0
+
     # ---------- ---------- ---------- Paint Funcs ---------- ---------- ---------- #
 
     def paintEvent(self, event):
@@ -687,17 +692,19 @@ class Depot(QWidget):
             event.accept()
 
         elif self._left_click:
-            if isinstance(self._start_pt, np.ndarray) and np.linalg.norm(self._start_pt - np.array((event.x(), event.y()))) < self._pl_wid / 5:
+            point = (event.x(), event.y())
+            pl_wid_5 = self._pl_wid / 5
+
+            if isinstance(self._start_pt, np.ndarray) and np.sum((self._start_pt - point) ** 2) < pl_wid_5 ** 2:
                 # fixed icon in small region.
                 event.ignore()
 
             else:
-                x = event.x()
-                y = event.y()
-                x = x if x > self._pl_wid / 5 else self._pl_wid / 5
-                x = x if x < self.width() - self._pl_wid / 5 else self.width() - self._pl_wid / 5
-                y = y if y > self._pl_wid / 5 else self._pl_wid / 5
-                y = y if y < self.height() - self._pl_wid / 5 else self.height() - self._pl_wid / 5
+                x, y = point
+                x = x if x > pl_wid_5 else pl_wid_5
+                x = x if x < self.width() - pl_wid_5 else self.width() - pl_wid_5
+                y = y if y > pl_wid_5 else pl_wid_5
+                y = y if y < self.height() - pl_wid_5 else self.height() - pl_wid_5
                 x = int(x) - self._scroll_contents.x()
                 y = int(y) - self._scroll_contents.y()
 
@@ -1214,7 +1221,7 @@ class Depot(QWidget):
             # self._info.clone_cell(self._args.stab_ucells[self._current_idx])
             self._info.show()
 
-    def attach_set(self, color_list=None, activate_list=True, location_idx=-1):
+    def attach_set(self, color_list=None, location_idx=-1):
         """
         Attach current color set from wheel or color list from file into depot.
         """
@@ -1256,13 +1263,12 @@ class Depot(QWidget):
         total_len = len(self._args.stab_ucells)
         self._args.stab_ucells = self._args.stab_ucells[:loc_idx] + [unit_cell,] + self._args.stab_ucells[loc_idx:]
 
-        if activate_list:
-            #
-            # add judge activate_list to prevent press_act error.
-            # activate current index to update info.
-            self.activate_idx((total_len + loc_idx) % total_len)
-
         self.update()
+
+        #
+        # add judge activate_list to prevent press_act error.
+        # activate current index to update info.
+        self.activate_idx((total_len + loc_idx) % total_len)
 
     def detail_state(self):
         """

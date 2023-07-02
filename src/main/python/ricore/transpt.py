@@ -124,6 +124,21 @@ def get_outer_box(center, radius):
 
     return box
 
+def get_box_center(box):
+    """
+    Get the center of a circle box.
+
+    Args:
+        box (tuple or list): circle box.
+
+    Returns:
+        center.
+    """
+
+    # radius , box[2] / 2
+
+    return np.array((box[0] + box[2] / 2, box[1] + box[3] / 2))
+
 def get_link_tag(box):
     """
     Get link tag shape with two square and one line.
@@ -170,3 +185,177 @@ def snap_point(pt, wid):
         y = (y // wid + 1) * wid
 
     return [x, y]
+
+def get_outer_circles(pt_array, activated_idx, pts_array, assit_pts_array, pt_radius, assit_pt_radius, info_pt_radius, last_result, major=True, minor=True):
+    """
+    Add info circles around pts and ref pts.
+
+    Args:
+        pt (tuple or list): current point.
+        activated_idx (int): current activated index of main points.
+        pts (tuple or list): main point locations.
+        assit_pts (tuple or list): ref point locations.
+        pt_radius (int or float): radius of a main point.
+        assit_pt_radius (int or float): radius of a ref point.
+        info_pt_radius (int or float): radius of a info point around a main point.
+        major (bool): consider major points.
+        minor (bool): consider minor points.
+
+    Return:
+        (sel_idx, sel_assit_idx, is_in_pt, is_in_assit_pt, ((circle_0, pattern_0), (circle_1, pattern_1), ...), sel_info_idx)
+    """
+
+    # pre-format.
+    # pt_array = pt # np.array(pt)
+    # pts_array = pts # [np.array(i) for i in pts]
+    # assit_pts_array = assit_pts # [[np.array(j) for j in i] for i in assit_pts]
+    info_pt_radius_int = int(info_pt_radius)
+
+    # auto find points with min distance.
+    # get distances between mouse pt and main pts (ref pts).
+    sel_idx = -1
+    sel_assit_idx = -1
+    all_pt_dist = []
+
+    idx_seq = list(range(5))
+    idx_seq = idx_seq[activated_idx + 1: ] + idx_seq[: activated_idx + 1]
+
+    pt_info_pt_radius_2 = (pt_radius + info_pt_radius_int * 2) ** 2
+    pt_radius_2 = pt_radius ** 2
+    assit_pt_info_pt_radius_2 = (assit_pt_radius + info_pt_radius_int * 2) ** 2
+    assit_pt_radius_2 = assit_pt_radius ** 2
+    info_pt_radius_int_2 = info_pt_radius_int ** 2
+
+    for idx in idx_seq:
+        pt_dist_2 = np.sum((pt_array - pts_array[idx]) ** 2)
+
+        if major:
+            all_pt_dist.append((pt_dist_2, (idx,)))
+
+            # without "not last_result".
+            # hide info pts when mouse over main points.
+            if pt_dist_2 < pt_info_pt_radius_2:
+                sel_idx = idx
+
+        if pt_dist_2 < pt_radius_2:
+            return None
+
+        assit_len = len(assit_pts_array[idx])
+
+        # max assit len 30. recommand 25.
+        if assit_len > 25:
+            return None
+
+        for assit_idx in range(assit_len):
+            assit_pt_dist_2 = np.sum((pt_array - assit_pts_array[idx][assit_idx]) ** 2)
+    
+            if minor:
+                all_pt_dist.append((assit_pt_dist_2, (idx, assit_idx)))
+
+                if assit_pt_dist_2 < assit_pt_info_pt_radius_2:
+                    sel_idx = idx
+                    sel_assit_idx = assit_idx
+
+            if not (minor and last_result) and assit_pt_dist_2 < assit_pt_radius_2:
+                return None
+
+    # get info circle index with min distance.
+    is_in_pt = False
+    is_in_assit_pt = False
+
+    if sel_assit_idx > -1:
+        is_in_assit_pt = True
+
+    elif sel_idx > -1:
+        is_in_pt = True
+
+    else:
+        all_pt_dist.sort(key=lambda x: x[0])
+        sel_pt = all_pt_dist[0]
+
+        if sel_pt[0] > pt_radius_2 * 4:
+            return None
+
+        if len(sel_pt[1]) == 1:
+            sel_idx = sel_pt[1][0]
+            sel_assit_idx = -1
+
+        else:
+            sel_idx, sel_assit_idx = sel_pt[1]
+
+    # without "is_in_pt".
+    # always generate circle locations for main points.
+    if is_in_assit_pt and last_result and sel_idx == last_result[0] and sel_assit_idx == last_result[1] and is_in_pt == last_result[2] and is_in_assit_pt == last_result[3]:
+        circle_locations = last_result[4]
+        sel_info_idx = -1
+
+        for loc_idx in range(len(circle_locations)):
+            o_center = get_box_center(circle_locations[loc_idx][0])
+
+            if np.sum((pt_array - o_center) ** 2) < info_pt_radius_int_2:
+                sel_info_idx = loc_idx
+
+    else:
+        circle_locations = []
+
+        if sel_assit_idx == len(assit_pts_array[sel_idx]):
+            sel_assit_idx = -1
+
+        if sel_assit_idx > -1:
+            info_around_center = assit_pts_array[sel_idx][sel_assit_idx]
+            info_around_radius = assit_pt_radius + info_pt_radius_int
+
+        else:
+            info_around_center = pts_array[sel_idx]
+            info_around_radius = pt_radius + info_pt_radius_int
+
+        theta = get_theta_center(info_around_center, pt_array)
+        info_pt_center = rotate_point_center(info_around_center, (info_around_center[0] + info_around_radius, info_around_center[1]), theta).astype(int)
+        sel_info_idx = -1
+
+        if np.sum((pt_array - info_pt_center) ** 2) < info_pt_radius_int_2:
+            sel_info_idx = 0
+
+        circle_locations.append((
+            get_outer_box(info_pt_center, info_pt_radius_int),
+            info_pt_center + np.array((
+                (-0.5, 0),
+                ( 0.5, 0),
+            )) * info_pt_radius_int, info_pt_center + np.array((
+                (0, -0.5),
+                (0,  0.5),
+            )) * info_pt_radius_int,
+        ))
+
+        if sel_assit_idx > -1:
+            theta = theta + 120
+            info_pt_center = rotate_point_center(info_around_center, (info_around_center[0] + info_around_radius, info_around_center[1]), theta).astype(int)
+            circle_locations.append((
+                get_outer_box(info_pt_center, info_pt_radius_int),
+                info_pt_center + np.array((
+                    (-0.5, 0),
+                    ( 0.5, 0),
+                )) * info_pt_radius_int,
+            ))
+
+            theta = theta + 120
+            info_pt_center = rotate_point_center(info_around_center, (info_around_center[0] + info_around_radius, info_around_center[1]), theta).astype(int)
+            circle_locations.append((
+                get_outer_box(info_pt_center, info_pt_radius_int),
+                info_pt_center + np.array((
+                    (-0.708, -0.708),
+                    ( 0.708,  0.708),
+                )) * info_pt_radius_int, info_pt_center + np.array((
+                    ( 0.0834386, -0.6349818),
+                    ( 0.6349818, -0.0834386),
+                    ( 0.2404163,  0.1216223),
+                    ( 0.2262741,  0.4440630),
+                    (-0.0975807,  0.0975807),
+                    (-0.5275016,  0.5275016),
+                    (-0.0975807,  0.0975807),
+                    (-0.4440630, -0.2262741),
+                    (-0.1216223, -0.2404163),
+                )) * info_pt_radius_int,
+            ))
+
+    return (sel_idx, sel_assit_idx, is_in_pt, is_in_assit_pt, circle_locations, sel_info_idx)

@@ -204,6 +204,9 @@ class Settings(QDialog, Ui_SettingsDialog):
         for method in self._args.global_hm_rules:
             self.hm_rule_comb.addItem("")
 
+        for i in range(len(self._color_sys_descs)):
+            self.color_sys_comb.addItem("")
+
         for overfl in self._args.global_overflows:
             self.overflow_comb.addItem("")
 
@@ -294,12 +297,12 @@ class Settings(QDialog, Ui_SettingsDialog):
         self.usr_color_ledit.setText(self._args.usr_color)
         self.usr_image_ledit.setText(self._args.usr_image)
 
-        self.press_act_cbox.setChecked(self._args.press_act)
         self.store_loc_cbox.setChecked(self._args.store_loc)
         self.win_on_top_cbox.setChecked(self._args.win_on_top)
 
         self.lang_comb.setCurrentIndex([x[1] for x in self._args.usr_langs].index(self._args.lang))
         self.hm_rule_comb.setCurrentIndex(self._args.global_hm_rules.index(self._args.hm_rule))
+        self.color_sys_comb.setCurrentIndex(self._args.color_sys)
         self.overflow_comb.setCurrentIndex(self._args.global_overflows.index(self._args.overflow))
         self.export_swatch_ctp_comb.setCurrentText(self._args.export_swatch_ctp.upper())
         self.export_ase_type_comb.setCurrentIndex(("spot", "global", "process").index(self._args.export_ase_type))
@@ -333,6 +336,12 @@ class Settings(QDialog, Ui_SettingsDialog):
         self.press_move_cbox.setChecked(self._args.press_move)
         self.show_hsv_cbox.setChecked(self._args.show_hsv)
         self.show_rgb_cbox.setChecked(self._args.show_rgb)
+        self.show_major_info_wheel_cbox.setChecked(self._args.show_info_pts[0] in (1, 3))
+        self.show_minor_info_wheel_cbox.setChecked(self._args.show_info_pts[0] > 1)
+        self.show_major_info_image_cbox.setChecked(self._args.show_info_pts[1] in (1, 3))
+        self.show_minor_info_image_cbox.setChecked(self._args.show_info_pts[1] > 1)
+        self.show_major_info_board_cbox.setChecked(self._args.show_info_pts[2] in (1, 3))
+        self.show_minor_info_board_cbox.setChecked(self._args.show_info_pts[2] > 1)
 
         self.h_range_0_dp.setValue(self._args.h_range[0])
         self.h_range_1_dp.setValue(self._args.h_range[1])
@@ -379,12 +388,13 @@ class Settings(QDialog, Ui_SettingsDialog):
         self._args.modify_settings("usr_color", self.usr_color_ledit.text())
         self._args.modify_settings("usr_image", self.usr_image_ledit.text())
 
-        self._args.modify_settings("press_act", self.press_act_cbox.isChecked())
         self._args.modify_settings("store_loc", self.store_loc_cbox.isChecked())
         self._args.modify_settings("win_on_top", self.win_on_top_cbox.isChecked())
 
         hm_rule = self._args.hm_rule
         self._args.modify_settings("hm_rule", self._args.global_hm_rules[self.hm_rule_comb.currentIndex()])
+
+        self._args.modify_settings("color_sys", self.color_sys_comb.currentIndex())
 
         if self._args.hm_rule != hm_rule:
             self.ps_rule_changed.emit()
@@ -442,6 +452,11 @@ class Settings(QDialog, Ui_SettingsDialog):
         self._args.modify_settings("press_move", self.press_move_cbox.isChecked())
         self._args.modify_settings("show_hsv", self.show_hsv_cbox.isChecked())
         self._args.modify_settings("show_rgb", self.show_rgb_cbox.isChecked())
+
+        w = int(self.show_major_info_wheel_cbox.isChecked()) + int(self.show_minor_info_wheel_cbox.isChecked()) * 2
+        i = int(self.show_major_info_image_cbox.isChecked()) + int(self.show_minor_info_image_cbox.isChecked()) * 2
+        b = int(self.show_major_info_board_cbox.isChecked()) + int(self.show_minor_info_board_cbox.isChecked()) * 2
+        self._args.modify_settings("show_info_pts", (w, i, b))
 
         self._args.modify_settings("h_range", (self.h_range_0_dp.value(), self.h_range_1_dp.value()))
         self._args.modify_settings("s_range", (self.s_range_0_dp.value(), self.s_range_1_dp.value()))
@@ -575,6 +590,9 @@ class Settings(QDialog, Ui_SettingsDialog):
         for idx in range(len(self._args.global_hm_rules)):
             self.hm_rule_comb.setItemText(idx, self._rule_descs[idx])
 
+        for idx in range(len(self._color_sys_descs)):
+            self.color_sys_comb.setItemText(idx, self._color_sys_descs[idx])
+
         for idx in range(len(self._args.global_overflows)):
             self.overflow_comb.setItemText(idx, self._overflow_descs[idx])
 
@@ -619,6 +637,13 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Rule", "Cutoff"),
             _translate("Rule", "Return"),
             _translate("Rule", "Repeat"),
+        )
+
+        self._color_sys_descs = (
+            _translate("Mode", "RGB Space"),
+            _translate("Mode", "Rev RGB Space"),
+            _translate("Mode", "RYB Space"),
+            _translate("Mode", "Rev RYB Space"),
         )
 
         self._bakgd_descs = (

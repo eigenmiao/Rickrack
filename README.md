@@ -13,6 +13,8 @@ In the age of digital creativity, the color palette has become an indispensable 
 
 Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. What’s more, you can export them into individual files and import them into other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack can run normally on operating systems such as Windows, Linux, and macOS.
 
+[:rocket: v2.8.27 Update Notes](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27)
+
 [:house: Rickrack](https://eigenmiao.com/rickrack)
 
 [:arrow_down: Translations of the Introduction in Other Languages :arrow_down:](#introduction-translations)
@@ -20,7 +22,9 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 # 焰火十二卷
 在数字创意的时代，调色板成为了设计师不可或缺的工具。一个好的调色板可以让设计更加有吸引力和协调性。如果你正在寻找一款优秀的调色板软件，那就试试焰火十二卷吧！焰火十二卷具有多种配色功能，适用于多种场景。焰火十二卷简单易上手，更重要的是，它完全免费，无需联网或注册。
 
-焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。此外，你也可以将色彩组或者色彩仓库导出为单独的色彩文档并导入其他软件中（如 Adobe Photoshop、GIMP、Krita、Pencil 2D 以及优动漫 Paint 等）。焰火十二卷可以在 Windows、Linux、macOS 等操作系统上正常运行。
+焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。此外，你也可以将色彩组或者色库导出为单独的色彩文档并导入其他软件中（如 Adobe Photoshop、GIMP、Krita、Pencil 2D 以及优动漫 Paint 等）。焰火十二卷可以在 Windows、Linux、macOS 等操作系统上正常运行。
+
+[:rocket: v2.8.27 更新说明](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27)
 
 [:house: 焰火十二卷](https://eigenmiao.com/yanhuo)
 
@@ -191,7 +195,7 @@ Support the continuous development of Rickrack!
 
 # Installation
 ## Current Release
-The latest preview version is [v2.8.5](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.5).
+The latest preview version is [v2.8.27](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27).
 
 ## Install Software
 ### Recommend: Install on Windows 10 or 11 via WinGet tool
@@ -200,7 +204,7 @@ winget install rickrack
 ```
 
 ## Install on other platforms
-Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.5) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.5/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
+Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.27/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 
@@ -221,16 +225,16 @@ rickrack -d "/PATH/TO/RICKRACK/SOFTWARE"
 ## How to Use the Software
 Visit https://eigenmiao.com/rickrack/ for tutorials. Just feel free to click anywhere in the interface!
 
-Here is a [video tutorial](https://www.bilibili.com/video/BV17L4y1A7P9/).
+Here is a [video tutorial](https://www.bilibili.com/video/BV1BM411L75t/).
 
-Here is a [demo](https://eigenmiao.com/2023/01/29/rickrack-alternative-to-adobe-color-en/).
+Here is a [demo](https://eigenmiao.com/2023/01/29/color-palette-generator-rickrack-en/).
 
 ## How to Use the Module
 Include Rickrack in other Python scripts, programs and softwares!
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV1VD4y157tX/).
 
-Here is a [demo](demo/).
+Here is a [demo](demo/03_plot_scripts).
 
 ```Python
 # Use Rickrack module in code.
@@ -250,10 +254,6 @@ dp_argv["help"] = True
 rr.run(dp_argv=dp_argv, dp_proj=dp_proj)
 ```
 
-## Notice
-* Please read the documents and tutorials when you encounter any difficulties.
-* The socket server is designed for obtaining colors from the Rickrack software in real-time. By default, this server is disabled and can only be started from the command line.
-
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Development
@@ -270,11 +270,14 @@ git clone https://github.com/eigenmiao/Rickrack.git
 # Change into the directory.
 cd Rickrack
 
-# Run Rickrack.
-python src/main/python/main.py
+# Install the Rickrack starter.
+pip install rickrack
 
-# Generate the installer for Rickrack.
-fbs freeze && fbs installer
+# Display the help information.
+rickrack -h
+
+# Run Rickrack.
+rickrack
 ```
 
 ## How to Build the Module
@@ -296,16 +299,13 @@ Copyright (c) 2019-2023 [Eigenmiao](mailto:eigenmiao@outlook.com). All Rights Re
 
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
-# Contributing
-This project welcomes contributions of all types. Recommending Rickrack to people you know, writing reviews for Rickrack on websites, help spec'ing, design, documentation, finding bugs, etc. can all help the project grow better.
-
 # License
 ## License for Rickrack
 Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the [GNU General Public License 3.0 (GPL 3.0)](https://www.gnu.org/licenses/) for more details.
 
 All images, documents and translations in Rickrack [code repository](https://github.com/eigenmiao/Rickrack) are licensed under [Creative Commons Attribution-NonCommercial-ShareAlike License 4.0 (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) unless stating additionally.
 
-Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif) ([SC](https://fonts.google.com/specimen/Noto+Serif+SC)) fonts and [Noto Sans](https://fonts.google.com/specimen/Noto+Sans) ([SC](https://fonts.google.com/specimen/Noto+Sans+SC)) fonts for interface display, which are designed by Google and published in website [Google Fonts](https://fonts.google.com/). These fonts are open-sourced under [Apache 2.0](http://www.apache.org/licenses/) and [SIL Open Font License 1.1](http://scripts.sil.org/OFL), respectively.
+Rickrack default uses [LXGW WenKai](https://github.com/lxgw/LxgwWenKai) font for interface display, which is an open-source Chinese font derived from Fontworks' Klee One. This font is open-sourced under [SIL Open Font License 1.1](http://scripts.sil.org/OFL).
 
 ## License for Required Packages
 | Package        | Version  | License          |
@@ -331,17 +331,24 @@ Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif)
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # More Information
+* Documentation: https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/ .
+* The installation package can be unzipped and run directly. This method does not require administrator privileges and can solve some installation failure problems.
+* The socket server is designed for obtaining colors from the Rickrack software in real-time. By default, this server is disabled and can only be started from the command line.
 * Rickrack is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
 * The code repository of Rickrack is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
 * The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
 * The cover image uses images from [Pixabay, which is created by martynaszulist](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/).
 * In some demo animations, [images of Ghibli](https://www.ghibli.jp/info/013409/) were used.
-* The interface display in demo animations uses the [LXGWWenKai font](https://lxgw.github.io/2021/01/28/Klee-Simpchin/).
+
+<div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
+
+# Contributing
+This project welcomes contributions of all types. If you want to contribute code (new features, or bug fixes) to this project, please contact me first. Thanks.
 
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Acknowledgment
-## Publicity & Promotion
+## Reviews
 <table>
   <tbody>
     <tr>
@@ -352,7 +359,7 @@ Rickrack default uses [Noto Serif](https://fonts.google.com/specimen/Noto+Serif)
   </tbody>
 </table>
 
-## l10n & i18n
+## Translators
 <table>
   <tbody>
     <tr>

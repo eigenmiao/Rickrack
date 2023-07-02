@@ -625,6 +625,40 @@ class Color(object):
         return _hec
 
     @classmethod
+    def sys_rgb2ryb(cls, h):
+        """
+        Class method. Transfer hue of rgb to hue of ryb.
+        """
+
+        _h = h % 360
+
+        if 0 <= _h < 60:
+            return _h / 60 * 120
+
+        elif 60 <= _h < 240:
+            return (_h - 60) / 180 * 120 + 120
+
+        else:
+            return _h
+
+    @classmethod
+    def sys_ryb2rgb(cls, h):
+        """
+        Class method. Transfer hue of ryb to hue of rgb.
+        """
+
+        _h = h % 360
+
+        if 0 <= _h < 120:
+            return _h / 120 * 60
+
+        elif 120 <= _h < 240:
+            return (_h - 120) / 120 * 180 + 60
+
+        else:
+            return _h
+
+    @classmethod
     def stri2color(cls, stri):
         """
         Find the first possible color in string.
@@ -1145,7 +1179,12 @@ class Color(object):
         if v > 0.95 and s < 0.05:
             return (1, 1)
 
-        prefix = int((h + 30) // 60 % 6) + 2
+        prefix = 2
+
+        for start, end, idx in ((0, 20, 0), (20, 40, 6), (40, 70, 1), (70, 160, 2), (160, 190, 3), (190, 250, 4), (250, 310, 5), (310, 340, 7), (340, 360, 0)):
+            if start <= h % 360 < end:
+                prefix = idx + 2
+                break
 
         if 0.0 <= v < 0.25:
             return (2, prefix)

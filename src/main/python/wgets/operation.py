@@ -30,12 +30,9 @@ class Operation(QWidget):
     Operation object based on QWidget. Init a operation in operation.
     """
 
-    ps_create = pyqtSignal(bool)
-    ps_locate = pyqtSignal(bool)
-    ps_derive = pyqtSignal(bool)
     ps_update = pyqtSignal(bool)
-    ps_attach = pyqtSignal(bool)
     ps_opened = pyqtSignal(bool)
+    ps_functn = pyqtSignal(int)
 
     def __init__(self, wget, args):
         """
@@ -81,14 +78,6 @@ class Operation(QWidget):
         gbox_grid_layout.setVerticalSpacing(12)
         scroll_grid_layout.addWidget(self._file_gbox, 0, 1, 1, 1)
 
-        self.open_btn = QPushButton(self._file_gbox)
-        gbox_grid_layout.addWidget(self.open_btn, 2, 1, 1, 1)
-        self.open_btn.clicked.connect(self.exec_open)
-
-        self.save_btn = QPushButton(self._file_gbox)
-        gbox_grid_layout.addWidget(self.save_btn, 3, 1, 1, 1)
-        self.save_btn.clicked.connect(self.exec_save)
-
         self.import_btn = QPushButton(self._file_gbox)
         gbox_grid_layout.addWidget(self.import_btn, 0, 1, 1, 1)
         self.import_btn.clicked.connect(self.exec_import)
@@ -98,11 +87,11 @@ class Operation(QWidget):
         self.export_btn.clicked.connect(self.exec_export)
 
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        gbox_grid_layout.addItem(spacer, 4, 1, 1, 1)
+        gbox_grid_layout.addItem(spacer, 2, 1, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        gbox_grid_layout.addItem(spacer, 4, 0, 1, 1)
+        gbox_grid_layout.addItem(spacer, 2, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        gbox_grid_layout.addItem(spacer, 4, 2, 1, 1)
+        gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
 
         # view functional region.
         self._view_gbox = QGroupBox(scroll_contents)
@@ -112,44 +101,46 @@ class Operation(QWidget):
         gbox_grid_layout.setVerticalSpacing(12)
         scroll_grid_layout.addWidget(self._view_gbox, 1, 1, 1, 1)
 
-        self.wheel_btn = QPushButton(self._view_gbox)
-        gbox_grid_layout.addWidget(self.wheel_btn, 0, 1, 1, 1)
-        self.wheel_btn.clicked.connect(lambda x: self.ps_create.emit(False))
+        self.functn = []
 
-        self.image_btn = QPushButton(self._view_gbox)
-        gbox_grid_layout.addWidget(self.image_btn, 1, 1, 1, 1)
-        self.image_btn.clicked.connect(lambda x: self.ps_locate.emit(False))
+        # 0  create color set.
+        # 1  reset.
+        # 
+        # 2  open image.
+        # 3  save image.
+        # 4  pick-up.
+        # 
+        # 5  save image.
+        # 6  switch fix.
+        # 7  switch ref.
+        # 8  reset.
+        # 
+        # 9  attach set.
+        # 10 export set.
+        # 11 detail set.
 
-        self.board_btn = QPushButton(self._view_gbox)
-        gbox_grid_layout.addWidget(self.board_btn, 2, 1, 1, 1)
-        self.board_btn.clicked.connect(lambda x: self.ps_derive.emit(False))
+        self.functn.append(QPushButton(self._view_gbox))
+        gbox_grid_layout.addWidget(self.functn[0], 0, 1, 1, 1)
+        self.functn[0].clicked.connect(lambda x: self.ps_functn.emit(0))
 
-        self.depot_btn = QPushButton(self._view_gbox)
-        gbox_grid_layout.addWidget(self.depot_btn, 3, 1, 1, 1)
-        self.depot_btn.clicked.connect(lambda x: self.ps_attach.emit(False))
+        self.functn.append(QPushButton(self._view_gbox))
+        gbox_grid_layout.addWidget(self.functn[1], 1, 1, 1, 1)
+        self.functn[1].clicked.connect(lambda x: self.ps_functn.emit(1))
 
-        self.create_btn = QPushButton(self._view_gbox)
-        gbox_grid_layout.addWidget(self.create_btn, 0, 2, 1, 1)
-        self.create_btn.clicked.connect(lambda x: self.ps_create.emit(True))
+        self.functn.append(QPushButton(self._view_gbox))
+        gbox_grid_layout.addWidget(self.functn[2], 2, 1, 1, 1)
+        self.functn[2].clicked.connect(lambda x: self.ps_functn.emit(2))
 
-        self.locate_btn = QPushButton(self._view_gbox)
-        gbox_grid_layout.addWidget(self.locate_btn, 1, 2, 1, 1)
-        self.locate_btn.clicked.connect(lambda x: self.ps_locate.emit(True))
-
-        self.derive_btn = QPushButton(self._view_gbox)
-        gbox_grid_layout.addWidget(self.derive_btn, 2, 2, 1, 1)
-        self.derive_btn.clicked.connect(lambda x: self.ps_derive.emit(True))
-
-        self.attach_btn = QPushButton(self._view_gbox)
-        gbox_grid_layout.addWidget(self.attach_btn, 3, 2, 1, 1)
-        self.attach_btn.clicked.connect(lambda x: self.ps_attach.emit(True))
+        self.functn.append(QPushButton(self._view_gbox))
+        gbox_grid_layout.addWidget(self.functn[3], 3, 1, 1, 1)
+        self.functn[3].clicked.connect(lambda x: self.ps_functn.emit(3))
 
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        gbox_grid_layout.addItem(spacer, 4, 1, 1, 2)
+        gbox_grid_layout.addItem(spacer, 4, 1, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 4, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        gbox_grid_layout.addItem(spacer, 4, 3, 1, 1)
+        gbox_grid_layout.addItem(spacer, 4, 2, 1, 1)
 
         self.update_text()
 
@@ -891,33 +882,33 @@ class Operation(QWidget):
         else:
             self.warning(self._operation_errs[10])
 
-    def exec_create(self, value):
+    def show_import_export(self):
         """
-        Exec create operation.
-        """
-
-        self.ps_create.emit(True)
-
-    def exec_locate(self, value):
-        """
-        Exec loacate operation.
+        Show import and export and hide open and save.
         """
 
-        self.ps_locate.emit(True)
+        self.import_btn.clicked.disconnect()
+        self.export_btn.clicked.disconnect()
 
-    def exec_derive(self, value):
+        self.import_btn.clicked.connect(self.exec_import)
+        self.export_btn.clicked.connect(self.exec_export)
+
+        self.import_btn.setText(self._operation_descs[0])
+        self.export_btn.setText(self._operation_descs[1])
+
+    def show_open_and_save(self):
         """
-        Exec derive operation.
+        Show open and save and hide import and export.
         """
 
-        self.ps_derive.emit(True)
+        self.import_btn.clicked.disconnect()
+        self.export_btn.clicked.disconnect()
 
-    def exec_attach(self, value):
-        """
-        Exec attach operation.
-        """
+        self.import_btn.clicked.connect(self.exec_open)
+        self.export_btn.clicked.connect(self.exec_save)
 
-        self.ps_attach.emit(True)
+        self.import_btn.setText(self._operation_descs[6])
+        self.export_btn.setText(self._operation_descs[7])
 
     def warning(self, text):
         box = QMessageBox(self)
@@ -932,22 +923,72 @@ class Operation(QWidget):
 
     def update_text(self):
         self._file_gbox.setTitle(self._gbox_descs[0])
+        self._view_gbox.setTitle(self._gbox_descs[1])
+
         self.import_btn.setText(self._operation_descs[0])
         self.export_btn.setText(self._operation_descs[1])
 
-        self.wheel_btn.setText(self._sub_descs[1])
-        self.image_btn.setText(self._sub_descs[2])
-        self.board_btn.setText(self._sub_descs[3])
-        self.depot_btn.setText(self._sub_descs[4])
 
-        self.create_btn.setText(self._operation_descs[2])
-        self.locate_btn.setText(self._operation_descs[3])
-        self.derive_btn.setText(self._operation_descs[4])
-        self.attach_btn.setText(self._operation_descs[5])
+    def update_functn_text(self, view_idx=0):
+        # 0  create color set.
+        # 1  reset.
+        # 
+        # 2  open image.
+        # 3  save image.
+        # 4  pick-up.
+        # 
+        # 5  save image.
+        # 6  switch fix.
+        # 7  switch ref.
+        # 8  reset.
+        # 
+        # 9  attach set.
+        # 10 export set.
+        # 11 detail set.
 
-        self._view_gbox.setTitle(self._gbox_descs[1])
-        self.open_btn.setText(self._operation_descs[6])
-        self.save_btn.setText(self._operation_descs[7])
+        if view_idx == 0:
+            # self.functn[0].show()
+            # self.functn[1].show()
+            # self.functn[2].show()
+            # self.functn[3].hide()
+
+            self.functn[0].setText(self._shortcut_descs[12])
+            self.functn[1].setText(self._shortcut_descs[0])
+            self.functn[2].setText(self._shortcut_descs[1])
+            self.functn[3].setText(self._shortcut_descs[13])
+
+        elif view_idx == 1:
+            # self.functn[0].show()
+            # self.functn[1].show()
+            # self.functn[2].show()
+            # self.functn[3].hide()
+
+            self.functn[0].setText(self._shortcut_descs[2])
+            self.functn[1].setText(self._shortcut_descs[3])
+            self.functn[2].setText(self._shortcut_descs[4])
+            self.functn[3].setText(self._shortcut_descs[13])
+
+        elif view_idx == 2:
+            # self.functn[0].show()
+            # self.functn[1].show()
+            # self.functn[2].show()
+            # self.functn[3].show()
+
+            self.functn[0].setText(self._shortcut_descs[5])
+            self.functn[1].setText(self._shortcut_descs[6])
+            self.functn[2].setText(self._shortcut_descs[7])
+            self.functn[3].setText(self._shortcut_descs[8])
+
+        elif view_idx == 3:
+            # self.functn[0].show()
+            # self.functn[1].show()
+            # self.functn[2].show()
+            # self.functn[3].hide()
+
+            self.functn[1].setText(self._shortcut_descs[9])
+            self.functn[2].setText(self._shortcut_descs[10])
+            self.functn[3].setText(self._shortcut_descs[11])
+            self.functn[0].setText(self._shortcut_descs[14])
 
     def _func_tr_(self):
         _translate = QCoreApplication.translate
@@ -955,6 +996,24 @@ class Operation(QWidget):
         self._gbox_descs = (
             _translate("MainWindow", "File"),
             _translate("MainWindow", "View"),
+        )
+
+        self._shortcut_descs = (
+            _translate("MainWindow", "Create Colors"),
+            _translate("Wheel", "Reset"),
+            _translate("Image", "Open Image"),
+            _translate("Image", "Save Image"),
+            _translate("MainWindow", "Locate Colors"),
+            _translate("Image", "Save Image"),
+            _translate("Board", "Gradient - Fixed"),
+            _translate("Board", "Gradient - Ref"),
+            _translate("Board", "Reset"),
+            _translate("Depot", "Attach Color Set"),
+            _translate("Depot", "Export Color Set"),
+            _translate("Depot", "Show Detail"),
+            _translate("Wheel", "Add More Colors"),
+            _translate("Wheel", "Generate Palette"),
+            _translate("Depot", "Import Color Set"),
         )
 
         self._operation_descs = (
