@@ -900,7 +900,6 @@ class Ui_SettingsDialog(object):
         self.gridLayout_9.addWidget(self.shortcuts_scroll_area, 0, 0, 1, 1)
         self.setti_items.addTab(self.setti_shortcuts, "")
         self.gridLayout.addWidget(self.setti_items, 0, 0, 1, 1)
-
         self.retranslateUi(SettingsDialog)
         self.setti_items.setCurrentIndex(0)
         self.buttonBox.accepted.connect(SettingsDialog.accept)
@@ -985,5 +984,3 @@ class Ui_SettingsDialog(object):
         self.lst_prefix_label.setText(_translate("SettingsDialog", "lst prefix"))
         self.setti_items.setTabText(self.setti_items.indexOf(self.setti_system), _translate("SettingsDialog", "System"))
         self.setti_items.setTabText(self.setti_items.indexOf(self.setti_shortcuts), _translate("SettingsDialog", "Shortcuts"))
-
-

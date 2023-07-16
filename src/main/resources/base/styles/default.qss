@@ -50,7 +50,7 @@ QMenuBar {
 }
 
 QMenuBar::item {
-    padding: 1px 9px 1px 9px;
+    padding: 2px 12px 2px 12px;
 }
 
 QMenuBar::item:hover {
@@ -87,15 +87,15 @@ QMenu::separator {
 
 QMenu::icon {
     border: 0px;
-    padding: 6px 6px 6px 6px;
+    padding: 4px 4px 4px 4px;
 }
 
 QMenu::indicator {
     border: 2px solid $qc_list_over;
-    width: 8px;
-    height: 8px;
+    width: 12px;
+    height: 12px;
     border-radius: 4px;
-    margin: 6px 6px 6px 6px;
+    margin: 4px 4px 4px 4px;
 }
 
 QMenu::indicator:checked {
@@ -104,7 +104,7 @@ QMenu::indicator:checked {
 }
 
 QMenu::item {
-    padding: 4px 32px 4px 32px;
+    padding: 4px 36px 4px 36px;
 }
 
 QMenu::item:enabled {
@@ -153,13 +153,13 @@ QToolBar {
     background-color: $qc_workarea_over;
     color: $qc_char;
     border: 4px solid $qc_list;
-    spacing: 4px;
+    spacing: 6px;
 }
 
 QToolBar::item {
     background-color: $qc_list_over;
     color: $qc_char_over;
-    padding: px 0px 0px 0px;
+    padding: 0px 0px 0px 0px;
 }
 
 QToolBar::handle {
@@ -175,22 +175,22 @@ QToolButton styles.
 QToolButton {
     background-color: $qc_workarea_over;
     color: $qc_char;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     padding: 3px 3px 3px 3px;
-    border: 1px solid $qc_workarea_over;
+    border: 2px solid $qc_workarea_over;
 }
 
 QToolButton:hover {
     background-color: $qc_list;
     color: $qc_char;
-    border: 1px solid $qc_list;
+    border: 2px solid $qc_list;
 }
 
 QToolButton:pressed {
     background-color: $qc_list;
     color: $qc_char;
-    border: 2px solid $qc_list;
+    border: 4px solid $qc_list;
 }
 
 /*
@@ -260,17 +260,16 @@ QPushButton {
     background-color: $qc_workarea_over;
     color: $qc_char;
     padding: 2px 16px 2px 16px;
-    border: 3px double $qc_list_over;
-    border-radius: 6px;
-    height: 24px;
+    border: 2px solid $qc_list_over;
+    border-radius: 8px;
+    height: 36px;
 }
 
 QPushButton:hover {
     background-color: $qc_list;
     color: $qc_char_over;
     padding: 2px 16px 2px 16px;
-    border: 3px solid $qc_list_over;
-    border-radius: 6px;
+    border: 2px solid $qc_list_over;
 }
 
 QPushButton:pressed {
@@ -285,7 +284,7 @@ QGroupBox styles.
 QGroupBox {
     color: $qc_char_over;
     border: 2px solid $qc_list_selected;
-    border-radius: 4px;
+    border-radius: 6px;
     margin-top: 0.5em;
     padding-top: 0.5em;
 }
@@ -313,10 +312,10 @@ QCheckBox:focus {
 }
 
 QCheckBox::indicator {
-    border: 3px solid $qc_list_over;
-    width: 10px;
-    height: 10px;
-    border-radius: 4px;
+    border: 2px solid $qc_list_over;
+    width: 12px;
+    height: 12px;
+    border-radius: 6px;
 }
 
 QCheckBox::indicator:hover {
@@ -325,7 +324,7 @@ QCheckBox::indicator:hover {
 
 QCheckBox::indicator:checked {
     background-color: $qc_list_selected;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
 }
 
 /*
@@ -349,9 +348,9 @@ QRadioButton:focus {
 }
 
 QRadioButton::indicator {
-    border: 3px solid $qc_list_over;
-    width: 10px;
-    height: 10px;
+    border: 2px solid $qc_list_over;
+    width: 12px;
+    height: 12px;
     border-radius: 8px;
 }
 
@@ -361,7 +360,7 @@ QRadioButton::indicator:hover {
 
 QRadioButton::indicator:checked {
     background-color: $qc_list_selected;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
 }
 
 /*
@@ -519,25 +518,25 @@ QProgressBar styles.
 
 QProgressBar {
     background-color: $qc_list;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_list;
 }
 
 QProgressBar:disabled {
     background-color: $qc_list;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_list;
 }
 
 QProgressBar::chunk {
     background-color: $qc_list_over;
-    border: 3px solid $qc_list;
+    border: 2px solid $qc_list;
     color: $qc_list_over;
 }
 
 QProgressBar::chunk:disabled {
     background-color: $qc_list_over;
-    border: 3px solid $qc_list;
+    border: 2px solid $qc_list;
     color: $qc_list_over;
 }
 
@@ -550,17 +549,23 @@ QSlider {
     color: $qc_char;
 }
 
+QSlider:horizontal {
+    margin: 10px 0px 10px 0px;
+}
+
 QSlider::add-page:horizontal {
     background-color: $qc_list;
+    height: 7px;
 }
 
 QSlider::sub-page:horizontal {
     background-color: $qc_list_over;
+    height: 7px;
 }
 
 QSlider::groove:horizontal {
     background-color: transparent;
-    height:6px;
+    height: 7px;
 }
 
 QSlider::handle:horizontal {
@@ -579,17 +584,23 @@ QSlider::handle:horizontal:disabled {
     background-color: $qc_list;
 }
 
+QSlider:vertical {
+    margin: 0px 10px 0px 10px;
+}
+
 QSlider::add-page:vertical {
     background-color: $qc_list;
+    width: 7px;
 }
 
 QSlider::sub-page:vertical {
     background-color: $qc_list_over;
+    width: 7px;
 }
 
 QSlider::groove:vertical {
-    background-color:transparent;
-    width:6px;
+    background-color: transparent;
+    width: 7px;
 }
 
 QSlider::handle:vertical {
@@ -613,18 +624,18 @@ QSpinBox styles.
 */
 
 QSpinBox {
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char;
 }
 
 QSpinBox:hover {
     background-color: $qc_list;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char_over;
 }
 
 QSpinBox:focus {
-    border: 3px solid $qc_list_selected;
+    border: 2px solid $qc_list_selected;
     color: $qc_char_over;
 }
 
@@ -653,22 +664,22 @@ QDoubleSpinBox styles.
 */
 
 QDoubleSpinBox {
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char;
 }
 
 QDoubleSpinBox:disabled {
-    border: 3px solid $qc_list;
+    border: 2px solid $qc_list;
 }
 
 QDoubleSpinBox:hover {
     background-color: $qc_list;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char_over;
 }
 
 QDoubleSpinBox:focus {
-    border: 3px solid $qc_list_selected;
+    border: 2px solid $qc_list_selected;
     color: $qc_char_over;
 }
 
@@ -697,18 +708,18 @@ QLineEdit styles.
 */
 
 QLineEdit {
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char;
 }
 
 QLineEdit:hover {
     background-color: $qc_list;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char_over;
 }
 
 QLineEdit:focus {
-    border: 3px solid $qc_list_selected;
+    border: 2px solid $qc_list_selected;
     color: $qc_char_over;
 }
 
@@ -717,18 +728,18 @@ QTextEdit styles.
 */
 
 QTextEdit {
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char;
 }
 
 QTextEdit:hover {
     background-color: $qc_list;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char_over;
 }
 
 QTextEdit:focus {
-    border: 3px solid $qc_list_selected;
+    border: 2px solid $qc_list_selected;
     color: $qc_char_over;
 }
 
@@ -737,18 +748,18 @@ QComboBox styles.
 */
 
 QComboBox {
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char;
 }
 
 QComboBox:hover {
     background-color: $qc_list;
-    border: 3px solid $qc_list_over;
+    border: 2px solid $qc_list_over;
     color: $qc_char_over;
 }
 
 QComboBox:focus {
-    border: 3px solid $qc_list_selected;
+    border: 2px solid $qc_list_selected;
     color: $qc_char_over;
 }
 

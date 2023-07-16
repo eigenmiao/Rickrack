@@ -69,7 +69,6 @@ class Ui_BoxDialog(object):
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.Reset)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 5, 0, 1, 4)
-
         self.retranslateUi(BoxDialog)
         self.buttonBox.accepted.connect(BoxDialog.accept)
         self.buttonBox.rejected.connect(BoxDialog.reject)
@@ -81,5 +80,3 @@ class Ui_BoxDialog(object):
         self.name_label.setText(_translate("BoxDialog", "Name:"))
         self.hec_label.setText(_translate("BoxDialog", "Color:"))
         self.index_label.setText(_translate("BoxDialog", "Index:"))
-
-

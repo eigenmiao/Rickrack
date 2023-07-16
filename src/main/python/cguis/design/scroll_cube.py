@@ -21,7 +21,7 @@ class Ui_ScrollCube(object):
         ScrollCube.setBaseSize(QtCore.QSize(0, 0))
         ScrollCube.setWindowTitle("Form")
         self.gridLayout = QtWidgets.QGridLayout(ScrollCube)
-        self.gridLayout.setContentsMargins(10, 10, 10, 10)
+        self.gridLayout.setContentsMargins(9, 0, 9, 0)
         self.gridLayout.setSpacing(8)
         self.gridLayout.setObjectName("gridLayout")
         self.sharp = QtWidgets.QLabel(ScrollCube)
@@ -187,11 +187,8 @@ class Ui_ScrollCube(object):
         self.dp_hsv_v.setObjectName("dp_hsv_v")
         self.gbox_hsv_grid_layout.addWidget(self.dp_hsv_v, 2, 2, 1, 1)
         self.gridLayout.addWidget(self.gbox_hsv, 3, 0, 1, 4)
-
         self.retranslateUi(ScrollCube)
         QtCore.QMetaObject.connectSlotsByName(ScrollCube)
 
     def retranslateUi(self, ScrollCube):
         pass
-
-

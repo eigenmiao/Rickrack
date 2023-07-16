@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.8.27-x2d3s3-pre
+v2.8.35-x3d3s3-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-June 25, 2023
+July 16, 2023
 """
 
 __HELP__ = """
@@ -796,7 +796,7 @@ class Rickrack(object):
                 dirname, basename = None, None
 
         else:
-            dirname, basename = None, None
+            dirname, basename = para_dir(".")
 
         if not dirname or not basename:
             dirname, basename = para_dir(os.path.abspath(os.path.dirname(__file__)))

@@ -17,7 +17,7 @@ Rickrack is a free software, which is distributed in the hope that it will be us
 
 All images, documents and translations in Rickrack [code repository](https://github.com/eigenmiao/Rickrack) are licensed under [Creative Commons Attribution-NonCommercial-ShareAlike License 4.0 (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) unless stating additionally.
 
-Rickrack default uses [LXGW WenKai](https://github.com/lxgw/LxgwWenKai) font for interface display, which is an open-source Chinese font derived from Fontworks' Klee One. This font is open-sourced under [SIL Open Font License 1.1](http://scripts.sil.org/OFL).
+Rickrack default uses [Noto Sans](https://fonts.google.com/noto) font family for interface display. These fonts are open-sourced under [SIL Open Font License 1.1](http://scripts.sil.org/OFL). Rickrack only carries basic fonts. All fonts can be downloaded here: [all fonts](https://fonts.google.com/noto/fonts).
 
 Please visit https://github.com/eigenmiao/Rickrack for more infomation about Rickrack.
 
