@@ -13,7 +13,7 @@ In the age of digital creativity, the color palette has become an indispensable 
 
 Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. What’s more, you can export them into individual files and import them into other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack can run normally on operating systems such as Windows, Linux, and macOS.
 
-[:rocket: v2.8.27 Update Notes](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27)
+[:rocket: v2.8.35 Update Notes](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35)
 
 [:house: Rickrack](https://eigenmiao.com/rickrack)
 
@@ -24,7 +24,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 
 焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。此外，你也可以将色彩组或者色库导出为单独的色彩文档并导入其他软件中（如 Adobe Photoshop、GIMP、Krita、Pencil 2D 以及优动漫 Paint 等）。焰火十二卷可以在 Windows、Linux、macOS 等操作系统上正常运行。
 
-[:rocket: v2.8.27 更新说明](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27)
+[:rocket: v2.8.35 更新说明](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35)
 
 [:house: 焰火十二卷](https://eigenmiao.com/yanhuo)
 
@@ -62,6 +62,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
   * [License for Rickrack](#license-for-rickrack)
   * [License for Required Packages](#license-for-required-packages)
 * [More Information](#more-information)
+* [Contributing](#contributing)
 * [Acknowledgment](#acknowledgment)
 
 # Introduction Translations
@@ -195,7 +196,7 @@ Support the continuous development of Rickrack!
 
 # Installation
 ## Current Release
-The latest preview version is [v2.8.27](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27).
+The latest preview version is [v2.8.35](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35).
 
 ## Install Software
 ### Recommend: Install on Windows 10 or 11 via WinGet tool
@@ -204,7 +205,7 @@ winget install rickrack
 ```
 
 ## Install on other platforms
-Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.27) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.27/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
+Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.35/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 
@@ -277,7 +278,7 @@ pip install rickrack
 rickrack -h
 
 # Run Rickrack.
-rickrack
+rickrack -d .
 ```
 
 ## How to Build the Module
@@ -305,7 +306,7 @@ Rickrack is a free software, which is distributed in the hope that it will be us
 
 All images, documents and translations in Rickrack [code repository](https://github.com/eigenmiao/Rickrack) are licensed under [Creative Commons Attribution-NonCommercial-ShareAlike License 4.0 (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) unless stating additionally.
 
-Rickrack default uses [LXGW WenKai](https://github.com/lxgw/LxgwWenKai) font for interface display, which is an open-source Chinese font derived from Fontworks' Klee One. This font is open-sourced under [SIL Open Font License 1.1](http://scripts.sil.org/OFL).
+Rickrack default uses [Noto Sans](https://fonts.google.com/noto) font family for interface display. These fonts are open-sourced under [SIL Open Font License 1.1](http://scripts.sil.org/OFL). Rickrack only carries basic fonts. All fonts can be downloaded here: [all fonts](https://fonts.google.com/noto/fonts).
 
 ## License for Required Packages
 | Package        | Version  | License          |
@@ -320,7 +321,7 @@ Rickrack default uses [LXGW WenKai](https://github.com/lxgw/LxgwWenKai) font for
 | Pillow         | 8.4.0    | HPND             |
 | pip            | 21.3.1   | MIT              |
 | PyInstaller    | 3.4      | GPLv2 or Later   |
-| PyQt5          | 5.12.1   | GPLv3            |
+| PyQt5          | 5.15.6   | GPLv3            |
 | PyQt5_sip      | 4.19.19  | SIP              |
 | pywin32        | 302      | PSF              |
 | pywin32-ctypes | 0.2.0    | BSD              |
@@ -343,49 +344,15 @@ Rickrack default uses [LXGW WenKai](https://github.com/lxgw/LxgwWenKai) font for
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Contributing
-This project welcomes contributions of all types. If you want to contribute code (new features, or bug fixes) to this project, please contact me first. Thanks.
+Welcome to participate in community discussions, report bugs and submit feature-requests, but it is not recommended to contribute code to this project.
 
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Acknowledgment
-## Reviews
-<table>
-  <tbody>
-    <tr>
-    <td align="center" valign="top" width="20%"><a href="https://www.youtube.com/watch?v=OUnktTCtv3E"><img src="https://yt3.googleusercontent.com/ytc/AGIKgqPSY98ka46AxjcUBDDntl1NHA8lL4PFMZt6g75TFA=s176-c-k-c0x00ffffff-no-rj" width="90px;"/><br /><sub><b>TJ&nbsp;FREE@Youtube</b></sub></a></td>
-    <td align="center" valign="top" width="20%"><a href="https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml"><img src="https://cdnssl.softpedia.com/_img/editors/Robert%20Condorache.jpg?v=2020" width="90px;"/><br /><sub><b>Robert&nbsp;Condorache@Softpedia</b></sub></a></td>
-    <td align="center" valign="top" width="20%"><a href="https://sspai.com/u/eigenmiao/updates"><img src="https://cdn.sspai.com/2023/01/14/eab0a38256bc3a045f8d5bf76dd30072.png?imageMogr2/auto-orient/quality/95/thumbnail/!200x200r/gravity/Center/crop/200x200/interlace/1" width="90px;"/><br /><sub><b>本征喵函数@少数派</b></sub></a></td>
-    </tr>
-  </tbody>
-</table>
-
-## Translators
-<table>
-  <tbody>
-    <tr>
-    <td align="center" valign="top" width="20%"><a href="https://poeditor.com/join/project?hash=kBeQjfxCES"><img src="https://avatars.githubusercontent.com/u/59333735?v=4" width="90px;"/><br /><sub><b>Eigenmiao@POEditor</b></sub></a></td>
-    </tr>
-  </tbody>
-</table>
-
-## Feature Implementation & Bug Fix
-<table>
-  <tbody>
-    <tr>
-    <td align="center" valign="top" width="20%"><a href="https://github.com/eigenmiao"><img src="https://avatars.githubusercontent.com/u/59333735?v=4" width="90px;"/><br /><sub><b>Eigenmiao@Github</b></sub></a></td>
-    </tr>
-  </tbody>
-</table>
+## Reviewers
+[TJ FREE@Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E), [Robert Condorache@Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
 
 ## Software Dependency
-<table>
-  <tbody>
-    <tr>
-    <td align="center" valign="top" width="20%"><a href="https://github.com/eigenmiao"><img src="https://avatars.githubusercontent.com/u/59333735?v=4" width="90px;"/><br /><sub><b>Eigenmiao@Github</b></sub></a></td>
-    <td align="center" valign="top" width="20%"><a href="https://github.com/vedantmgoyal2009"><img src="https://avatars.githubusercontent.com/u/83997633?v=4" width="90px;"/><br /><sub><b>Vedantmgoyal2009@Github</b></sub></a></td>
-    <td align="center" valign="top" width="20%"><a href="https://github.com/apps/dependabot"><img src="https://avatars.githubusercontent.com/in/29110?s=64&v=4" width="90px;"/><br /><sub><b>Dependabot@Github</b></sub></a></td>
-    </tr>
-  </tbody>
-</table>
+[Vedantmgoyal2009@Github](https://github.com/vedantmgoyal2009), [Dependabot@Github](https://github.com/apps/dependabot)
 
 <div align="right"><a href="#rickrack">:arrow_up: Back to Top :arrow_up:</a> <a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>

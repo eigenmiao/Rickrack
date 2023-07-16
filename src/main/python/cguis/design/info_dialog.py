@@ -76,7 +76,6 @@ class Ui_InfoDialog(object):
         self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Apply|QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok|QtWidgets.QDialogButtonBox.Reset)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 6, 0, 1, 4)
-
         self.retranslateUi(InfoDialog)
         self.buttonBox.accepted.connect(InfoDialog.accept)
         self.buttonBox.rejected.connect(InfoDialog.reject)
@@ -89,5 +88,3 @@ class Ui_InfoDialog(object):
         self.rule_label.setText(_translate("InfoDialog", "Rule:"))
         self.time_label.setText(_translate("InfoDialog", "Time:"))
         self.desc_label.setText(_translate("InfoDialog", "Description"))
-
-

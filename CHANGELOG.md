@@ -108,3 +108,18 @@
 23. Update color rule and relation under ryb system.
 24. Optimize data type.
 25. Change default font to LXGW WenKai.
+
+# v2.8.35-x3d3s3
+* Date: July 16, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35
+* Comments:
+1. Update scale factor for 1080p screen.
+2. Change color cube ratio.
+3. Update view icons.
+4. Update translations.
+5. Update button logic.
+6. Fix fcitx input bug on Ubuntu.
+7. Change default font to Noto Sans.
+8. Update interface theme colors.
+9. Upgrade ersion of PyQt5 from 5.12.1 to 5.15.6.
+10. Upgrade version of settings.json from 2 to 3 (x3d3s3).
