@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.8.35-x3d3s3-pre
+v2.8.36-x3d3s3-pre
 """
 
 __AUTHOR__ = """

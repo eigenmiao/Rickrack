@@ -13,7 +13,7 @@ In the age of digital creativity, the color palette has become an indispensable 
 
 Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly color editor. It is designed to generate a set of harmonious colors from the color wheel or other places. You can share these colors with your friends, or apply them into your creative works. What’s more, you can export them into individual files and import them into other softwares such as Adobe Photoshop, GIMP, Krita, Pencil 2D and Clip Studio Paint. Rickrack can run normally on operating systems such as Windows, Linux, and macOS.
 
-[:rocket: v2.8.35 Update Notes](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35)
+[:rocket: v2.8.36 Update Notes](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.36)
 
 [:house: Rickrack](https://eigenmiao.com/rickrack)
 
@@ -24,7 +24,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 
 焰火十二卷（实时色彩工具箱）是一款免费且实用的色彩编辑器。它可以帮助你从色轮或者其他地方生成一组和谐的色彩。你可以将这些色彩分享给其他人，或者应用到你自己的创作当中。此外，你也可以将色彩组或者色库导出为单独的色彩文档并导入其他软件中（如 Adobe Photoshop、GIMP、Krita、Pencil 2D 以及优动漫 Paint 等）。焰火十二卷可以在 Windows、Linux、macOS 等操作系统上正常运行。
 
-[:rocket: v2.8.35 更新说明](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35)
+[:rocket: v2.8.36 更新说明](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.36)
 
 [:house: 焰火十二卷](https://eigenmiao.com/yanhuo)
 
@@ -196,7 +196,7 @@ Support the continuous development of Rickrack!
 
 # Installation
 ## Current Release
-The latest preview version is [v2.8.35](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35).
+The latest preview version is [v2.8.36](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.36).
 
 ## Install Software
 ### Recommend: Install on Windows 10 or 11 via WinGet tool
@@ -205,7 +205,7 @@ winget install rickrack
 ```
 
 ## Install on other platforms
-Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.35) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.35/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
+Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.36) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.36/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 
