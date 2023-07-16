@@ -123,3 +123,10 @@
 8. Update interface theme colors.
 9. Upgrade ersion of PyQt5 from 5.12.1 to 5.15.6.
 10. Upgrade version of settings.json from 2 to 3 (x3d3s3).
+
+# v2.8.36-x3d3s3
+* Date: July 16, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.36
+* Comments:
+1. Update default font family name.
+2. Fix default document directory on Linux.

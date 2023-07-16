@@ -26,8 +26,8 @@ from ricore.check import check_key, check_file_name, check_nonempt_str_lst
 
 class Args(object):
     def __init__(self, resources, resetall=False, uselang=""):
-        self.info_version_zh = "v2.8.35-x3d3s3-预览版"
-        self.info_version_en = "v2.8.35-x3d3s3-pre"
+        self.info_version_zh = "v2.8.36-x3d3s3-预览版"
+        self.info_version_en = "v2.8.36-x3d3s3-pre"
         self.info_date_zh = "2023年7月16日"
         self.info_date_en = "July 16, 2023"
         self.global_temp_dir = None
@@ -101,7 +101,7 @@ class Args(object):
         self.home_dir = os.path.expanduser('~')
         self.doc_name = "Documents"
         self.pic_name = "Pictures"
-        if not os.path.isfile(os.sep.join([self.home_dir, ".config", "user-dirs.dirs"])):
+        if os.path.isfile(os.sep.join([self.home_dir, ".config", "user-dirs.dirs"])):
             try:
                 with open(os.sep.join([self.home_dir, ".config", "user-dirs.dirs"]), "r") as f:
                     data = f.read().split()
@@ -444,7 +444,7 @@ class Args(object):
                 if vid < 3:
                     uss["circle_dist"] = 16
                     uss["font_size"] = 16
-                    uss["font_family"] = ["Noto Sans", ", Noto Sans SC", "Noto Sans TC", "Noto Sans JP"]
+                    uss["font_family"] = ["Noto Sans", "Noto Sans SC", "Noto Sans TC", "Noto Sans JP"]
                 if vid == 0 or vid > 3:
                     self.load_settings_failed = 2
                     self.backup_settings(settings_file)
