@@ -22,7 +22,7 @@ Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
 
 __SVG_FMT__ = """
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg width="100mm" height="100mm" viewBox="0 0 {size} {size}" version="1.1"><g>
+<svg width="{wid}mm" height="{hig}mm" viewBox="0 0 {swid} {shig}" version="1.1"><g>
 {context}
 </g></svg>
 """
@@ -110,19 +110,19 @@ __SVG_FORUM__ = """
 """
 
 __SVG_UP__ = """
-<path d="M11.9997 10.8284L7.04996 15.7782L5.63574 14.364L11.9997 8L18.3637 14.364L16.9495 15.7782L11.9997 10.8284Z" fill="#{forecolor}"></path>
+<path style="fill:none;stroke:#{forecolor};stroke-width:2.4;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:{higopacity};stroke-miterlimit:4;stroke-dasharray:none" d="m 5.6652622,8.3644365 6.3347398,-6.3346739 6.33474,6.3346739" />
 """
 
 __SVG_DOWN__ = """
-<path d="M11.9997 13.1714L16.9495 8.22168L18.3637 9.63589L11.9997 15.9999L5.63574 9.63589L7.04996 8.22168L11.9997 13.1714Z" fill="#{forecolor}"></path>
+<path style="fill:none;stroke:#{forecolor};stroke-width:2.4;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:{higopacity};stroke-miterlimit:4;stroke-dasharray:none" d="m 5.665258,3.6355811 6.33474,6.3346733 6.33474,-6.3346733" />
 """
 
 __SVG_LEFT__ = """
-<path d="M10.8284 12.0007L15.7782 16.9504L14.364 18.3646L8 12.0007L14.364 5.63672L15.7782 7.05093L10.8284 12.0007Z" fill="#{forecolor}"></path>
+<path style="fill:none;stroke:#{forecolor};stroke-width:2.4;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:{higopacity};stroke-miterlimit:4;stroke-dasharray:none" d="m 8.3644365,5.665258 -6.3346739,6.33474 6.3346739,6.33474" />
 """
 
 __SVG_RIGHT__ = """
-<path d="M13.1714 12.0007L8.22168 7.05093L9.63589 5.63672L15.9999 12.0007L9.63589 18.3646L8.22168 16.9504L13.1714 12.0007Z" fill="#{forecolor}"></path>
+<path style="fill:none;stroke:#{forecolor};stroke-width:2.4;stroke-linecap:square;stroke-linejoin:miter;stroke-opacity:{higopacity};stroke-miterlimit:4;stroke-dasharray:none" d="m 3.6355811,5.6652622 6.3346733,6.3347398 -6.3346733,6.33474" />
 """
 
 __SVG_ZOOM_IN__ = """
@@ -143,6 +143,16 @@ __SVG_LAYOUT_L__ = """
 
 __SVG_LAYOUT_R__ = """
 <path d="M3 21C2.44772 21 2 20.5523 2 20V4C2 3.44772 2.44772 3 3 3H21C21.5523 3 22 3.44772 22 4V20C22 20.5523 21.5523 21 21 21H3ZM15 10H4V19H15V10ZM20 10H17V19H20V10ZM20 5H4V8H20V5Z" fill="#{forecolor}"></path>
+"""
+
+__SVG_FLOAT__ = """
+<path style="fill:none;stroke:#{forecolor};stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 1.1759623,6.3462621 V 22.798078 H 17.647324 V 6.3462621 H 1.1759623" />
+<path style="fill:none;stroke:#{forecolor};stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 8.7057274,1.1756913 H 22.824037 V 15.277248" />
+"""
+
+__SVG_CLOSE__ = """
+<path style="fill:none;stroke:#{forecolor};stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 1.169074,1.1686236 22.830926,22.797538" />
+<path style="fill:none;stroke:#{forecolor};stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="M 22.830926,1.1686236 1.169074,22.797538" />
 """
 
 import os
@@ -168,6 +178,12 @@ def get_icon(name, forecolor, backcolor, higopacity, lowopacity, temp_dir, defau
         "home": __SVG_HOME__,
         "update": __SVG_UPDATE__,
         "forum": __SVG_FORUM__,
+        "sel_up": __SVG_UP__,
+        "sel_down": __SVG_DOWN__,
+        "box_up": __SVG_UP__,
+        "box_down": __SVG_DOWN__,
+        "box_left": __SVG_LEFT__,
+        "box_right": __SVG_RIGHT__,
         "up": __SVG_UP__,
         "down": __SVG_DOWN__,
         "left": __SVG_LEFT__,
@@ -177,13 +193,22 @@ def get_icon(name, forecolor, backcolor, higopacity, lowopacity, temp_dir, defau
         "zoom_out": __SVG_ZOOM_OUT__,
         "layout_l": __SVG_LAYOUT_L__,
         "layout_r": __SVG_LAYOUT_R__,
+        "float": __SVG_FLOAT__,
+        "close": __SVG_CLOSE__,
     }
-    size = "24"
+    wid = hig = 100
+    swid = shig = 24
     if name in ("sel_wheel", "sel_image", "sel_board", "sel_depot", "wheel", "image", "board", "depot", "about", "settings",):
-      size = "100"
+        swid = shig = "100"
+    elif name in ("sel_up", "sel_down", "box_up", "box_down", "up", "down"):
+        hig = hig / 2
+        shig = shig / 2
+    elif name in ("box_left", "box_right", "left", "right"):
+        wid = wid / 2
+        swid = swid / 2
     if os.path.isdir(temp_dir) and name in name_dict:
         with open(os.sep.join([temp_dir, "{}.svg".format(name)]), "w") as f:
             context = name_dict[name].format(forecolor=forecolor, backcolor=backcolor, stroke=6, higopacity=higopacity, lowopacity=lowopacity)
-            f.write(__SVG_FMT__.format(context=context, size=size)[1:])
+            f.write(__SVG_FMT__.format(context=context, wid=wid, hig=hig, swid=swid, shig=shig)[1:])
         return QIcon(os.sep.join([temp_dir, "{}.svg".format(name)]))
     return default
