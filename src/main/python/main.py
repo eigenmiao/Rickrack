@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.8.36-x3d3s3-pre
+v2.8.40-x3d3s3-stable
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-July 16, 2023
+July 23, 2023
 """
 
 __HELP__ = """
@@ -1095,6 +1095,14 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             curr_positive_color = Color.hec2rgb(qc_list_selected)
             curr_negative_color = Color.hec2rgb(qc_list)
             curr_wheel_ed_color = Color.hec2rgb(qc_workarea_over)
+            get_icon("box_up", forecolor, backcolor, 0.64, 0.0, self._args.global_temp_dir.path(), app_icon)
+            get_icon("box_down", forecolor, backcolor, 0.64, 0.0, self._args.global_temp_dir.path(), app_icon)
+            get_icon("box_left", forecolor, backcolor, 0.64, 0.0, self._args.global_temp_dir.path(), app_icon)
+            get_icon("box_right", forecolor, backcolor, 0.64, 0.0, self._args.global_temp_dir.path(), app_icon)
+            get_icon("sel_up", qc_list_over, backcolor, 0.64, 0.0, self._args.global_temp_dir.path(), app_icon)
+            get_icon("sel_down", qc_list_over, backcolor, 0.64, 0.0, self._args.global_temp_dir.path(), app_icon)
+            get_icon("float", forecolor, backcolor, 1.0, 0.0, self._args.global_temp_dir.path(), app_icon)
+            get_icon("close", forecolor, backcolor, 1.0, 0.0, self._args.global_temp_dir.path(), app_icon)
             qstyle = qstyle.replace("$qc_workarea_over", "#" + qc_workarea_over)
             qstyle = qstyle.replace("$qc_workarea", "#" + qc_workarea)
             qstyle = qstyle.replace("$qc_char_over", "#" + qc_char_over)
@@ -1102,6 +1110,14 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             qstyle = qstyle.replace("$qc_list_selected", "#" + qc_list_selected)
             qstyle = qstyle.replace("$qc_list_over", "#" + qc_list_over)
             qstyle = qstyle.replace("$qc_list", "#" + qc_list)
+            qstyle = qstyle.replace("$up_arrow", "/".join([self._args.global_temp_dir.path(), "box_up.svg"]))
+            qstyle = qstyle.replace("$down_arrow", "/".join([self._args.global_temp_dir.path(), "box_down.svg"]))
+            qstyle = qstyle.replace("$left_arrow", "/".join([self._args.global_temp_dir.path(), "box_left.svg"]))
+            qstyle = qstyle.replace("$right_arrow", "/".join([self._args.global_temp_dir.path(), "box_right.svg"]))
+            qstyle = qstyle.replace("$sel_up_arrow", "/".join([self._args.global_temp_dir.path(), "sel_up.svg"]))
+            qstyle = qstyle.replace("$sel_down_arrow", "/".join([self._args.global_temp_dir.path(), "sel_down.svg"]))
+            qstyle = qstyle.replace("$float_arrow", "/".join([self._args.global_temp_dir.path(), "float.svg"]))
+            qstyle = qstyle.replace("$close_arrow", "/".join([self._args.global_temp_dir.path(), "close.svg"]))
         if change_pn_colors:
             self._args.modify_settings("positive_color", curr_positive_color)
             self._args.modify_settings("negative_color", curr_negative_color)

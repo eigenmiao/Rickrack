@@ -26,10 +26,10 @@ from ricore.check import check_key, check_file_name, check_nonempt_str_lst
 
 class Args(object):
     def __init__(self, resources, resetall=False, uselang=""):
-        self.info_version_zh = "v2.8.36-x3d3s3-预览版"
-        self.info_version_en = "v2.8.36-x3d3s3-pre"
-        self.info_date_zh = "2023年7月16日"
-        self.info_date_en = "July 16, 2023"
+        self.info_version_zh = "v2.8.40-x3d3s3-稳定版"
+        self.info_version_en = "v2.8.40-x3d3s3-stable"
+        self.info_date_zh = "2023年7月23日"
+        self.info_date_en = "July 23, 2023"
         self.global_temp_dir = None
         self.global_hm_rules = (
             "analogous",
@@ -103,15 +103,29 @@ class Args(object):
         self.pic_name = "Pictures"
         if os.path.isfile(os.sep.join([self.home_dir, ".config", "user-dirs.dirs"])):
             try:
-                with open(os.sep.join([self.home_dir, ".config", "user-dirs.dirs"]), "r") as f:
+                with open(os.sep.join([self.home_dir, ".config", "user-dirs.dirs"]), "r", encoding="utf-8") as f:
                     data = f.read().split()
             except Exception as err:
                 data = []
             for line in data:
-                if "DOCUMENTS" in line:
-                    self.doc_name = line.split("\"")[-2].split("/")[-1]
-                elif "PICTURES" in line:
-                    self.pic_name = line.split("\"")[-2].split("/")[-1]
+                if "DOCUMENTS" in line.upper():
+                    if line.count('"') == 2:
+                        doc_name = line.split('"')[-2].split("/")[-1]
+                        if os.path.isdir(os.sep.join((self.home_dir, doc_name))):
+                            self.doc_name = doc_name
+                    elif line.count("'") == 2:
+                        doc_name = line.split("'")[-2].split("/")[-1]
+                        if os.path.isdir(os.sep.join((self.home_dir, doc_name))):
+                            self.doc_name = doc_name
+                elif "PICTURES" in line.upper():
+                    if line.count('"') == 2:
+                        pic_name = line.split('"')[-2].split("/")[-1]
+                        if os.path.isdir(os.sep.join((self.home_dir, pic_name))):
+                            self.pic_name = pic_name
+                    elif line.count("'") == 2:
+                        pic_name = line.split("'")[-2].split("/")[-1]
+                        if os.path.isdir(os.sep.join((self.home_dir, pic_name))):
+                            self.pic_name = pic_name
         self.usr_store = os.sep.join((self.home_dir, self.doc_name, "Rickrack"))
         self.resources = resources
         self.load_settings_failed = 0

@@ -130,3 +130,10 @@
 * Comments:
 1. Update default font family name.
 2. Fix default document directory on Linux.
+
+# v2.8.40-x3d3s3
+* Date: July 23, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.40
+* Comments:
+1. Fix fcitx5 input bug on Ubuntu (for fcitx5).
+2. Change button icons.
