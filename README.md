@@ -363,7 +363,7 @@ The names are sorted in chronological order. If there is any omission in the nam
 ## Software Dependency Solvers / 软件依赖解决者
 [Vedantmgoyal2009@Github](https://github.com/vedantmgoyal2009), [Dependabot@Github](https://github.com/apps/dependabot)
 
-In addition, thank you to the following communities for providing valuable space to discuss this software.
+In addition, thank you to the following active communities for providing valuable space to discuss this software. / 此外，感谢以下活跃的社区为讨论此软件提供了宝贵的空间。
 
 ## Communities / 社区
 [Github Discussions (Rickrack)](https://github.com/eigenmiao/Rickrack/discussions?discussions_q=), [小众软件](https://www.appinn.com/rickrack/), [PIXLS.US](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/37399), [KRITA-ARTISTS.ORG](https://krita-artists.org/t/alternatives-to-adobe-color-rickrack/60041), [Pencil2D Community](https://discuss.pencil2d.org/t/crafting-a-distinctive-color-palette-for-pencil2d-enthusiasts/7210), [百度贴吧（clipstudiopaint吧）](https://tieba.baidu.com/p/8411736675), [百度贴吧（绘画吧）](https://tieba.baidu.com/p/8253007907)
