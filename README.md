@@ -302,7 +302,7 @@ Copyright (c) 2019-2023 [Eigenmiao](mailto:eigenmiao@outlook.com). All Rights Re
 
 # License
 ## License for Rickrack
-Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the [GNU General Public License 3.0 (GPL 3.0)](https://www.gnu.org/licenses/) for more details.
+Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the [GNU General Public License 3.0 (GPLv3)](https://www.gnu.org/licenses/) for more details.
 
 All images, documents and translations in Rickrack [code repository](https://github.com/eigenmiao/Rickrack) are licensed under [Creative Commons Attribution-NonCommercial-ShareAlike License 4.0 (CC BY-NC-SA 4.0)](https://creativecommons.org/licenses/by-nc-sa/4.0/) unless stating additionally.
 
@@ -337,6 +337,7 @@ Rickrack default uses [Noto Sans](https://fonts.google.com/noto) font family for
 * The socket server is designed for obtaining colors from the Rickrack software in real-time. By default, this server is disabled and can only be started from the command line.
 * Rickrack is written in [Python](https://www.python.org/), constructed based on [PyQt5](https://www.qt.io/qt-for-python) and packed up by [fbs (free edition)](https://build-system.fman.io/).
 * The code repository of Rickrack is deposited on [Github](https://github.com/eigenmiao/Rickrack) and [Gitee](https://gitee.com/eigenmiao/Rickrack).
+* Some icons in the Rickrack software come from the [REMIX ICON](https://remixicon.cn/). These icons can be used for free in non-commercial software.
 * The localization (l10n) and internationalization (i18n) of Rickrack is based on [Google Translate](https://translate.google.cn/) and [Microsoft Translator](https://cn.bing.com/translator), deployed on [POEditor](https://poeditor.com/join/project?hash=kBeQjfxCES).
 * The cover image uses images from [Pixabay, which is created by martynaszulist](https://pixabay.com/zh/photos/pattern-the-palette-web-1508277/).
 * In some demo animations, [images of Ghibli](https://www.ghibli.jp/info/013409/) were used.
@@ -348,7 +349,7 @@ Welcome to participate in community discussions, report bugs and submit feature-
 
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
-# Acknowledgment / 致谢
+# Acknowledgment
 Thank you to everyone who likes this software. Thank you to the following personnel for their unique insights and suggestions for improving the software. / 感谢所有喜欢这个软件的人。感谢以下人员为改进软件提供的独特见解和建议。
 
 The names are sorted in chronological order. If there is any omission in the name, please do not hesitate to point it out. / 名称按时间顺序排列。名称若有遗漏，请不吝指出。
@@ -357,11 +358,14 @@ The names are sorted in chronological order. If there is any omission in the nam
 [TJ FREE@Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E), [Robert Condorache@Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
 
 ## Testers / 测试者
-[VIctoryRoad@小众软件](https://meta.appinn.net/t/topic/43556/22), [yazii@小众软件](https://meta.appinn.net/t/topic/43556/18), [Betty@小众软件](https://meta.appinn.net/t/topic/43556/11), 
-
-[In addition, a user on PIXLS.US also conducted a detailed test of the software, but the website is currently unable to connect (503 error). I will add the link after the website is restored.](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/)
+[VIctoryRoad@小众软件](https://meta.appinn.net/t/topic/43556/22), [yazii@小众软件](https://meta.appinn.net/t/topic/43556/18), [Betty@小众软件](https://meta.appinn.net/t/topic/43556/11), [Soupy@PIXLS.US](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/37399/6)
 
 ## Software Dependency Solvers / 软件依赖解决者
 [Vedantmgoyal2009@Github](https://github.com/vedantmgoyal2009), [Dependabot@Github](https://github.com/apps/dependabot)
+
+In addition, thank you to the following communities for providing valuable space to discuss this software.
+
+## Communities / 社区
+[Github Discussions (Rickrack)](https://github.com/eigenmiao/Rickrack/discussions?discussions_q=), [小众软件](https://www.appinn.com/rickrack/), [PIXLS.US](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/37399), [KRITA-ARTISTS.ORG](https://krita-artists.org/t/alternatives-to-adobe-color-rickrack/60041), [Pencil2D Community](https://discuss.pencil2d.org/t/crafting-a-distinctive-color-palette-for-pencil2d-enthusiasts/7210), [百度贴吧（clipstudiopaint吧）](https://tieba.baidu.com/p/8411736675), [百度贴吧（绘画吧）](https://tieba.baidu.com/p/8253007907)
 
 <div align="right"><a href="#rickrack">:arrow_up: Back to Top :arrow_up:</a> <a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
