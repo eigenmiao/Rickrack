@@ -1,5 +1,5 @@
 <div align="center">
-<img width="100%" align="center" src="src/main/icons/logo_long.png" alt="Rickrack">
+<img width="100%" align="center" src="src/main/icons/logo_long_en.png" alt="Rickrack">
 <br/><br/>
 Rickrack<br/>焰火十二卷<br/> ----- ----- ----- ----- ----- ----- ----- ----- <br/>
 Generate Harmonious Colors Freely.<br/>自由自在生成和谐色彩。
@@ -177,9 +177,15 @@ Rickrack has several features:
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Reviews about Rickrack
-> All in all, Rickrack is a comprehensive tool for anything that requires color work. Experienced users have an exhaustive toolset to work with, while a more casual audience can improve the presentation of their art by quickly getting color synergy ideas. -- [Robert Condorache @ Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
+> All in all, Rickrack is a comprehensive tool for anything that requires color work. Experienced users have an exhaustive toolset to work with, while a more casual audience can improve the presentation of their art by quickly getting color synergy ideas. -- [Robert Condorache @ Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/Rickrack.shtml)
 
 > Rickrack is an easy to use desktop app for creating and saving color palettes. It supports many major color palette formats for import and export, and is a great tool for generating color palettes of colors that go well together. -- [TJ FREE @ Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E)
+
+> With the Rickrack app you get a smart and extensively usable tool for creating color palettes free of charge. ... I find Rickrack to be a very well thought out and practical app. -- [Sir Apfelot @ sir-apfelot.de](https://www.sir-apfelot.de/en/5-app-recommendations-in-march-2023-49820/)
+
+> 焰火十二卷是一款免费开源的调色板软件。它提供了多种功能来生成一组调和色彩，可以为你提供更好的色彩搭配方案。 -- [蚁工厂 @ 微博](https://weibo.com/2194035935/NbMH54olg)
+
+> 焰火十二卷，画画人的调色板软件。 -- [戦场原礼亜 @ 微博](https://weibo.com/2782339740/NcqUmxxiT)
 
 > ... and more!
 
@@ -360,10 +366,10 @@ Welcome to participate in community discussions, report bugs and submit feature-
 # Acknowledgment
 Thank you to everyone who likes this software. Thank you to the following personnel for their unique insights and suggestions for improving the software. / 感谢所有喜欢这个软件的人。感谢以下人员为改进软件提供的独特见解和建议。
 
-The names are sorted in chronological order. If there is any omission in the name, please do not hesitate to point it out. / 名称按时间顺序排列。名称若有遗漏，请不吝指出。
+**The names are sorted in chronological order.** If there is any omission in the name, please do not hesitate to point it out. / **名称按时间顺序排列。** 名称若有遗漏，请不吝指出。
 
 ## Reviewers / 评论者
-[TJ FREE@Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E), [Robert Condorache@Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
+[戦场原礼亜@微博](https://weibo.com/2782339740/NcqUmxxiT), [蚁工厂@微博](https://weibo.com/2194035935/NbMH54olg), [业余の玩家@哔哩哔哩](https://www.bilibili.com/video/BV18M4y1W7X8), [Appfuns@网易订阅](https://www.163.com/dy/article/IAR1M5DM0511ETFJ.html), [Sir Apfelot@sir-apfelot.de](https://www.sir-apfelot.de/en/5-app-recommendations-in-march-2023-49820/), [TJ FREE@Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E), [Robert Condorache@Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
 
 ## Testers / 测试者
 [VIctoryRoad@小众软件](https://meta.appinn.net/t/topic/43556/22), [yazii@小众软件](https://meta.appinn.net/t/topic/43556/18), [Betty@小众软件](https://meta.appinn.net/t/topic/43556/11), [Soupy@PIXLS.US](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/37399/6)
@@ -374,6 +380,9 @@ The names are sorted in chronological order. If there is any omission in the nam
 In addition, thank you to the following active communities for providing valuable space to discuss this software. / 此外，感谢以下活跃的社区为讨论此软件提供了宝贵的空间。
 
 ## Communities / 社区
-[Github Discussions (Rickrack)](https://github.com/eigenmiao/Rickrack/discussions?discussions_q=), [小众软件](https://www.appinn.com/rickrack/), [PIXLS.US](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/37399), [KRITA-ARTISTS.ORG](https://krita-artists.org/t/alternatives-to-adobe-color-rickrack/60041), [Pencil2D Community](https://discuss.pencil2d.org/t/crafting-a-distinctive-color-palette-for-pencil2d-enthusiasts/7210), [百度贴吧（clipstudiopaint吧）](https://tieba.baidu.com/p/8411736675), [百度贴吧（绘画吧）](https://tieba.baidu.com/p/8253007907)
+[Github Discussions (Rickrack)](https://github.com/eigenmiao/Rickrack/discussions?discussions_q=), [小众软件](https://meta.appinn.net/t/topic/43556), [PIXLS.US](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/37399), [KRITA-ARTISTS.ORG](https://krita-artists.org/t/alternatives-to-adobe-color-rickrack/60041), [Pencil2D Community](https://discuss.pencil2d.org/t/crafting-a-distinctive-color-palette-for-pencil2d-enthusiasts/7210), [百度贴吧（clipstudiopaint吧）](https://tieba.baidu.com/p/8411736675), [百度贴吧（绘画吧）](https://tieba.baidu.com/p/8253007907)
+
+## Websites / 网站
+[科技爱好者周刊（第 264 期）](https://www.ruanyifeng.com/blog/2023/07/weekly-issue-264.html), [小众软件](https://www.appinn.com/rickrack/), [Product Hunt](https://www.producthunt.com/products/rickrack-color-editor), [AlternativeTo](https://alternativeto.net/software/rickrack/about/), [OSCHINA](https://www.oschina.net/p/haworthia-the-firework), [SourceForge](https://sourceforge.net/projects/rickrack/), [Awesome Open Source](https://awesomeopensource.com/project/eigenmiao/Rickrack), [PyPI](https://pypi.org/project/Rickrack/), [Gitee](https://gitee.com/eigenmiao/Rickrack), [Github](https://github.com/eigenmiao/Rickrack)
 
 <div align="right"><a href="#rickrack">:arrow_up: Back to Top :arrow_up:</a> <a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
