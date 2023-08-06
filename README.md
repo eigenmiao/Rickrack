@@ -359,30 +359,13 @@ Rickrack default uses [Noto Sans](https://fonts.google.com/noto) font family for
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Contributing
-Welcome to participate in community discussions, report bugs and submit feature-requests, but it is not recommended to contribute code to this project.
+Welcome to participate in community discussions, report bugs and submit feature-requests. / 欢迎参与社区讨论、报告错误和提交功能请求。
 
 <div align="right"><a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
 
 # Acknowledgment
-Thank you to everyone who likes this software. Thank you to the following personnel for their unique insights and suggestions for improving the software. / 感谢所有喜欢这个软件的人。感谢以下人员为改进软件提供的独特见解和建议。
+Thank you to everyone who likes this software. / 感谢所有喜欢这个软件的人。
 
-**The names are sorted in chronological order.** If there is any omission in the name, please do not hesitate to point it out. / **名称按时间顺序排列。** 名称若有遗漏，请不吝指出。
-
-## Reviewers / 评论者
-[戦场原礼亜@微博](https://weibo.com/2782339740/NcqUmxxiT), [蚁工厂@微博](https://weibo.com/2194035935/NbMH54olg), [业余の玩家@哔哩哔哩](https://www.bilibili.com/video/BV18M4y1W7X8), [Appfuns@网易订阅](https://www.163.com/dy/article/IAR1M5DM0511ETFJ.html), [Sir Apfelot@sir-apfelot.de](https://www.sir-apfelot.de/en/5-app-recommendations-in-march-2023-49820/), [TJ FREE@Youtube](https://www.youtube.com/watch?v=OUnktTCtv3E), [Robert Condorache@Softpedia](https://www.softpedia.com/get/Multimedia/Graphic/Graphic-Others/RickRack.shtml)
-
-## Testers / 测试者
-[VIctoryRoad@小众软件](https://meta.appinn.net/t/topic/43556/22), [yazii@小众软件](https://meta.appinn.net/t/topic/43556/18), [Betty@小众软件](https://meta.appinn.net/t/topic/43556/11), [Soupy@PIXLS.US](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/37399/6)
-
-## Software Dependency Solvers / 软件依赖解决者
-[Vedantmgoyal2009@Github](https://github.com/vedantmgoyal2009), [Dependabot@Github](https://github.com/apps/dependabot)
-
-In addition, thank you to the following active communities for providing valuable space to discuss this software. / 此外，感谢以下活跃的社区为讨论此软件提供了宝贵的空间。
-
-## Communities / 社区
-[Github Discussions (Rickrack)](https://github.com/eigenmiao/Rickrack/discussions?discussions_q=), [小众软件](https://meta.appinn.net/t/topic/43556), [PIXLS.US](https://discuss.pixls.us/t/crafting-distinctive-color-palettes-for-gimp-enthusiasts/37399), [KRITA-ARTISTS.ORG](https://krita-artists.org/t/alternatives-to-adobe-color-rickrack/60041), [Pencil2D Community](https://discuss.pencil2d.org/t/crafting-a-distinctive-color-palette-for-pencil2d-enthusiasts/7210), [百度贴吧（clipstudiopaint吧）](https://tieba.baidu.com/p/8411736675), [百度贴吧（绘画吧）](https://tieba.baidu.com/p/8253007907)
-
-## Websites / 网站
-[科技爱好者周刊（第 264 期）](https://www.ruanyifeng.com/blog/2023/07/weekly-issue-264.html), [小众软件](https://www.appinn.com/rickrack/), [Product Hunt](https://www.producthunt.com/products/rickrack-color-editor), [AlternativeTo](https://alternativeto.net/software/rickrack/about/), [OSCHINA](https://www.oschina.net/p/haworthia-the-firework), [SourceForge](https://sourceforge.net/projects/rickrack/), [Awesome Open Source](https://awesomeopensource.com/project/eigenmiao/Rickrack), [PyPI](https://pypi.org/project/Rickrack/), [Gitee](https://gitee.com/eigenmiao/Rickrack), [Github](https://github.com/eigenmiao/Rickrack)
+Thank you to all communities and websites that have provided valuable space for discussing and showcasing this software. / 感谢所有为讨论和展示此软件提供了宝贵空间的社区和网站。
 
 <div align="right"><a href="#rickrack">:arrow_up: Back to Top :arrow_up:</a> <a href="#table-of-content">:arrow_up: Back to TOC  :arrow_up:</a></div>
