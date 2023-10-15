@@ -17,7 +17,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 <img width="60%" src="demo/04_videos/play_en.png" alt="..." />
 </a></div>
 
-[:rocket: v2.8.40 Update Notes](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.40)
+[:rocket: v2.8.41 Update Notes](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.41)
 
 [:house: Rickrack](https://eigenmiao.com/rickrack)
 
@@ -32,7 +32,7 @@ Rickrack (**R**e**a**l-t**i**me **C**olor **K**it) is a free and user-friendly c
 <img width="60%" src="demo/04_videos/play_zh.png" alt="..." />
 </a></div>
 
-[:rocket: v2.8.40 更新说明](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.40)
+[:rocket: v2.8.41 更新说明](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.41)
 
 [:house: 焰火十二卷](https://eigenmiao.com/yanhuo)
 
@@ -210,7 +210,7 @@ Support the continuous development of Rickrack!
 
 # Installation
 ## Current Release
-The latest preview version is [v2.8.40](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.40).
+The latest preview version is [v2.8.41](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.41).
 
 ## Install Software
 ### Recommend: Install on Windows 10 or 11 via WinGet tool
@@ -219,7 +219,7 @@ winget install rickrack
 ```
 
 ## Install on other platforms
-Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.40) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.40/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
+Download Software from [Github](https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.41) or [Sourceforge](https://sourceforge.net/projects/rickrack/files/v2.8.41/). The installation steps are presented in [tutorials](https://eigenmiao.com/2021/12/12/rickrack-tutorial-en-v2.3.4/#Installation).
 
 Here is a [video tutorial](https://www.bilibili.com/video/BV17r4y1L7R6/).
 

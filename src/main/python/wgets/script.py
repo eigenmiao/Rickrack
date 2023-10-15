@@ -19,6 +19,10 @@ from wgets.general import SlideText
 
 
 class Script(QWidget):
+    """
+    Script object based on QWidget. Init a script in script.
+    """
+
     ps_filter = pyqtSignal(tuple)
     ps_crop = pyqtSignal(bool)
     ps_freeze = pyqtSignal(bool)
@@ -26,6 +30,10 @@ class Script(QWidget):
     ps_extract = pyqtSignal(int)
 
     def __init__(self, wget, args):
+        """
+        Init operation.
+        """
+
         super().__init__(wget)
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self._args = args
@@ -53,9 +61,11 @@ class Script(QWidget):
         gbox_grid_layout.setVerticalSpacing(12)
         scroll_grid_layout.addWidget(self._filter_gbox, 1, 1, 1, 1)
         self._filter_btns = []
+
         for i in range(10):
             btn = QPushButton(self._filter_gbox)
             self._filter_btns.append(btn)
+
         gbox_grid_layout.addWidget(self._filter_btns[0], 0, 1, 1, 1)
         self._filter_btns[0].clicked.connect(lambda x: self.ps_filter.emit(("BLUR", None)))
         gbox_grid_layout.addWidget(self._filter_btns[1], 1, 1, 1, 1)
@@ -143,9 +153,11 @@ class Script(QWidget):
         gbox_grid_layout.setVerticalSpacing(12)
         scroll_grid_layout.addWidget(self._extract_gbox, 0, 1, 1, 1)
         self._extract_btns = []
+
         for i in range(6):
             btn = QPushButton(self._extract_gbox)
             self._extract_btns.append(btn)
+
         gbox_grid_layout.addWidget(self._extract_btns[0], 0, 1, 1, 1)
         self._extract_btns[0].clicked.connect(lambda x: self.ps_extract.emit(0))
         gbox_grid_layout.addWidget(self._extract_btns[1], 1, 1, 1, 1)
@@ -170,17 +182,25 @@ class Script(QWidget):
         return QSize(250, 145)
 
     def update_zoom(self):
+        """
+        Update zoom region.
+        """
+
         if self.sdt_zoom.get_value() == 1.0:
             self.btn_zoom.setText(self._zoom_descs[1])
+
         elif self.sdt_zoom.get_value() < 1.0:
             self.btn_zoom.setText(self._zoom_descs[2])
+
         else:
             self.btn_zoom.setText(self._zoom_descs[3])
 
     def update_text(self):
         self._filter_gbox.setTitle(self._gbox_descs[0])
+
         for i in range(10):
             self._filter_btns[i].setText(self._filter_descs[i])
+
         self._zoom_gbox.setTitle(self._gbox_descs[1])
         self.sdt_zoom.set_text(self._zoom_descs[0])
         self.update_zoom()
@@ -191,6 +211,7 @@ class Script(QWidget):
         self.btn_freeze.setText(self._snap_descs[0])
         self.btn_print.setText(self._snap_descs[1])
         self._extract_gbox.setTitle(self._gbox_descs[4])
+
         for i in range(6):
             self._extract_btns[i].setText(self._extract_descs[i])
 
@@ -203,6 +224,7 @@ class Script(QWidget):
             _translate("Script", "Snap"),
             _translate("Script", "Extract"),
         )
+
         self._extract_descs = (
             _translate("Script", "Bright Colorful"),
             _translate("Script", "Light Colorful"),
@@ -211,6 +233,7 @@ class Script(QWidget):
             _translate("Script", "Light"),
             _translate("Script", "Dark"),
         )
+
         self._filter_descs = (
             _translate("Script", "Blur"),
             _translate("Script", "Contour"),
@@ -223,17 +246,21 @@ class Script(QWidget):
             _translate("Script", "Smooth"),
             _translate("Script", "Smooth More"),
         )
+
         self._zoom_descs = (
             _translate("Script", "Ratio - "),
             _translate("Script", "Zoom"),
             _translate("Script", "Zoom In"),
             _translate("Script", "Zoom Out"),
         )
+
         self._crop_descs = (
             _translate("Script", "Crop"),
             _translate("Script", "Cancel"),
         )
+
         self._snap_descs = (
             _translate("Script", "Freeze Image"),
             _translate("Script", "Save Image"),
         )
+

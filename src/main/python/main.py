@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.8.40-x3d3s3-stable
+v2.8.41-x3d3s3-stable
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-July 23, 2023
+October 15, 2023
 """
 
 __HELP__ = """
@@ -173,7 +173,15 @@ from wgets.splash import DPSplash
 
 
 class Rickrack(QMainWindow, Ui_MainWindow):
+    """
+    Rickrack main window framework.
+    """
+
     def __init__(self, resources, sys_argv):
+        """
+        Init main window.
+        """
+
         super().__init__()
         self.setupUi(self)
         self.setAttribute(Qt.WA_AcceptTouchEvents)
@@ -184,8 +192,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._args.global_temp_dir = QTemporaryDir()
         try:
             geo_args = QSettings(self._args.geometry_args, QSettings.IniFormat)
+
         except Exception as err:
             geo_args = None
+
         self._geo_args = geo_args
         self._save_settings_before_close = True
         self._connected_keymaps = {}
@@ -262,25 +272,32 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._install_translator()
         self._wget_wheel.setFocus()
         self._load_last_work()
+
         if self._sys_argv["input"]:
             if self._sys_argv["input"].split(".")[-1].lower() in ("png", "bmp", "jpg", "jpeg", "tif", "tiff", "webp"):
                 self._switch_to_image()
                 self._wget_image.open_image(self._sys_argv["input"])
+
             else:
                 try:
                     with open(self._sys_argv["input"], "r", encoding="utf-8") as f:
                         color_dict = json.load(f)
+
                 except Exception as err:
                     color_dict = None
+
                 if isinstance(color_dict, dict) and "type" in color_dict:
                     if color_dict["type"] == "depot":
                         self._switch_to_depot()
                         self._wget_operation.dp_open(color_dict, direct_dict=True, dp_path=os.path.dirname(os.path.abspath(self._sys_argv["input"])))
+
                     elif color_dict["type"] == "set":
                         self._wget_operation.dp_import(color_dict, direct_dict=True)
+
         if self._args.load_settings_failed:
             self._wget_operation.warning(self._wget_operation.main_errs[self._args.load_settings_failed - 1])
-        self._default_state = self.saveState()
+
+        self._default_state = QByteArray.fromBase64(bytes(self._args.default_layout, 'ascii')) if self._args.default_layout else self.saveState()
         self._default_size = self.size()
         self._change_layout()
         self._setup_geometry()
@@ -293,6 +310,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self.actionMode.setChecked(self.mode_dock_widget.isVisible())
         self.actionTransformation.setChecked(self.transformation_dock_widget.isVisible())
         self.actionResult.setChecked(self.result_dock_widget.isVisible())
+
         if self._sys_argv["window"] >= 0:
             self.rule_dock_widget.setVisible(bool(self._sys_argv["window"] // 2 // 2 // 2 // 2 // 2 // 2 % 2))
             self.channel_dock_widget.setVisible(bool(self._sys_argv["window"] // 2 // 2 // 2 // 2 // 2 % 2))
@@ -301,10 +319,12 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self.mode_dock_widget.setVisible(bool(self._sys_argv["window"] // 2 // 2 % 2))
             self.transformation_dock_widget.setVisible(bool(self._sys_argv["window"] // 2 % 2))
             self.result_dock_widget.setVisible(bool(self._sys_argv["window"] % 2))
+
         if os.path.isdir(os.sep.join((resources, "fonts"))):
             for font in os.listdir(os.sep.join((resources, "fonts"))):
                 if font.split(".")[-1].lower() in ("ttf", "otf"):
                     QFontDatabase.addApplicationFont(os.sep.join((resources, "fonts", font)))
+
         self._wheel_icon = None
         self._image_icon = None
         self._board_icon = None
@@ -319,15 +339,23 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._setup_history()
 
     def _setup_geometry(self):
+        """
+        Keep window visiable when screen count changed.
+        """
+
         scr_count = QApplication.desktop().screenCount()
+
         if scr_count >= 0:
             cur_geometry = self.geometry()
             cur_in_window = False
+
             for sc_idx in range(scr_count):
                 scr_geometry = QApplication.desktop().availableGeometry(sc_idx)
+
                 if scr_geometry.x() < cur_geometry.x() < scr_geometry.x() + scr_geometry.width() and scr_geometry.y() < cur_geometry.y() < scr_geometry.y() + scr_geometry.height():
                     cur_in_window = True
                     break
+
             if not cur_in_window:
                 scr_geometry = QApplication.desktop().availableGeometry(0)
                 new_x = (scr_geometry.width() - cur_geometry.width()) / 2
@@ -337,33 +365,62 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 self.setGeometry(new_x, new_y, cur_geometry.width(), cur_geometry.height())
 
     def _setup_workarea(self):
+        """
+        Setup workarea (wheel, image or depot).
+        """
+
         def _wheel_status(value):
+            """
+            Show information about wheel behavior in statusbar.
+            """
+
             color_sign = self._color_descs[value[0]] + self._color_descs[value[1] + 10]
             self.statusbar.showMessage(self._status_descs[4].format(color_sign))
 
         def _image_status(value):
+            """
+            Show information about image behavior in statusbar.
+            """
+
             if len(value) == 2:
                 self.statusbar.showMessage(self._status_descs[1].format(*value))
+
             elif len(value) == 4:
                 self.statusbar.showMessage(self._status_descs[2].format(*value))
+
             else:
                 color_sign = self._color_descs[value[4][0]] + self._color_descs[value[4][1] + 10]
                 self.statusbar.showMessage(self._status_descs[5].format(*value[:4], color_sign))
 
         def _board_status(value):
+            """
+            Show information about board behavior in statusbar.
+            """
+
             if value[0] == 0:
                     self.statusbar.showMessage(self._status_descs[8].format(value[1], value[2], value[3], value[4] + 1))
+
             elif value[0] == 1:
                 self.statusbar.showMessage(self._status_descs[7].format(value[1]))
+
             else:
                 self.statusbar.showMessage(self._status_descs[6])
 
         def _depot_status(value):
+            """
+            Show information about depot behavior in statusbar.
+            """
+
             self.statusbar.showMessage(self._status_descs[3].format(*value))
 
         def _transfer_image(value):
+            """
+            Transfer image from board to image view.
+            """
+
             self._switch_to_image()
             self._wget_image.open_image(value, direct=True)
+
         central_widget_grid_layout = QGridLayout(self.central_widget)
         central_widget_grid_layout.setContentsMargins(2, 2, 2, 2)
         self._wget_wheel = Wheel(self.central_widget, self._args)
@@ -387,6 +444,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_board.ps_assit_pt_changed.connect(self._wget_wheel.change_assit_point)
 
     def _setup_result(self):
+        """
+        Setup result (cube).
+        """
+
         result_grid_layout = QGridLayout(self.result_dock_contents)
         result_grid_layout.setContentsMargins(2, 2, 2, 2)
         self._wget_cube_table = CubeTable(self.result_dock_contents, self._args)
@@ -405,6 +466,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_depot.ps_linked.connect(lambda x: self._wget_cube_table.update_all())
 
     def _setup_history(self):
+        """
+        Setup history.
+        """
+
         self._wget_wheel.ps_history_backup.connect(self._inner_backup)
         self._wget_image.ps_history_backup.connect(self._inner_backup)
         self._wget_board.ps_history_backup.connect(self._inner_backup)
@@ -418,6 +483,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_depot.ps_undo.connect(self._inner_undo_or_redo)
 
     def _setup_toolbar(self):
+        """
+        Setup toolbar.
+        """
+
         self.toolbar.addAction(self.actionWheel)
         self.toolbar.addAction(self.actionImage)
         self.toolbar.addAction(self.actionBoard)
@@ -429,6 +498,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self.toolbar.addAction(self.actionAbout)
 
     def _setup_rule(self):
+        """
+        Setup rule.
+        """
+
         rule_grid_layout = QGridLayout(self.rule_dock_contents)
         rule_grid_layout.setContentsMargins(2, 2, 2, 2)
         self._wget_rule = Rule(self.rule_dock_contents, self._args)
@@ -437,6 +510,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_image.ps_modify_rule.connect(lambda x: self._wget_rule.update_rule())
 
     def _setup_mode(self):
+        """
+        Setup mode.
+        """
+
         mode_grid_layout = QGridLayout(self.mode_dock_contents)
         mode_grid_layout.setContentsMargins(2, 2, 2, 2)
         self._wget_mode = Mode(self.mode_dock_contents, self._args)
@@ -451,6 +528,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_board.setMouseTracking(bool(self._args.show_info_pts[2]))
 
     def _setup_operation(self):
+        """
+        Setup operation.
+        """
+
         operation_grid_layout = QGridLayout(self.operation_dock_contents)
         operation_grid_layout.setContentsMargins(2, 2, 2, 2)
         self._wget_operation = Operation(self.operation_dock_contents, self._args)
@@ -460,39 +541,55 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             if self._curr_view_idx == 0:
                 if value == 0:
                     self._wget_wheel.insert_assit_point((15 * np.random.random() + 15) * np.random.choice([1,-1]), 0.3 * np.random.random() - 0.15, 0)
+
                 if value == 1:
                     self._ins_create()
+
                 elif value == 2:
                     self._wget_wheel.reset_assit_point()
+
                 elif value == 3:
                     self._switch_to_board()
+
             elif self._curr_view_idx == 1:
                 if value == 0:
                     self._ins_open_image()
+
                 elif value == 1:
                     self._ins_save_image()
+
                 elif value == 2:
                     self._ins_locate()
+
                 elif value == 3:
                     self._switch_to_board()
+
             elif self._curr_view_idx == 2:
                 if value == 0:
                     self._ins_save_image()
+
                 elif value == 1:
                     self._wget_board.clear_or_gen_grid_list()
+
                 elif value == 2:
                     self._wget_board.clear_or_gen_assit_color_list()
+
                 elif value == 3:
                     self._wget_board.reset_locations()
+
             elif self._curr_view_idx == 3:
                 if value == 0:
                     self._wget_depot.import_set()
+
                 if value == 1:
                     self._ins_attach()
+
                 elif value == 2:
                     self._wget_depot.export_set()
+
                 elif value == 3:
                     self._wget_depot.detail_set()
+
             self._inner_backup()
         self._wget_operation.ps_functn.connect(_functn)
         self._wget_operation.ps_update.connect(lambda x: self._wget_cube_table.update_color())
@@ -511,6 +608,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_operation.show_import_export()
 
     def _setup_script(self):
+        """
+        Setup script.
+        """
+
         script_grid_layout = QGridLayout(self.script_dock_contents)
         script_grid_layout.setContentsMargins(2, 2, 2, 2)
         self._wget_script = Script(self.script_dock_contents, self._args)
@@ -524,6 +625,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_script.ps_extract.connect(self._wget_image.extract_image)
 
     def _setup_channel(self):
+        """
+        Setup channel.
+        """
+
         channel_grid_layout = QGridLayout(self.channel_dock_contents)
         channel_grid_layout.setContentsMargins(2, 2, 2, 2)
         self._wget_channel = Channel(self.channel_dock_contents, self._args)
@@ -533,6 +638,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_image.ps_recover_channel.connect(lambda x: self._wget_channel.recover())
 
     def _setup_transformation(self):
+        """
+        Setup transformation.
+        """
+
         transformation_grid_layout = QGridLayout(self.transformation_dock_contents)
         transformation_grid_layout.setContentsMargins(2, 2, 2, 2)
         self._wget_transformation = Transformation(self.transformation_dock_contents, self._args)
@@ -550,6 +659,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_transformation.ps_enhance.connect(self._wget_image.enhance_image)
 
     def _setup_settings(self):
+        """
+        Setup settings.
+        """
+
         self._wget_settings = Settings(self, self._args)
         self._wget_settings.ps_rule_changed.connect(self._wget_cube_table.modify_rule)
         self._wget_settings.ps_lang_changed.connect(self._install_translator)
@@ -560,6 +673,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_settings.ps_theme_changed.connect(lambda x: self._setup_interface_style(change_pn_colors=x))
 
     def _setup_server(self):
+        """
+        Start server if port exist.
+        """
+
         if self._sys_argv["port"]:
             self._server = ResultServer(self._args, port=self._sys_argv["port"])
             self._server.ps_iset.connect(lambda x: self._inner_import((x, False)))
@@ -571,28 +688,42 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self._server.ps_star.connect(self._choice_dialog.showup)
             self._server.ps_exit.connect(lambda x: self.close_with_verify() if x else self.close_without_save())
             self._server.start()
+
         else:
             self._server = None
             self._choice_dialog = None
 
     def _translate_server(self):
+        """
+        Update server translations.
+        """
+
         if self._sys_argv["port"] and self._choice_dialog:
             self._choice_dialog._func_tr_()
             self._choice_dialog.update_text()
 
     def _update_info_args(self):
+        """
+        Update interface info pts.
+        """
+
         curr_wget = None
+
         if self._wget_wheel.isVisible():
             curr_wget = self._wget_wheel
             idx = 0
+
         elif self._wget_image.isVisible():
             curr_wget = self._wget_image
             idx = 1
+
         elif self._wget_board.isVisible():
             curr_wget = self._wget_board
             idx = 2
+
         else:
             return
+
         value = self._wget_mode.get_info()
         self._args.show_info_pts[idx] = value
         self._wget_wheel.setMouseTracking(bool(self._args.show_info_pts[0]))
@@ -600,131 +731,194 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_board.setMouseTracking(bool(self._args.show_info_pts[2]))
 
     def _update_info_cbox(self, view_idx=None):
+        """
+        Update interface info pts.
+        """
+
         idx = 0
+
         if self._wget_image.isVisible():
             idx = 1
+
         elif self._wget_board.isVisible():
             idx = 2
+
         value = self._args.show_info_pts[idx]
         self._wget_mode.update_info(value in (1, 3), value > 1)
 
     def _change_layout(self, layout_src=""):
+        """
+        Change layout.
+        """
+
         if isinstance(layout_src, str) and self._args.geometry_args:
             main_win_layout = 0
             main_win_state = self._geo_args.value('main_win_state', None)
             main_win_geometry = self._geo_args.value('main_win_geometry', None)
+
         elif isinstance(layout_src, int):
             main_win_layout = layout_src
             main_win_state = QByteArray.fromBase64(bytes(self._args.layouts[layout_src], 'ascii'))
             main_win_geometry = None
+
         else:
-            main_win_layout = 0
+            main_win_layout = 5 if self._args.default_layout else 0
             main_win_state = self._default_state
             main_win_geometry = None
             self.resize(self._default_size)
+
         if main_win_state:
             try:
                 self.restoreState(main_win_state)
+
             except Exception as err:
                 pass
+
         if main_win_geometry:
             try:
                 self.restoreGeometry(main_win_geometry)
+
             except Exception as err:
                 pass
 
     def _load_last_work(self):
+        """
+        Recovery the work quit last time.
+        """
+
         if self._sys_argv["temporary"]:
             return
+
         if self._args.store_loc:
             store_path = self._args.resources
+
         else:
             store_path = self._args.usr_store
+
         if not os.path.isdir(os.sep.join((store_path, "MyColors"))):
             os.makedirs(os.sep.join((store_path, "MyColors")))
+
         if os.path.isfile(os.sep.join((store_path, "depot.json"))) and self._sys_argv["reset"] not in ("depot", "work", "all"):
             self._wget_operation.dp_open(os.sep.join((store_path, "depot.json")))
+
         if os.path.isfile(os.sep.join((store_path, "set.json"))) and self._sys_argv["reset"] not in ("set", "work", "all"):
             self._wget_operation.dp_import(os.sep.join((store_path, "set.json")))
 
     def _inner_backup(self, accept=True):
+        """
+        Backup in history.
+        """
+
         self._history.backup()
         self._wget_cube_table.update_color()
 
     def _inner_undo_or_redo(self, undo=True):
+        """
+        Undo or redo in history.
+        """
+
         self._args.sys_activated_assit_idx = -1
+
         if undo:
             self._history.undo()
             self._wget_rule.update_rule()
             self._wget_cube_table.update_color()
+
         else:
             self._history.redo()
             self._wget_rule.update_rule()
             self._wget_cube_table.update_color()
 
     def _inner_modify_color(self, idx, color):
+        """
+        Modify color in color set by idx and color.
+        """
+
         if idx and idx in range(5):
             self._args.sys_activated_idx = int(idx)
             self._args.sys_activated_assit_idx = -1
+
         fmt_color = Color(color, tp="hsv", overflow=self._args.sys_color_set.get_overflow())
         self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, fmt_color)
         self._wget_cube_table.update_color()
         self._wget_cube_table.update_index()
 
     def _switch_to_wheel(self):
+        """
+        For connection in _setup_operation with create sign.
+        """
+
         self._curr_view_idx = 0
+
         if self._sel_wheel_icon:
             self.actionWheel.setIcon(self._sel_wheel_icon)
             self.actionImage.setIcon(self._image_icon)
             self.actionBoard.setIcon(self._board_icon)
             self.actionDepot.setIcon(self._depot_icon)
+
         self._wget_operation.update_functn_text(0)
+
         if self._wget_wheel.isVisible():
             self._inner_all_show_or_hide_current()
+
         self._wget_wheel.show()
         self._wget_image.hide()
         self._wget_board.hide()
         self._wget_board.hide_detail()
         self._wget_depot.hide()
         self._wget_depot.hide_detail()
-        # self.statusbar.showMessage(self._status_descs[0])
         self._update_info_cbox(0)
         self._wget_operation.show_import_export()
         self._wget_wheel.init_key()
         self._wget_wheel.setFocus()
 
     def _switch_to_image(self):
+        """
+        For connection in _setup_operation with locate sign.
+        """
+
         self._curr_view_idx = 1
+
         if self._sel_image_icon:
             self.actionWheel.setIcon(self._wheel_icon)
             self.actionImage.setIcon(self._sel_image_icon)
             self.actionBoard.setIcon(self._board_icon)
             self.actionDepot.setIcon(self._depot_icon)
+
         self._wget_operation.update_functn_text(1)
+
         if self._wget_image.isVisible():
             self._inner_all_show_or_hide_current()
+
         self._wget_image.show()
         self._wget_wheel.hide()
         self._wget_board.hide()
         self._wget_board.hide_detail()
         self._wget_depot.hide()
         self._wget_depot.hide_detail()
-        # self.statusbar.showMessage(self._status_descs[0])
         self._update_info_cbox(1)
         self._wget_operation.show_import_export()
         self._wget_image.init_key()
         self._wget_image.setFocus()
 
     def _switch_to_board(self):
+        """
+        For connection in _setup_operation with derive sign.
+        """
+
         self._curr_view_idx = 2
+
         if self._sel_board_icon:
             self.actionWheel.setIcon(self._wheel_icon)
             self.actionImage.setIcon(self._image_icon)
             self.actionBoard.setIcon(self._sel_board_icon)
             self.actionDepot.setIcon(self._depot_icon)
+
         self._wget_operation.update_functn_text(2)
+
         if self._wget_board.isVisible():
             self._inner_all_show_or_hide_current()
+
         self._wget_board.show()
         self._wget_wheel.hide()
         self._wget_image.hide()
@@ -736,59 +930,101 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_board.setFocus()
 
     def _switch_to_depot(self):
+        """
+        For connection in _setup_operation with attach sign.
+        """
+
         self._curr_view_idx = 3
+
         if self._sel_depot_icon:
             self.actionWheel.setIcon(self._wheel_icon)
             self.actionImage.setIcon(self._image_icon)
             self.actionBoard.setIcon(self._board_icon)
             self.actionDepot.setIcon(self._sel_depot_icon)
+
         self._wget_operation.update_functn_text(3)
+
         if self._wget_depot.isVisible():
             self._inner_all_show_or_hide_current()
+
         self._wget_depot.show()
         self._wget_wheel.hide()
         self._wget_image.hide()
         self._wget_board.hide()
         self._wget_board.hide_detail()
-        # self.statusbar.showMessage(self._status_descs[0])
         self._wget_operation.show_open_and_save()
         self._wget_depot.init_key()
         self._wget_depot.setFocus()
 
     def _ins_create(self):
+        """
+        Create a set of colors from wheel immediately.
+        """
+
         if not self._wget_wheel.isVisible():
             self._switch_to_wheel()
+
         self._wget_cube_table.create_set(direct=True)
 
     def _ins_open_image(self):
+        """
+        Locate a set of colors from image immediately.
+        """
+
         if not self._wget_image.isVisible():
             self._switch_to_image()
+
         self._wget_image.open_image_dialog()
 
     def _ins_save_image(self):
+        """
+        Locate a set of colors from image immediately.
+        """
+
         if self._wget_image.isVisible():
             self._wget_image.save_image()
+
         elif self._wget_board.isVisible():
             self._wget_board.save_image()
 
     def _ins_locate(self):
+        """
+        Locate a set of colors from image immediately.
+        """
+
         if not self._wget_image.isVisible():
             self._switch_to_image()
+
         if not self._wget_image.image3c.display:
             self._ins_open_image()
+
         self._wget_image.extract_image(0)
 
     def _ins_derive(self):
+        """
+        Derive a set of colors from board immediately.
+        """
+
         if not self._wget_board.isVisible():
             self._switch_to_board()
+
         self._wget_board.reset_locations()
 
     def _ins_attach(self):
+        """
+        Attach a set of colors into depot immediately.
+        """
+
         if not self._wget_depot.isVisible():
             self._switch_to_depot()
+
         self._wget_depot.attach_set()
 
     def _inner_update(self):
+        """
+        Update setable wgets.
+        """
+
         self._args.sys_color_set.set_overflow(self._args.overflow)
         self._args.sys_color_set.set_hsv_ranges(self._args.h_range, self._args.s_range, self._args.v_range)
         self._wget_wheel.update()
@@ -803,15 +1039,24 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self.update()
 
     def _inner_show_or_hide(self, wget):
+        """
+        Change hidden wget to shown state and change shown wget to hidden state.
+        """
+
         def _func_():
             if wget.isVisible():
                 wget.hide()
+
             else:
                 wget.show()
-            # self.statusbar.showMessage(self._status_descs[0])
+
         return _func_
 
     def _inner_all_show_or_hide(self):
+        """
+        Change all hidden wget to shown state and change shown wget to hidden state.
+        """
+
         if self.rule_dock_widget.isVisible() and self.channel_dock_widget.isVisible() and self.operation_dock_widget.isVisible() and self.script_dock_widget.isVisible() and self.mode_dock_widget.isVisible() and self.transformation_dock_widget.isVisible() and self.result_dock_widget.isVisible():
             self.rule_dock_widget.hide()
             self.channel_dock_widget.hide()
@@ -820,6 +1065,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self.mode_dock_widget.hide()
             self.transformation_dock_widget.hide()
             self.result_dock_widget.hide()
+
         else:
             self.rule_dock_widget.show()
             self.channel_dock_widget.show()
@@ -828,9 +1074,12 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self.mode_dock_widget.show()
             self.transformation_dock_widget.show()
             self.result_dock_widget.show()
-        # self.statusbar.showMessage(self._status_descs[0])
 
     def _inner_all_show_or_hide_current(self):
+        """
+        Change all hidden current dock wget.
+        """
+
         curr_docks = (
             self.rule_dock_widget.isVisible(),
             self.channel_dock_widget.isVisible(),
@@ -840,6 +1089,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self.transformation_dock_widget.isVisible(),
             self.result_dock_widget.isVisible(),
         )
+
         if True in curr_docks:
             self.rule_dock_widget.hide()
             self.channel_dock_widget.hide()
@@ -849,6 +1099,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self.transformation_dock_widget.hide()
             self.result_dock_widget.hide()
             self._curr_docks = curr_docks
+
         else:
             if True in self._curr_docks:
                 self.rule_dock_widget.setVisible(self._curr_docks[0])
@@ -858,6 +1109,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 self.mode_dock_widget.setVisible(self._curr_docks[4])
                 self.transformation_dock_widget.setVisible(self._curr_docks[5])
                 self.result_dock_widget.setVisible(self._curr_docks[6])
+
             else:
                 self.rule_dock_widget.show()
                 self.channel_dock_widget.show()
@@ -868,25 +1120,43 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 self.result_dock_widget.show()
 
     def _inner_open(self, depot_file):
+        """
+        Open a depot file.
+        """
+
         self._wget_operation.dp_open(depot_file[0], direct_dict=depot_file[1])
         self.update()
 
     def _inner_import(self, set_file):
+        """
+        Import a set file.
+        """
+
         self._wget_operation.dp_import(set_file[0], direct_dict=set_file[1])
         self.update()
 
     def _inner_append(self, set_file):
+        """
+        Append a set file.
+        """
+
         color_list = self._wget_operation.dp_import(set_file[0], direct_dict=set_file[1], return_set=True)
+
         if color_list:
             self._wget_depot.attach_set(color_list=color_list)
-        # self.update()
 
     def _install_translator(self):
+        """
+        Translate Rickrack interface.
+        """
+
         self._app.removeTranslator(self._tr)
+
         if self._args.lang != "default":
             lang = os.sep.join((self._args.resources, "langs", self._args.lang))
             self._tr.load(lang)
             self._app.installTranslator(self._tr)
+
         self._func_tr_()
         self._wget_wheel._func_tr_()
         self._wget_image._func_tr_()
@@ -912,43 +1182,59 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_script.update_text()
         self._wget_settings.update_text()
         self._translate_server()
+
         if self._args.lang[:2].lower() in ("zh", "ja", "ko"):
             main_info = "焰火十二卷 {}".format("-".join((self._args.info_version_zh.split("-")[0], self._args.info_version_zh.split("-")[2])))
+
             if self._sys_argv["port"]:
                 port_info = "端口：{}".format(self._sys_argv["port"])
                 main_info = self._info_descs[12].format(main_info, port_info)
+
         else:
             main_info = "Rickrack {}".format("-".join((self._args.info_version_en.split("-")[0], self._args.info_version_en.split("-")[2])))
+
             if self._sys_argv["port"]:
                 port_info = "Port: {}".format(self._sys_argv["port"])
                 main_info = self._info_descs[12].format(main_info, port_info)
+
         self.setWindowTitle(main_info)
         self.setStatusTip(self._status_descs[0])
         self.update()
 
     def _setup_interface_style(self, change_pn_colors=True):
+        """
+        Setup theme.
+        """
+
         curr_positive_color = ( 80,  80,  80)
         curr_negative_color = (245, 245, 245)
         curr_wheel_ed_color = (255, 255, 255)
         app_icon = QIcon()
         app_icon.addPixmap(QPixmap(":/images/images/icon_128.png"), QIcon.Normal, QIcon.Off)
+
         if self._args.style_id == 0:
             qstyle = ""
+
         else:
             qss_file = os.sep.join((self._args.resources, "styles", "default.qss"))
+
             if os.path.isfile(qss_file):
                 try:
                     with open(qss_file, encoding="utf-8") as qf:
                         qstyle = qf.read()
+
                 except Exception as err:
                     qstyle = ""
+
             else:
                 qstyle = ""
+
             ffmy = ", ".join(["\"{}\"".format(ff) for ff in self._args.font_family])
             ffmy = ffmy if ffmy else "\"\""
             qstyle = qstyle.replace("$qc_font_family", ffmy)
             qstyle = qstyle.replace("$qc_font_weight", str(self._args.font_weight * 100))
             qstyle = qstyle.replace("$qc_font_size", str(self._args.font_size) + "px")
+
             if self._args.style_id in (1, 2):
                 qc_char = Color.hsv2hec((0, 0, 0.1))
                 qc_char_over = Color.hsv2hec((0, 0, 0.0))
@@ -960,6 +1246,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 qc_list_selected = Color.hsv2hec((gen_h, gen_s, 0.35))
                 qc_workarea = Color.hsv2hec((gen_h, gen_s, gen_v))
                 qc_workarea_over = Color.hsv2hec((gen_h, gen_s, gen_v - 0.05))
+
             elif self._args.style_id in (3, 4):
                 qc_char = Color.hsv2hec((0, 0, 0.9))
                 qc_char_over = Color.hsv2hec((0, 0, 1.0))
@@ -968,16 +1255,20 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 gen_v = 0.4 - (self._args.style_id - 3) * 0.25
                 qc_list = Color.hsv2hec((gen_h, gen_s, gen_v + 0.08))
                 qc_list_over = Color.hsv2hec((gen_h, gen_s, gen_v + 0.24))
-                qc_list_selected = Color.hsv2hec((gen_h, gen_s, 1.0))
+                qc_list_selected = Color.hsv2hec((gen_h, gen_s, 0.9))
                 qc_workarea = Color.hsv2hec((gen_h, gen_s, gen_v))
                 qc_workarea_over = Color.hsv2hec((gen_h, gen_s, gen_v + 0.1))
+
             elif self._args.style_id in (5, 6, 7, 8, 9, 10):
                 qc_char = Color.hsv2hec((0, 0, 0.1))
                 qc_char_over = Color.hsv2hec((0, 0, 0.0))
+
                 if self._args.style_id % 2 == 1:
                     gen_h = (self._args.style_id - 5) * 60.0 + 25.0
+
                 else:
                     gen_h = (self._args.style_id - 5) * 60.0 - 5.0
+
                 gen_s = 0.05
                 gen_v = 1.0
                 qc_list = Color.hsv2hec((gen_h + 10.0, gen_s + 0.24, gen_v - 0.02))
@@ -985,13 +1276,17 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 qc_list_selected = Color.hsv2hec((gen_h - 30.0, gen_s + 0.42, 0.90))
                 qc_workarea = "FFFFFF"
                 qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s + 0.1, gen_v - 0.01))
+
             elif self._args.style_id in (11, 12, 13, 14, 15, 16):
                 qc_char = Color.hsv2hec((0, 0, 0.9))
                 qc_char_over = Color.hsv2hec((0, 0, 1.0))
+
                 if self._args.style_id % 2 == 1:
                     gen_h = (self._args.style_id - 11) * 60.0 + 25.0
+
                 else:
                     gen_h = (self._args.style_id - 11) * 60.0 - 5.0
+
                 gen_s = 1.0
                 gen_v = 0.05
                 qc_list = Color.hsv2hec((gen_h + 10.0, gen_s - 0.24, gen_v + 0.16))
@@ -999,6 +1294,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 qc_list_selected = Color.hsv2hec((gen_h - 30.0, gen_s - 0.32, 0.64))
                 qc_workarea = "000000"
                 qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s - 0.1, gen_v + 0.06))
+
             if self._args.bakgd_id in (1, 2):
                 qc_char = Color.hsv2hec((0, 0, 0.1))
                 qc_char_over = Color.hsv2hec((0, 0, 0.0))
@@ -1008,6 +1304,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 qc_list = Color.hsv2hec((gen_h, gen_s, gen_v - 0.08))
                 qc_workarea = Color.hsv2hec((gen_h, gen_s, gen_v))
                 qc_workarea_over = Color.hsv2hec((gen_h, gen_s, gen_v - 0.05))
+
             elif self._args.bakgd_id in (3, 4):
                 qc_char = Color.hsv2hec((0, 0, 0.9))
                 qc_char_over = Color.hsv2hec((0, 0, 1.0))
@@ -1017,38 +1314,49 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 qc_list = Color.hsv2hec((gen_h, gen_s, gen_v + 0.08))
                 qc_workarea = Color.hsv2hec((gen_h, gen_s, gen_v))
                 qc_workarea_over = Color.hsv2hec((gen_h, gen_s, gen_v + 0.1))
+
             elif self._args.bakgd_id in (5, 6, 7, 8, 9, 10):
                 qc_char = Color.hsv2hec((0, 0, 0.1))
                 qc_char_over = Color.hsv2hec((0, 0, 0.0))
+
                 if self._args.bakgd_id % 2 == 1:
                     gen_h = (self._args.bakgd_id - 5) * 60.0 + 25.0
+
                 else:
                     gen_h = (self._args.bakgd_id - 5) * 60.0 - 5.0
+
                 gen_s = 0.05
                 gen_v = 1.0
                 qc_list = Color.hsv2hec((gen_h + 10.0, gen_s + 0.24, gen_v - 0.02))
                 qc_workarea = "FFFFFF"
                 qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s + 0.1, gen_v - 0.01))
+
             elif self._args.bakgd_id in (11, 12, 13, 14, 15, 16):
                 qc_char = Color.hsv2hec((0, 0, 0.9))
                 qc_char_over = Color.hsv2hec((0, 0, 1.0))
+
                 if self._args.bakgd_id % 2 == 1:
                     gen_h = (self._args.bakgd_id - 11) * 60.0 + 25.0
+
                 else:
                     gen_h = (self._args.bakgd_id - 11) * 60.0 - 5.0
+
                 gen_s = 1.0
                 gen_v = 0.05
                 qc_list = Color.hsv2hec((gen_h + 10.0, gen_s - 0.24, gen_v + 0.24))
                 qc_workarea = "000000"
                 qc_workarea_over = Color.hsv2hec((gen_h + 5.0, gen_s - 0.1, gen_v + 0.06))
+
             if self._args.style_id < 5:
                 forecolor = qc_list_selected
                 backcolor = qc_list_selected
                 curropc = 0.6
+
             else:
                 forecolor = qc_list_selected
                 backcolor = qc_list_over
                 curropc = 1.0
+
             self._sel_wheel_icon = get_icon("wheel", forecolor, backcolor, curropc, 0.0, self._args.global_temp_dir.path(), app_icon)
             self._sel_image_icon = get_icon("image", forecolor, backcolor, curropc, 0.0, self._args.global_temp_dir.path(), app_icon)
             self._sel_board_icon = get_icon("board", forecolor, backcolor, curropc, 0.0, self._args.global_temp_dir.path(), app_icon)
@@ -1089,10 +1397,20 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self.actionInspired_R.setIcon(layout_r)
             self.actionSpecific_R.setIcon(layout_r)
             self.actionConcise_R.setIcon(layout_r)
+
             for btn_idx in range(7):
                 name = ("up", "down", "left", "right", "reset", "zoom_in", "zoom_out")[btn_idx]
                 self._wget_transformation.move_btns[btn_idx].setIcon(get_icon(name, forecolor, backcolor, 1.0, 0.0, self._args.global_temp_dir.path(), app_icon))
-            curr_positive_color = Color.hec2rgb(qc_list_selected)
+
+            if self._args.style_id in (1, 2):
+                curr_positive_color = (0, 0, 0)
+
+            elif self._args.style_id in (3, 4):
+                curr_positive_color = (255, 255, 255)
+
+            else:
+                curr_positive_color = Color.hec2rgb(qc_list_selected)
+
             curr_negative_color = Color.hec2rgb(qc_list)
             curr_wheel_ed_color = Color.hec2rgb(qc_workarea_over)
             get_icon("box_up", forecolor, backcolor, 0.64, 0.0, self._args.global_temp_dir.path(), app_icon)
@@ -1118,35 +1436,48 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             qstyle = qstyle.replace("$sel_down_arrow", "/".join([self._args.global_temp_dir.path(), "sel_down.svg"]))
             qstyle = qstyle.replace("$float_arrow", "/".join([self._args.global_temp_dir.path(), "float.svg"]))
             qstyle = qstyle.replace("$close_arrow", "/".join([self._args.global_temp_dir.path(), "close.svg"]))
+
         if change_pn_colors:
             self._args.modify_settings("positive_color", curr_positive_color)
             self._args.modify_settings("negative_color", curr_negative_color)
             self._args.modify_settings("wheel_ed_color", curr_wheel_ed_color)
             self._wget_settings.setup_colors()
+
         self._app.setStyleSheet(qstyle)
         self._wget_image.init_icon()
 
     def _show_about(self):
+        """
+        Show Rickrack information.
+        """
+
         if self._args.lang[:2].lower() in ("zh", "ja", "ko"):
             info = "焰火十二卷（调色板软件）"
+
         else:
             info = "Rickrack (Color Palette Generator)"
+
         info = "<h2>{}</h2><hr/><p style='line-height:150%;'>".format(info)
+
         if self._args.lang[:2].lower() in ("zh", "ja", "ko"):
             info += self._info_descs[1].format(self._args.info_version_zh) + "<br/>"
             info += self._info_descs[2].format(self._args.info_author_zh) + "<br/>"
             info += self._info_descs[3].format(self._args.info_date_zh) + "<br/>"
+
         else:
             info += self._info_descs[1].format(self._args.info_version_en) + "<br/>"
             info += self._info_descs[2].format(self._args.info_author_en) + "<br/>"
             info += self._info_descs[3].format(self._args.info_date_en) + "<br/>"
+
         info += self._info_descs[4] # + "<br/>"
         info += "</p><hr/><p style='line-height:130%;'>"
         info += self._info_descs[5] + "<br/>"
         info += self._info_descs[10] + "<br/>"
         info += self._info_descs[8].format(QT_VERSION_STR, PYQT_VERSION_STR) # + "<br/>"
+
         if self._args.lang[:2].lower() not in ("zh", "en"):
             info += "<br/>" + self._info_descs[13]
+
         info += "</p>"
         info = "<html><body>{}</body></html>".format(info)
         box = QMessageBox(self)
@@ -1174,97 +1505,148 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         box.exec_()
 
     def _chg_win_on_top(self):
+        """
+        Change the on top hint state of window.
+        """
+
         self._args.win_on_top = not self._args.win_on_top
         self.setWindowFlag(Qt.WindowStaysOnTopHint, on=self._args.win_on_top)
+
         if not self.isVisible():
             self.show()
 
     def close_with_verify(self):
+        """
+        If info window of board or depot is not closed, than close info window instead of main window.
+        """
+
         if self._wget_board.hide_detail() or self._wget_depot.hide_detail():
             return
+
         if self._wget_image.cancel_croping_or_locating():
             return
+
         if self._wget_settings.isVisible():
             self._wget_settings.hide()
             return
+
         self._save_settings_before_close = True
         self.close()
 
     def close_without_save(self):
+        """
+        Close the main window without saving settings.
+        """
+
         self._save_settings_before_close = False
         self.close()
 
     def rename(self, source, target):
+        """
+        Delete target if it exist.
+        """
+
         if os.path.isfile(target):
             os.remove(target)
+
         os.rename(source, target)
 
     def save_main_settings(self):
+        """
+        Save settings before closing the main window.
+        """
+
         if self._args.store_loc:
             store_path = self._args.resources
+
         else:
             store_path = self._args.usr_store
+
         if not os.path.isdir(os.sep.join((store_path, "History", "Depots"))):
             os.makedirs(os.sep.join((store_path, "History", "Depots")))
+
         if os.path.isfile(os.sep.join((store_path, "depot.temp"))):
             os.remove(os.sep.join((store_path, "depot.temp")))
+
         self._wget_operation.dp_save(os.sep.join((store_path, "depot.temp")), True)
+
         if os.path.isfile(os.sep.join((store_path, "depot.temp"))):
             if self._args.max_history_files and os.path.isfile(os.sep.join((store_path, "depot.json"))):
                 json_hash = ""
                 temp_hash = ""
                 with open(os.sep.join((store_path, "depot.json")), "rb") as frp:
                     json_hash = hashlib.md5(frp.read()).hexdigest()
+
                 with open(os.sep.join((store_path, "depot.temp")), "rb") as frp:
                     temp_hash = hashlib.md5(frp.read()).hexdigest()
+
                 if json_hash != temp_hash or (not json_hash) or (not temp_hash):
                     for backup_file in os.listdir(os.sep.join((store_path, "History", "Depots"))):
                         if os.path.isfile(os.sep.join((store_path, "History", "Depots", backup_file))):
                             if backup_file[:6] == "depot_" and backup_file[-13:] == "_bak_{:0>3d}.json".format(self._args.max_history_files - 1):
                                 os.remove(os.sep.join((store_path, "History", "Depots", backup_file)))
                                 continue
+
                             for i in range(self._args.max_history_files - 1):
                                 if os.path.isfile(os.sep.join((store_path, "History", "Depots", backup_file))) and backup_file[:6] == "depot_" and backup_file[-13:] == "_bak_{:0>3d}.json".format(i):
                                     self.rename(os.sep.join((store_path, "History", "Depots", backup_file)), os.sep.join((store_path, "History", "Depots", backup_file[:-13] + "_bak_{:0>3d}.json".format(i + 1))))
+
                     self.rename(os.sep.join((store_path, "depot.json")), os.sep.join((store_path, "History", "Depots", "depot_{}_bak_000.json".format(time.strftime("%Y%m%d_%H%M%S", time.localtime())))))
                     self.rename(os.sep.join((store_path, "depot.temp")), os.sep.join((store_path, "depot.json")))
+
             else:
                 self.rename(os.sep.join((store_path, "depot.temp")), os.sep.join((store_path, "depot.json")))
+
         if not os.path.isdir(os.sep.join((store_path, "History", "Sets"))):
             os.makedirs(os.sep.join((store_path, "History", "Sets")))
+
         if os.path.isfile(os.sep.join((store_path, "set.temp"))):
             os.remove(os.sep.join((store_path, "set.temp")))
+
         self._wget_operation.dp_export(os.sep.join((store_path, "set.temp")), True)
+
         if os.path.isfile(os.sep.join((store_path, "set.temp"))):
             if self._args.max_history_files and os.path.isfile(os.sep.join((store_path, "set.json"))):
                 json_hash = ""
                 temp_hash = ""
                 with open(os.sep.join((store_path, "set.json")), "rb") as frp:
                     json_hash = hashlib.md5(frp.read()).hexdigest()
+
                 with open(os.sep.join((store_path, "set.temp")), "rb") as frp:
                     temp_hash = hashlib.md5(frp.read()).hexdigest()
+
                 if json_hash != temp_hash or (not json_hash) or (not temp_hash):
                     for backup_file in os.listdir(os.sep.join((store_path, "History", "Sets"))):
                         if os.path.isfile(os.sep.join((store_path, "History", "Sets", backup_file))):
                             if backup_file[:4] == "set_" and backup_file[-13:] == "_bak_{:0>3d}.json".format(self._args.max_history_files - 1):
                                 os.remove(os.sep.join((store_path, "History", "Sets", backup_file)))
                                 continue
+
                             for i in range(self._args.max_history_files - 1):
                                 if os.path.isfile(os.sep.join((store_path, "History", "Sets", backup_file))) and backup_file[:4] == "set_" and backup_file[-13:] == "_bak_{:0>3d}.json".format(i):
                                     self.rename(os.sep.join((store_path, "History", "Sets", backup_file)), os.sep.join((store_path, "History", "Sets", backup_file[:-13] + "_bak_{:0>3d}.json".format(i + 1))))
+
                     self.rename(os.sep.join((store_path, "set.json")), os.sep.join((store_path, "History", "Sets", "set_{}_bak_000.json".format(time.strftime("%Y%m%d_%H%M%S", time.localtime())))))
                     self.rename(os.sep.join((store_path, "set.temp")), os.sep.join((store_path, "set.json")))
+
             else:
                 self.rename(os.sep.join((store_path, "set.temp")), os.sep.join((store_path, "set.json")))
+
         for backup_file in os.listdir(store_path):
             if os.path.isfile(os.sep.join((store_path, backup_file))) and backup_file[-5:] == ".temp":
                 os.remove(os.sep.join((store_path, backup_file)))
+
         if self._args.geometry_args:
             self._geo_args.setValue('main_win_state', self.saveState())
             self._geo_args.setValue('main_win_geometry', self.saveGeometry())
+
         self._args.save_settings()
 
     def _setup_skey(self):
+        """
+        Set main window shortcuts.
+        """
+
         self.actionHomepage.setShortcuts(self._args.shortcut_keymaps[0])
         self.actionUpdate.setShortcuts(self._args.shortcut_keymaps[1])
         self.actionAbout.setShortcuts(self._args.shortcut_keymaps[2])
@@ -1283,158 +1665,215 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self.actionDepot.setShortcuts(self._args.shortcut_keymaps[55])
         self.actionSettings.setShortcuts(self._args.shortcut_keymaps[3])
         self.actionAll.setShortcuts(self._args.shortcut_keymaps[49])
+
         for skey in self._args.shortcut_keymaps[4]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self.close_with_verify)
+
         for skey in self._args.shortcut_keymaps[5]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self.close_without_save)
+
         for skey in self._args.shortcut_keymaps[14]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_cube_table.clipboard_act("rgb"))
+
         for skey in self._args.shortcut_keymaps[15]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_cube_table.clipboard_act("hsv"))
+
         for skey in self._args.shortcut_keymaps[16]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_cube_table.clipboard_act("hec"))
+
         for skey in self._args.shortcut_keymaps[17]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_wheel.clipboard_all("rgb"))
+
         for skey in self._args.shortcut_keymaps[18]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_wheel.clipboard_all("hsv"))
+
         for skey in self._args.shortcut_keymaps[19]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_wheel.clipboard_all("hec"))
+
         for actv_idx, skey_idx in zip(range(5), (25, 24, 23, 26, 27)):
             for skey in self._args.shortcut_keymaps[skey_idx]:
                 if skey in self._connected_keymaps:
                     shortcut = self._connected_keymaps[skey]
                     shortcut.disconnect()
+
                 else:
                     shortcut = QShortcut(QKeySequence(skey), self)
                     self._connected_keymaps[skey] = shortcut
+
                 shortcut.activated.connect(self._wget_cube_table.active_by_num(actv_idx))
+
         for skey in self._args.shortcut_keymaps[28]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_transformation.move_up)
+
         for skey in self._args.shortcut_keymaps[29]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_transformation.move_down)
+
         for skey in self._args.shortcut_keymaps[30]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_transformation.move_left)
+
         for skey in self._args.shortcut_keymaps[31]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_transformation.move_right)
+
         for skey in self._args.shortcut_keymaps[34]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_transformation.reset_home)
+
         for skey in self._args.shortcut_keymaps[32]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_transformation.zoom_in)
+
         for skey in self._args.shortcut_keymaps[33]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._wget_transformation.zoom_out)
+
         for skey in self._args.shortcut_keymaps[48]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(self._chg_win_on_top)
+
         for skey in self._args.shortcut_keymaps[47]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(lambda: self._inner_undo_or_redo(True))
+
         for skey in self._args.shortcut_keymaps[56]:
             if skey in self._connected_keymaps:
                 shortcut = self._connected_keymaps[skey]
                 shortcut.disconnect()
+
             else:
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
+
             shortcut.activated.connect(lambda: self._inner_undo_or_redo(False))
         self._wget_wheel.update_skey()
         self._wget_image.update_skey()
@@ -1442,19 +1881,29 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_depot.update_skey()
 
     def closeEvent(self, event):
+        """
+        Actions before close Rickrack.
+        """
+
         if self._sys_argv["output"]:
             self._wget_operation.dp_export(self._sys_argv["output"], True)
+
         result_text = export_text([(self._args.sys_color_set, self._args.hm_rule, "Console Results", "", (time.time(), time.time()), self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values),])
+
         for line in result_text.split("\n"):
             if line and len(line) > 3:
                 if line[2] in [str(i) for i in range(10)] and int(line[2]) == self._args.sys_activated_idx:
                     print("+ *{}".format(line[1:]))
+
                 else:
                     print("+ {}".format(line))
+
             else:
                 print("+")
+
         if self._save_settings_before_close and not self._sys_argv["temporary"]:
             self.save_main_settings()
+
         self._args.remove_temp_dir()
         self._wget_wheel.close()
         self._wget_image.close()
@@ -1469,7 +1918,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("Rickrack", "Author: {}"),
             _translate("Rickrack", "Update: {}"),
             _translate("Rickrack", "All Rights Reserved."),
-            _translate("Rickrack", "Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the GNU General Public License 3.0 (GPL 3.0) for more details."),
+            _translate("Rickrack", "Rickrack is a free software, which is distributed in the hope that it will be useful, but without any warranty. You can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation. See the GNU General Public License 3.0 (GPLv3) for more details."),
             _translate("Rickrack", "OK"),
             _translate("Rickrack", "Visit Website"),
             _translate("Rickrack", "Rickrack uses Qt version {} (PyQt version {}) licensed under GNU General Public License. Please see qt.io/licensing for an overview of Qt licensing."),
@@ -1480,6 +1929,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("Rickrack", "The internationalization (i18n) and localization (l10n) of Rickrack are based on Google Translate."),
             _translate("Rickrack", "Download Full Fonts"),
             )
+
         self._status_descs = (
             _translate("Rickrack", "Ready."),
             _translate("Rickrack", "Image Size: {} x {}."),
@@ -1491,6 +1941,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("Rickrack", "Assistant Points Count for Current Control Points: {}."),
             _translate("Rickrack", "Board Volume: Row {}, Col {}; Total {}, Index {}."),
         )
+
         self._color_descs = (
             _translate("Rickrack", "Deep "),
             _translate("Rickrack", "Snow "),
@@ -1513,6 +1964,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("Rickrack", "Orange"),
             _translate("Rickrack", "Pink"),
         )
+
         _QColorDialog = (
             _translate("QColorDialog", "Hu&e:"),
             _translate("QColorDialog", "&Sat:"),
@@ -1529,6 +1981,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("QColorDialog", "&Custom colors"),
             _translate("QColorDialog", "&Add to Custom Colors"),
         )
+
         _QPlatformTheme = (
             _translate("QPlatformTheme", "OK"),
             _translate("QPlatformTheme", "Save"),
@@ -1549,6 +2002,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("QPlatformTheme", "Reset"),
             _translate("QPlatformTheme", "Restore Defaults"),
         )
+
         _QLineEdit = (
             _translate("QLineEdit", "&Undo"),
             _translate("QLineEdit", "&Redo"),
@@ -1558,52 +2012,68 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("QLineEdit", "Delete"),
             _translate("QLineEdit", "Select All"),
         )
+
         _QAbstractSpinBox = (
             _translate("QAbstractSpinBox", "&Select All"),
             _translate("QAbstractSpinBox", "&Step up"),
             _translate("QAbstractSpinBox", "Step &down"),
         )
+
 if __name__ == "__main__":
     argv_opts, argv_left = getopt(sys.argv[1:], "hvtr:i:o:w:e:l:p:", ["help", "version", "temporary", "reset=", "input=", "output=", "export=", "window=", "sequence=", "lang=", "locale=", "port="])
     sys_argv = {"temporary": False, "reset": "", "input": None, "output": None, "window": -1, "lang": "", "port": None}
+
     for opt_name,opt_value in argv_opts:
         if opt_name in ("-h", "--help"):
             print("\n+" + "-" * 34 + " Rickrack " + "-" * 34 + "+")
             print(__HELP__)
             sys.exit()
+
         elif opt_name in ("-v", "--version"):
             print("Rickrack {} ({})\n".format(__VERSION__[1:-1], __DATE__[1:-1]))
             sys.exit()
+
         elif opt_name in ("-t", "--temporary"):
             sys_argv["temporary"] = True
+
         elif opt_name in ("-r", "--reset"):
             if opt_value.lower() in ("settings", "setting", "layout", "geometry", "set", "depot", "work", "all"):
                 sys_argv["reset"] = opt_value.lower()
+
         elif opt_name in ("-i", "--input"):
             if os.path.isfile(opt_value):
                 sys_argv["input"] = opt_value
+
         elif opt_name in ("-o", "--output", "--export"):
             if os.path.isdir(os.path.dirname(opt_value)) and opt_value.split(".")[-1] in ("dps", "txt", "aco", "ase", "gpl", "xml"):
                 sys_argv["output"] = opt_value
+
         elif opt_name in ("-w", "--window"):
             if opt_value and check_is_num(opt_value, length=3):
                 sys_argv["window"] = int(opt_value)
+
         elif opt_name in ("-e", "--sequence"):
             if opt_value and check_is_num(opt_value, length=7, scope=("0", "1")):
                 num = 0
+
                 for i in range(len(opt_value)):
                     num = num + int(opt_value[len(opt_value) - i - 1]) * 2 ** i
+
                 sys_argv["window"] = num
         elif opt_name in ("-l", "--lang", "--locale"):
             if len(opt_value) > 1:
                 sys_argv["lang"] = opt_value
+
         elif opt_name in ("-p", "--port"):
             if opt_value and check_is_num(opt_value, length=5):
                 port = int(opt_value)
+
                 if 0 < port < 65536:
                     sys_argv["port"] = port
+
     if not sys_argv["input"] and argv_left and os.path.isfile(argv_left[-1]):
         sys_argv["input"] = argv_left[-1]
+
     QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
     QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)

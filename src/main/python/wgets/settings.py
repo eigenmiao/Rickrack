@@ -23,6 +23,10 @@ from cguis.resource import view_rc
 
 
 class Settings(QDialog, Ui_SettingsDialog):
+    """
+    Settings object based on QDialog. Init a settings in settings.
+    """
+
     ps_rule_changed = pyqtSignal()
     ps_lang_changed = pyqtSignal()
     ps_skey_changed = pyqtSignal()
@@ -32,6 +36,10 @@ class Settings(QDialog, Ui_SettingsDialog):
     ps_theme_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args):
+        """
+        Init settings.
+        """
+
         super().__init__(wget, Qt.WindowCloseButtonHint)
         self.setupUi(self)
         self.setAttribute(Qt.WA_AcceptTouchEvents)
@@ -50,24 +58,30 @@ class Settings(QDialog, Ui_SettingsDialog):
         self._skey_distribution = (6, 8, 9, 5, 10, 10)
         g0_seq = (0, 1, 2, 4, 7, 8)
         g5_seq = (0, 1, 2, 3, 4, 5, 6, 8, 9, 10)
+
         for gbox_id in range(len(self._skey_distribution)):
             skey_gbox = QGroupBox(self.shortcuts_scroll_contents)
             gbox_grid_layout = QGridLayout(skey_gbox)
             scroll_grid_layout.addWidget(skey_gbox, gbox_id, 1, 1, 1)
             self._skey_gboxes.append(skey_gbox)
             skey_gboxe_layouts.append(gbox_grid_layout)
+
             for curr_id in range(self._skey_distribution[gbox_id]):
                 if gbox_id == 0:
                     skey_id = g0_seq[curr_id]
+
                 elif gbox_id == 5:
                     skey_id = g5_seq[curr_id]
+
                 else:
                     skey_id = curr_id
+
                 skey_label = QLabel(skey_gbox)
                 skey_label.setMinimumSize(200, 25)
                 skey_label.setMaximumSize(400, 40)
                 gbox_grid_layout.addWidget(skey_label, skey_id, 0, 1, 1)
                 self._skey_labels.append(skey_label)
+
                 for ledit_id in range(3):
                     skey_ledit = QLineEdit(skey_gbox)
                     skey_ledit.setMinimumSize(68, 25)
@@ -75,11 +89,13 @@ class Settings(QDialog, Ui_SettingsDialog):
                     gbox_grid_layout.addWidget(skey_ledit, skey_id, ledit_id + 1, 1, 1)
                     skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
                     self._skey_ledits.append(skey_ledit)
+
         skey_label = QLabel(self._skey_gboxes[0])
         skey_label.setMinimumSize(200, 25)
         skey_label.setMaximumSize(400, 40)
         skey_gboxe_layouts[0].addWidget(skey_label, 5, 0, 1, 1)
         self._skey_labels.append(skey_label)
+
         for ledit_id in range(3):
             skey_ledit = QLineEdit(self._skey_gboxes[0])
             skey_ledit.setMinimumSize(68, 25)
@@ -87,11 +103,13 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_gboxe_layouts[0].addWidget(skey_ledit, 5, ledit_id + 1, 1, 1)
             skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
             self._skey_ledits.append(skey_ledit)
+
         skey_label = QLabel(self._skey_gboxes[0])
         skey_label.setMinimumSize(200, 25)
         skey_label.setMaximumSize(400, 40)
         skey_gboxe_layouts[0].addWidget(skey_label, 6, 0, 1, 1)
         self._skey_labels.append(skey_label)
+
         for ledit_id in range(3):
             skey_ledit = QLineEdit(self._skey_gboxes[0])
             skey_ledit.setMinimumSize(68, 25)
@@ -99,11 +117,13 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_gboxe_layouts[0].addWidget(skey_ledit, 6, ledit_id + 1, 1, 1)
             skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
             self._skey_ledits.append(skey_ledit)
+
         skey_label = QLabel(self._skey_gboxes[0])
         skey_label.setMinimumSize(200, 25)
         skey_label.setMaximumSize(400, 40)
         skey_gboxe_layouts[0].addWidget(skey_label, 3, 0, 1, 1)
         self._skey_labels.append(skey_label)
+
         for ledit_id in range(3):
             skey_ledit = QLineEdit(self._skey_gboxes[0])
             skey_ledit.setMinimumSize(68, 25)
@@ -111,11 +131,13 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_gboxe_layouts[0].addWidget(skey_ledit, 3, ledit_id + 1, 1, 1)
             skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
             self._skey_ledits.append(skey_ledit)
+
         skey_label = QLabel(self._skey_gboxes[5])
         skey_label.setMinimumSize(200, 25)
         skey_label.setMaximumSize(400, 40)
         skey_gboxe_layouts[5].addWidget(skey_label, 7, 0, 1, 1)
         self._skey_labels.append(skey_label)
+
         for ledit_id in range(3):
             skey_ledit = QLineEdit(self._skey_gboxes[5])
             skey_ledit.setMinimumSize(68, 25)
@@ -123,12 +145,14 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_gboxe_layouts[5].addWidget(skey_ledit, 7, ledit_id + 1, 1, 1)
             skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
             self._skey_ledits.append(skey_ledit)
+
         for key_id in range(4):
             skey_label = QLabel(self._skey_gboxes[3])
             skey_label.setMinimumSize(200, 25)
             skey_label.setMaximumSize(400, 40)
             skey_gboxe_layouts[3].addWidget(skey_label, key_id + 5, 0, 1, 1)
             self._skey_labels.append(skey_label)
+
             for ledit_id in range(3):
                 skey_ledit = QLineEdit(self._skey_gboxes[3])
                 skey_ledit.setMinimumSize(68, 25)
@@ -136,11 +160,13 @@ class Settings(QDialog, Ui_SettingsDialog):
                 skey_gboxe_layouts[3].addWidget(skey_ledit, key_id + 5, ledit_id + 1, 1, 1)
                 skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
                 self._skey_ledits.append(skey_ledit)
+
         skey_label = QLabel(self._skey_gboxes[5])
         skey_label.setMinimumSize(200, 25)
         skey_label.setMaximumSize(400, 40)
         skey_gboxe_layouts[5].addWidget(skey_label, 11, 0, 1, 1)
         self._skey_labels.append(skey_label)
+
         for ledit_id in range(3):
             skey_ledit = QLineEdit(self._skey_gboxes[5])
             skey_ledit.setMinimumSize(68, 25)
@@ -148,28 +174,40 @@ class Settings(QDialog, Ui_SettingsDialog):
             skey_gboxe_layouts[5].addWidget(skey_ledit, 11, ledit_id + 1, 1, 1)
             skey_ledit.textChanged.connect(self.verify_shortcut_keymaps)
             self._skey_ledits.append(skey_ledit)
+
         for lang in self._args.usr_langs:
             self.lang_comb.addItem("")
+
         for method in self._args.global_hm_rules:
             self.hm_rule_comb.addItem("")
+
         for i in range(len(self._color_sys_descs)):
             self.color_sys_comb.addItem("")
+
         for overfl in self._args.global_overflows:
             self.overflow_comb.addItem("")
+
         for ctp in ("rgb", "hsv", "cmyk", "lab", "gray"):
             self.export_swatch_ctp_comb.addItem(ctp.upper())
+
         for atp in range(3):
             self.export_ase_type_comb.addItem("")
+
         for wref in range(20):
             self.white_illuminant_comb.addItem("")
+
         for wref in range(2):
             self.white_observer_comb.addItem("")
+
         for fweight in range(9):
             self.font_weight_comb.addItem(str((fweight + 1) * 100))
+
         for bakid in range(17):
             self.bakgd_id_comb.addItem("")
+
         for styid in range(17):
             self.style_id_comb.addItem("")
+
         self.clean_up_btn.clicked.connect(lambda x: self.ps_clean_up.emit())
         self.restore_original_btn.clicked.connect(lambda x: self.ps_restore_layout.emit())
         self.buttonBox.clear()
@@ -188,6 +226,10 @@ class Settings(QDialog, Ui_SettingsDialog):
         self.update_text()
 
     def setup_colors(self):
+        """
+        Initialize color dp values by colors in self._args.
+        """
+
         self.positive_color_0_dp.setValue(self._args.positive_color[0])
         self.positive_color_1_dp.setValue(self._args.positive_color[1])
         self.positive_color_2_dp.setValue(self._args.positive_color[2])
@@ -199,16 +241,25 @@ class Settings(QDialog, Ui_SettingsDialog):
         self.wheel_ed_color_2_dp.setValue(self._args.wheel_ed_color[2])
 
     def initialize(self):
+        """
+        Initialize values of boxes in settings dialog by self._args.
+        """
+
         self._is_initializing = True
         self._skey_accept = []
+
         for i in range(len(self._args.shortcut_keymaps)):
             keymaps = self._args.shortcut_keymaps[i]
+
             for j in range(3):
                 self._skey_ledits[i * 3 + j].setStyleSheet("")
+
                 if j < len(keymaps):
                     self._skey_ledits[i * 3 + j].setText(keymaps[j])
+
                 else:
                     self._skey_ledits[i * 3 + j].setText("")
+
         self.usr_color_ledit.setText(self._args.usr_color)
         self.usr_image_ledit.setText(self._args.usr_image)
         self.store_loc_cbox.setChecked(self._args.store_loc)
@@ -273,9 +324,14 @@ class Settings(QDialog, Ui_SettingsDialog):
         self._is_initializing = False
 
     def application(self):
+        """
+        Modify self._args by values of boxes in settings dialog.
+        """
+
         if self._skey_accept:
             self._args.modify_settings("shortcut_keymaps", [(self._skey_accept[i * 3], self._skey_accept[i * 3 + 1], self._skey_accept[i * 3 + 2]) for i in range(len(self._args.shortcut_keymaps))])
             self.ps_skey_changed.emit()
+
         self._args.modify_settings("usr_color", self.usr_color_ledit.text())
         self._args.modify_settings("usr_image", self.usr_image_ledit.text())
         self._args.modify_settings("store_loc", self.store_loc_cbox.isChecked())
@@ -283,13 +339,17 @@ class Settings(QDialog, Ui_SettingsDialog):
         hm_rule = self._args.hm_rule
         self._args.modify_settings("hm_rule", self._args.global_hm_rules[self.hm_rule_comb.currentIndex()])
         self._args.modify_settings("color_sys", self.color_sys_comb.currentIndex())
+
         if self._args.hm_rule != hm_rule:
             self.ps_rule_changed.emit()
+
         self._args.modify_settings("overflow", self._args.global_overflows[self.overflow_comb.currentIndex()])
         lang = self._args.lang
         self._args.modify_settings("lang", self._args.usr_langs[self.lang_comb.currentIndex()][1])
+
         if self._args.lang != lang:
             self.ps_lang_changed.emit()
+
         self._args.modify_settings("export_swatch_ctp", self.export_swatch_ctp_comb.currentText().lower())
         self._args.modify_settings("export_ase_type", ("spot", "global", "process")[self.export_ase_type_comb.currentIndex()])
         self._args.modify_settings("white_illuminant", self.white_illuminant_comb.currentIndex())
@@ -299,21 +359,26 @@ class Settings(QDialog, Ui_SettingsDialog):
         new_font_weight = self.font_weight_comb.currentIndex() + 1
         new_font_size = int(self.font_size_sp.value())
         new_font_family = check_nonempt_str_lst(re.split(r"[\v\a\f\n\r\t\[\]\(\),;:#]", str(self.font_family_ledit.text())))
+
         if new_bakgd_id != self._args.bakgd_id or new_style_id != self._args.style_id or new_font_weight != self._args.font_weight or new_font_size != self._args.font_size or new_font_family != self._args.font_family:
             if new_bakgd_id == self._args.bakgd_id and new_style_id == self._args.style_id:
                 change_pn_colors = False
+
             else:
                 change_pn_colors = True
                 self._args.modify_settings("bakgd_id", new_bakgd_id)
                 self._args.modify_settings("style_id", new_style_id)
+
             self._args.modify_settings("font_weight", new_font_weight)
             self._args.modify_settings("font_size", new_font_size)
             self._args.modify_settings("font_family", new_font_family)
             self.ps_theme_changed.emit(change_pn_colors)
+
         else:
             self._args.modify_settings("positive_color", (self.positive_color_0_dp.value(), self.positive_color_1_dp.value(), self.positive_color_2_dp.value()))
             self._args.modify_settings("negative_color", (self.negative_color_0_dp.value(), self.negative_color_1_dp.value(), self.negative_color_2_dp.value()))
             self._args.modify_settings("wheel_ed_color", (self.wheel_ed_color_0_dp.value(), self.wheel_ed_color_1_dp.value(), self.wheel_ed_color_2_dp.value()))
+
         self._args.modify_settings("max_history_files", self.max_history_files_sp.value())
         self._args.modify_settings("max_history_steps", self.max_history_steps_sp.value())
         self._args.modify_settings("export_grid_extns", self.export_grid_extns_ledit.text())
@@ -349,14 +414,26 @@ class Settings(QDialog, Ui_SettingsDialog):
         self.ps_settings_changed.emit()
 
     def showup(self):
+        """
+        Initialize and show.
+        """
+
         self.initialize()
         self.show()
 
     def update_values(self):
+        """
+        For button apply.
+        """
+
         self.application()
         self.initialize()
 
     def reset_values(self):
+        """
+        For button reset.
+        """
+
         hm_rule = self._args.hm_rule
         lang = self._args.lang
         old_bakgd_id = self._args.bakgd_id
@@ -366,39 +443,52 @@ class Settings(QDialog, Ui_SettingsDialog):
         old_font_family = self._args.font_family
         self._args.init_settings()
         self.initialize()
+
         if self._args.hm_rule != hm_rule:
             self.ps_rule_changed.emit()
+
         if self._args.lang != lang:
             self.ps_lang_changed.emit()
+
         self.ps_settings_changed.emit()
         self.ps_theme_changed.emit(True)
 
     def verify_shortcut_keymaps(self):
         if self._is_initializing:
             return
+
         self._skey_accept = []
         skey_copies = []
+
         for i in range(len(self._skey_labels)):
             for j in range(3):
                 self._skey_ledits[i * 3 + j].setStyleSheet("color: '#202020'; background-color: '#F9FFDF';")
                 skey_copies.append(self._skey_ledits[i * 3 + j].text())
+
         err_id = []
         used_names = []
+
         for i in range(len(skey_copies)):
             if not skey_copies[i]:
                 self._skey_accept.append("")
                 continue
+
             skey_name = check_key(skey_copies[i])
+
             if not skey_name:
                 self._skey_accept.append("")
                 err_id.append(i)
+
             elif skey_name in self._skey_accept:
                 self._skey_accept.append("")
+
                 for copy_id in range(len(skey_copies)):
                     if skey_copies[copy_id] == skey_name and copy_id not in err_id:
                         err_id.append(copy_id)
+
             else:
                 self._skey_accept.append(skey_name)
+
         for i in err_id:
             self._skey_ledits[i].setStyleSheet("color: '#202020'; background-color: '#FFB6AE';")
 
@@ -408,27 +498,38 @@ class Settings(QDialog, Ui_SettingsDialog):
         self._btn_2.setText(self._dialog_descs[2])
         self._btn_3.setText(self._dialog_descs[3])
         self._btn_4.setText(self._dialog_descs[4])
+
         for i in range(len(self._skey_gboxes)):
             self._skey_gboxes[i].setTitle(self._skey_blocks[i])
+
         for i in range(len(self._skey_labels)):
             self._skey_labels[i].setText(self._skey_seqs[i])
+
         for idx in range(len(self._args.usr_langs)):
             lang = self._args.usr_langs[idx]
             self.lang_comb.setItemText(idx, self._lang_descs[0].format(self._lang_descs[lang[0] + 1], lang[1].split(".")[0]))
+
         for idx in range(len(self._args.global_hm_rules)):
             self.hm_rule_comb.setItemText(idx, self._rule_descs[idx])
+
         for idx in range(len(self._color_sys_descs)):
             self.color_sys_comb.setItemText(idx, self._color_sys_descs[idx])
+
         for idx in range(len(self._args.global_overflows)):
             self.overflow_comb.setItemText(idx, self._overflow_descs[idx])
+
         for idx in range(3):
             self.export_ase_type_comb.setItemText(idx, self._ase_descs[idx])
+
         for idx in range(17):
             self.bakgd_id_comb.setItemText(idx, self._bakgd_descs[idx])
+
         for idx in range(17):
             self.style_id_comb.setItemText(idx, self._theme_descs[idx])
+
         for idx in range(20):
             self.white_illuminant_comb.setItemText(idx, self._white_illuminant_descs[idx])
+
         for idx in range(2):
             self.white_observer_comb.setItemText(idx, self._white_observer_descs[idx])
 
@@ -441,6 +542,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "Apply"),
             _translate("Settings", "Reset"),
         )
+
         self._rule_descs = (
             _translate("Rule", "Analogous"),
             _translate("Rule", "Monochromatic"),
@@ -451,17 +553,20 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Rule", "Shades"),
             _translate("Rule", "Custom"),
         )
+
         self._overflow_descs = (
             _translate("Rule", "Cutoff"),
             _translate("Rule", "Return"),
             _translate("Rule", "Repeat"),
         )
+
         self._color_sys_descs = (
             _translate("Mode", "RGB Space"),
             _translate("Mode", "Rev RGB Space"),
             _translate("Mode", "RYB Space"),
             _translate("Mode", "Rev RYB Space"),
         )
+
         self._bakgd_descs = (
             _translate("Settings", "Colorful"),
             _translate("Settings", "White"),
@@ -481,6 +586,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "Dark Blue"),
             _translate("Settings", "Dark Magenta"),
         )
+
         self._theme_descs = (
             _translate("Settings", "Default"),
             _translate("Settings", "White"),
@@ -500,6 +606,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "Dark Blue"),
             _translate("Settings", "Dark Magenta"),
         )
+
         self._skey_blocks = (
             _translate("Settings", "General"),
             _translate("Settings", "Operation"),
@@ -508,11 +615,13 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "Transformation"),
             _translate("Settings", "Storage"),
         )
+
         self._ase_descs = (
             _translate("Settings", "Spot"),
             _translate("Settings", "Global"),
             _translate("Settings", "Process"),
         )
+
         self._skey_seqs = (
             _translate("Settings", "Homepage"),
             _translate("Settings", "Update"),
@@ -572,6 +681,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "Depot_View"),
             _translate("Settings", "Redo"),
         )
+
         self._white_illuminant_descs = (
             _translate("Settings", "A (Incandescent/tungsten)"),
             _translate("Settings", "B (Old direct sunlight at noon)"),
@@ -594,10 +704,12 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "F11 (Ultralume 40, Philips TL84)"),
             _translate("Settings", "F12 (Ultralume 30, Philips TL83)"),
         )
+
         self._white_observer_descs = (
             _translate("Settings", "2Ang (CIE 1931)"),
             _translate("Settings", "10Ang (CIE 1964)"),
         )
+
         self._lang_descs = (
             _translate("Rickrack", "{} ({})"),
             _translate("Settings", "en"),
@@ -643,3 +755,4 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Settings", "zh"),
             _translate("Settings", "default"),
         )
+

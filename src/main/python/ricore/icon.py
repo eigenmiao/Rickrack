@@ -94,7 +94,7 @@ __SVG_OPEN__ = """
 """
 
 __SVG_QUIT__ = """
-<path d="M12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C15.2713 2 18.1757 3.57078 20.0002 5.99923L17.2909 5.99931C15.8807 4.75499 14.0285 4 12 4C7.58172 4 4 7.58172 4 12C4 16.4183 7.58172 20 12 20C14.029 20 15.8816 19.2446 17.2919 17.9998L20.0009 17.9998C18.1765 20.4288 15.2717 22 12 22ZM19 16V13H11V11H19V8L24 12L19 16Z" fill="#{forecolor}"></path>
+<path d="M5 22C4.44772 22 4 21.5523 4 21V3C4 2.44772 4.44772 2 5 2H19C19.5523 2 20 2.44772 20 3V6H18V4H6V20H18V18H20V21C20 21.5523 19.5523 22 19 22H5ZM18 16V13H11V11H18V8L23 12L18 16Z" fill="#{forecolor}"></path>
 """
 
 __SVG_HOME__ = """
@@ -196,19 +196,25 @@ def get_icon(name, forecolor, backcolor, higopacity, lowopacity, temp_dir, defau
         "float": __SVG_FLOAT__,
         "close": __SVG_CLOSE__,
     }
+
     wid = hig = 100
     swid = shig = 24
+
     if name in ("sel_wheel", "sel_image", "sel_board", "sel_depot", "wheel", "image", "board", "depot", "about", "settings",):
         swid = shig = "100"
+
     elif name in ("sel_up", "sel_down", "box_up", "box_down", "up", "down"):
         hig = hig / 2
         shig = shig / 2
+
     elif name in ("box_left", "box_right", "left", "right"):
         wid = wid / 2
         swid = swid / 2
+
     if os.path.isdir(temp_dir) and name in name_dict:
         with open(os.sep.join([temp_dir, "{}.svg".format(name)]), "w") as f:
             context = name_dict[name].format(forecolor=forecolor, backcolor=backcolor, stroke=6, higopacity=higopacity, lowopacity=lowopacity)
             f.write(__SVG_FMT__.format(context=context, wid=wid, hig=hig, swid=swid, shig=shig)[1:])
+
         return QIcon(os.sep.join([temp_dir, "{}.svg".format(name)]))
     return default

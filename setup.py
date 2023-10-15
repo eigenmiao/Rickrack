@@ -18,7 +18,7 @@ from setuptools import setup
 
 setup(
     name="Rickrack",
-    version="2.8.40",
+    version="2.8.41",
     author="Eigenmiao",
     author_email="eigenmiao@outlook.com",
     description="Generate harmonious colors freely.",
@@ -39,24 +39,32 @@ setup(
         "Natural Language :: Chinese (Simplified)",
         "Natural Language :: English",
     ],
+
     keywords=["Color-Editor", "Color-Picker", "Color-Palette", "Digital-Palette", "Desktop-Application"],
     install_requires=[
         "numpy",
     ],
+
     python_requires=">=3.5",
     entry_points={
         "console_scripts": [
             "rickrack = rickrack.rickrack:startup",
         ],
+
         "gui_scripts": [
             "rickrack-gui = rickrack.rickrack:startup",
         ],
+
     },
+
     include_package_data=True,
     packages=["rickrack"],
     package_data={
         "rickrack": [
             "rickrack/*",
         ],
+
     }
+
 )
+

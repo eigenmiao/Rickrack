@@ -18,7 +18,15 @@ import hashlib
 
 
 class History(object):
+    """
+    History object. Undo and redo operations.
+    """
+
     def __init__(self, args):
+        """
+        Init history.
+        """
+
         self._args = args
         self._curr_idx = 0
         self._history_line = []
@@ -26,14 +34,21 @@ class History(object):
         self._recording = False
 
     def backup(self):
+        """
+        Create a history step.
+        """
+
         if self._moving:
             return
+
         if self._curr_idx != len(self._history_line) - 1:
             self._curr_idx = self._curr_idx if self._curr_idx < len(self._history_line) else len(self._history_line) - 1
             self._history_line = self._history_line[:self._curr_idx + 1]
+
         if len(self._history_line) > self._args.max_history_steps:
             self._curr_idx = self._curr_idx - (len(self._history_line) - self._args.max_history_steps)
             self._history_line = self._history_line[len(self._history_line) - self._args.max_history_steps: ]
+
         step_md5 = ""
         step_md5 = step_md5 + hashlib.md5(str(self._args.hm_rule).encode("utf-8")).hexdigest()[:10]
         step_md5 = step_md5 + hashlib.md5(str(self._args.sys_color_set).encode("utf-8")).hexdigest()[:10]
@@ -43,9 +58,10 @@ class History(object):
         step_md5 = step_md5 + hashlib.md5(str(self._args.sys_grid_values).encode("utf-8")).hexdigest()[:10]
         step_md5 = step_md5 + hashlib.md5(str(self._args.sys_color_locs.count(None)).encode("utf-8")).hexdigest()[:10]
         step_md5 = hashlib.md5(step_md5.encode("utf-8")).hexdigest()[:10]
-        # print("{} / {} -> {}".format(self._curr_idx, len(self._history_line), step_md5))
+
         if len(self._history_line) > 0 and step_md5 == self._history_line[-1][1]:
             return
+
         self._recording = True
         step = []
         step.append(str(self._args.hm_rule))
@@ -61,11 +77,17 @@ class History(object):
         self._recording = False
 
     def undo(self):
+        """
+        Move backward.
+        """
+
         if self._recording:
             return
+
         if self._curr_idx <= 0:
             self._curr_idx = 0
             return
+
         self._moving = True
         self._curr_idx = self._curr_idx - 1
         step = self._history_line[self._curr_idx][0]
@@ -80,11 +102,17 @@ class History(object):
         self._moving = False
 
     def redo(self):
+        """
+        Move foreward.
+        """
+
         if self._recording:
             return
+
         if self._curr_idx >= len(self._history_line) - 1:
             self._curr_idx = len(self._history_line) - 1
             return
+
         self._moving = True
         self._curr_idx = self._curr_idx + 1
         step = self._history_line[self._curr_idx][0]

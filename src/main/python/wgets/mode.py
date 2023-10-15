@@ -19,12 +19,20 @@ from wgets.general import SlideText, RGBHSVCkb
 
 
 class Mode(QWidget):
+    """
+    Mode object based on QWidget. Init a mode in mode.
+    """
+
     ps_mode_changed = pyqtSignal(bool)
     ps_assistp_changed = pyqtSignal(bool)
     ps_info_changed = pyqtSignal(bool)
     ps_color_sys_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args):
+        """
+        Init mode.
+        """
+
         super().__init__(wget)
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self._args = args
@@ -52,11 +60,13 @@ class Mode(QWidget):
         gbox_grid_layout.setVerticalSpacing(12)
         scroll_grid_layout.addWidget(self._color_sys_gbox, 0, 1, 1, 1)
         self._color_sys_btns = []
+
         for i in range(4):
             btn = QRadioButton(self._color_sys_gbox)
             gbox_grid_layout.addWidget(btn, i, 1, 1, 1)
             btn.clicked.connect(self.modify_color_sys(i))
             self._color_sys_btns.append(btn)
+
         self._color_sys_btns[self._args.color_sys].setChecked(True)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
         gbox_grid_layout.addItem(spacer, 4, 1, 1, 1)
@@ -141,26 +151,48 @@ class Mode(QWidget):
         return QSize(250, 60)
 
     def modify_state(self, tag):
+        """
+        Modify stored shown state set by cbox.
+        """
+
         def _func_(state):
             setattr(self._args, "show_{}".format(tag), bool(state))
             self.ps_mode_changed.emit(True)
+
         return _func_
 
     def update_mode(self):
+        """
+        Update mode cbox by self._args.show_rgb and show_hsv.
+        """
+
         self._cbox_rgb.setChecked(self._args.show_rgb)
         self._cbox_hsv.setChecked(self._args.show_hsv)
         self._color_sys_btns[self._args.color_sys].setChecked(True)
 
     def modify_color_sys(self, idx):
+        """
+        Modify stored color system by btn.
+        """
+
         def _func_(value):
             self._args.modify_settings("color_sys", idx)
             self.ps_color_sys_changed.emit(True)
+
         return _func_
 
     def get_info(self):
+        """
+        Get value of cbox of self._args.show_info_pts.
+        """
+
         return int(self._cbox_major.isChecked()) + int(self._cbox_minor.isChecked()) * 2
 
     def update_info(self, major, minor):
+        """
+        Update mode cbox by self._args.show_info_pts.
+        """
+
         self._cbox_major.stateChanged.disconnect()
         self._cbox_minor.stateChanged.disconnect()
         self._cbox_major.setChecked(major)
@@ -169,12 +201,21 @@ class Mode(QWidget):
         self._cbox_minor.stateChanged.connect(lambda x: self.ps_info_changed.emit(x))
 
     def modify_grid_value(self, name, dtype=float):
+        """
+        Modify a grid values.
+        """
+
         def _func_(value):
             self._args.sys_grid_values[name] = dtype(value)
             self.ps_assistp_changed.emit(True)
+
         return _func_
 
     def update_grid_vales(self):
+        """
+        Update grid values.
+        """
+
         self.rhc_govalue.set_values(self._args.sys_grid_values["ctp"])
         self.sdt_col.set_value(self._args.sys_grid_values["col"])
         self.sdt_sum_factor.set_value(self._args.sys_grid_values["sum_factor"])
@@ -195,8 +236,10 @@ class Mode(QWidget):
         self.sdt_dim_factor.set_text(self._assistp_descs[5])
         self.sdt_assist_factor.set_text(self._assistp_descs[6])
         self.ckb_rev_grid.setText(self._assistp_descs[7])
+
         for i in range(4):
             self._color_sys_btns[i].setText(self._color_sys_descs[i])
+
         self.update_mode()
 
     def _func_tr_(self):
@@ -208,16 +251,19 @@ class Mode(QWidget):
             _translate("Mode", "Info"),
             _translate("Mode", "Color Space"),
         )
+
         self._info_descs = (
             _translate("Mode", "Show Major Info"),
             _translate("Mode", "Show Minor Info"),
         )
+
         self._color_sys_descs = (
             _translate("Mode", "RGB Space"),
             _translate("Mode", "Rev RGB Space"),
             _translate("Mode", "RYB Space"),
             _translate("Mode", "Rev RYB Space"),
         )
+
         self._assistp_descs = (
             _translate("Mode", "Select"),
             _translate("Mode", "Selected: "),
@@ -228,3 +274,4 @@ class Mode(QWidget):
             _translate("Mode", "Asst F - "),
             _translate("Mode", "Reverse Grid"),
         )
+
