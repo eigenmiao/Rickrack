@@ -137,3 +137,10 @@
 * Comments:
 1. Fix fcitx5 input bug on Ubuntu (for fcitx5).
 2. Change button icons.
+
+# v2.8.41-x3d3s3
+* Date: October 15, 2023
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.41
+* Comments:
+1. Update documents.
+2. Update translations.

@@ -376,7 +376,7 @@ QTabBar styles.
 QTabBar {
     background-color: $qc_workarea_over;
     color: $qc_char;
-    border-bottom: 2px solid $qc_list_selected;
+    border-bottom: 2px solid $qc_list;
     qproperty-drawBase: 0;
 }
 
@@ -385,7 +385,7 @@ QTabBar::tab {
     color: $qc_char;
     padding: 5px 12px 5px 12px;
     border: 2px solid $qc_workarea_over;
-    border-bottom: 2px solid $qc_list_selected;
+    border-bottom: 2px solid $qc_list;
 }
 
 QTabBar::tab:hover {

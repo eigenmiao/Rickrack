@@ -1,5 +1,5 @@
 <div align="center">
-<img width="100%" align="center" src="https://raw.githubusercontent.com/eigenmiao/Rickrack/main/src/main/icons/logo_long.png" alt="Rickrack">
+<img width="100%" align="center" src="https://raw.githubusercontent.com/eigenmiao/Rickrack/main/src/main/icons/logo_long_zh.png" alt="Rickrack">
 <br/><br/>
 Rickrack<br/>焰火十二卷<br/> ----- ----- ----- ----- ----- ----- ----- ----- <br/>
 Generate Harmonious Colors Freely.<br/>自由自在生成和谐色彩。

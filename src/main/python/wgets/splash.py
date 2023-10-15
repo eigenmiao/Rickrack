@@ -23,24 +23,39 @@ from cguis.resource import view_rc
 
 
 class DPSplash(QSplashScreen):
+    """
+    Show image when loading.
+    """
+
     def __init__(self, resources, sys_argv):
+        """
+        Init splash.
+        """
+
         display_lang = "en"
+
         if sys_argv["lang"]:
             if sys_argv["lang"][:2].lower() in ("zh", "ja", "ko"):
                 display_lang = "zh"
+
         else:
             default_locale = locale.getdefaultlocale()[0]
             default_locale = str(default_locale).lower() if default_locale else ""
+
             if len(default_locale) > 1 and default_locale[:2].lower() in ("zh", "ja", "ko"):
                 display_lang = "zh"
+
             else:
                 try:
                     with open(os.sep.join((resources, "settings.json")), "r", encoding="utf-8") as sf:
                         uss = json.load(sf)
+
                 except Exception as err:
                     uss = None
+
                 if isinstance(uss, dict) and "lang" in uss and str(uss["lang"])[:2].lower() in ("zh", "ja", "ko"):
                     display_lang = "zh"
+
         super().__init__()
         design_img = QImage(":/images/images/design_{}.png".format(display_lang)).scaled(780 * 1.2 * self.devicePixelRatioF(), 500 * 1.2 * self.devicePixelRatioF(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         design_img.setDevicePixelRatio(self.devicePixelRatioF())

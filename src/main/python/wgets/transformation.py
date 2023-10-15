@@ -19,6 +19,10 @@ from wgets.general import SlideText, RGBHSVCkb
 
 
 class Transformation(QWidget):
+    """
+    Transformation object based on QWidget. Init a transformation in transformation.
+    """
+
     ps_move = pyqtSignal(tuple)
     ps_zoom = pyqtSignal(float)
     ps_home = pyqtSignal(bool)
@@ -26,6 +30,10 @@ class Transformation(QWidget):
     ps_enhance = pyqtSignal(tuple)
 
     def __init__(self, wget, args):
+        """
+        Init transformation.
+        """
+
         super().__init__(wget)
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self._args = args
@@ -200,15 +208,31 @@ class Transformation(QWidget):
         return QSize(250, 60)
 
     def move_up(self):
+        """
+        Move image up.
+        """
+
         self.ps_move.emit((0, self._args.move_step * -1))
 
     def move_down(self):
+        """
+        Move image down.
+        """
+
         self.ps_move.emit((0, self._args.move_step))
 
     def move_left(self):
+        """
+        Move image left.
+        """
+
         self.ps_move.emit((self._args.move_step * -1, 0))
 
     def move_right(self):
+        """
+        Move image right.
+        """
+
         self.ps_move.emit((self._args.move_step, 0))
 
     def reset_home(self):
@@ -221,36 +245,56 @@ class Transformation(QWidget):
         self.ps_zoom.emit(1 / self._args.zoom_step)
 
     def sync_reserve(self, state):
+        """
+        Sync enhance, inverse and replace reserve boxes.
+        """
+
         if state != self.ckb_reserve_ehs.isChecked():
             self.ckb_reserve_ehs.setChecked(state)
+
         if state != self.ckb_reserve_inv.isChecked():
             self.ckb_reserve_inv.setChecked(state)
+
         if state != self.ckb_reserve_rep.isChecked():
             self.ckb_reserve_rep.setChecked(state)
+
         if state != self.ckb_reserve_cov.isChecked():
             self.ckb_reserve_cov.setChecked(state)
 
     def sync_extd(self, value):
+        """
+        Sync enhance and replace extd sdr.
+        """
+
         if self.sdt_extd_ehs.get_value() != value:
             self.sdt_extd_ehs.set_value(value)
+
         if self.sdt_extd_rep.get_value() != value:
             self.sdt_extd_rep.set_value(value)
 
     def emit_enhance(self, value):
+        """
+        Emit enhance.
+        """
+
         region = []
         separ = []
         checked_values = self.rhc_ehs.get_values()
+
         if not checked_values:
             return
+
         if checked_values[0] in ("r", "g", "b"):
             for vl in checked_values:
                 reg = {"r": 0, "g": 1, "b": 2}[vl]
                 region.append(reg)
                 sepr = self._args.sys_color_set[self._args.sys_activated_idx].rgb[reg]
                 separ.append(sepr)
+
             if not self.ckb_ubox_ehs.isChecked():
                 sepr = self.sdt_sepr_ehs.get_value() / 100.0
                 separ = (sepr * 255.0, sepr * 255.0, sepr * 255.0)
+
             self.ps_enhance.emit(("enhance_rgb", tuple(region), tuple(separ), self.sdt_fact_ehs.get_value() / 100.0, self.ckb_reserve_ehs.isChecked(), self.sdt_extd_ehs.get_value() / 100.0))
         else:
             for vl in checked_values:
@@ -258,37 +302,55 @@ class Transformation(QWidget):
                 region.append(reg)
                 sepr = self._args.sys_color_set[self._args.sys_activated_idx].hsv[reg]
                 separ.append(sepr)
+
             if not self.ckb_ubox_ehs.isChecked():
                 sepr = self.sdt_sepr_ehs.get_value() / 100.0
                 separ = (sepr * 360.0, sepr, sepr)
+
             self.ps_enhance.emit(("enhance_hsv", tuple(region), tuple(separ), self.sdt_fact_ehs.get_value() / 100.0, self.ckb_reserve_ehs.isChecked(), self.sdt_extd_ehs.get_value() / 100.0))
 
     def emit_inverse(self, value):
+        """
+        Emit inverse.
+        """
+
         region = set()
         checked_values = self.rhc_inv.get_values()
+
         if not checked_values:
             return
+
         if checked_values[0] in ("r", "g", "b"):
             for vl in checked_values:
                 region.add({"r": 0, "g": 1, "b": 2}[vl])
+
             self.ps_enhance.emit(("inverse_rgb", region, self.ckb_reserve_inv.isChecked()))
         else:
             for vl in checked_values:
                 region.add({"h": 0, "s": 1, "v": 2}[vl])
+
             self.ps_enhance.emit(("inverse_hsv", region, self.ckb_reserve_inv.isChecked()))
 
     def emit_cover(self, value):
+        """
+        Emit cover.
+        """
+
         region = set()
         checked_values = self.rhc_cov.get_values()
+
         if not checked_values:
             return
+
         if checked_values[0] in ("r", "g", "b"):
             for vl in checked_values:
                 region.add({"r": 0, "g": 1, "b": 2}[vl])
+
             self.ps_enhance.emit(("cover_rgb", region, self.ckb_reserve_cov.isChecked()))
         else:
             for vl in checked_values:
                 region.add({"h": 0, "s": 1, "v": 2}[vl])
+
             self.ps_enhance.emit(("cover_hsv", region, self.ckb_reserve_cov.isChecked()))
 
     def update_text(self):
@@ -321,6 +383,7 @@ class Transformation(QWidget):
             _translate("Transformation", "Inverse"),
             _translate("Transformation", "Cover"),
         )
+
         self._move_descs = (
             _translate("Transformation", "U"),
             _translate("Transformation", "D"),
@@ -330,12 +393,14 @@ class Transformation(QWidget):
             _translate("Transformation", "I"),
             _translate("Transformation", "O"),
         )
+
         self._replace_descs = (
             _translate("Transformation", "Replace RGB"),
             _translate("Transformation", "Replace HSV"),
             _translate("Transformation", "Cancel"),
             _translate("Transformation", "Use Old Algorithm"),
         )
+
         self._enhance_descs = (
             _translate("Transformation", "Link"),
             _translate("Transformation", "Space - "),
@@ -349,6 +414,7 @@ class Transformation(QWidget):
             _translate("Transformation", "Linked: "),
             _translate("Transformation", "Use Result Color"),
         )
+
         self._extend_descs = (
             _translate("Image", "All Images"),
             _translate("Image", "PNG Image"),
@@ -356,3 +422,4 @@ class Transformation(QWidget):
             _translate("Image", "JPG Image"),
             _translate("Image", "TIF Image"),
         )
+

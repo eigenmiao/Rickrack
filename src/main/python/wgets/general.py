@@ -18,23 +18,47 @@ from PyQt5.QtCore import Qt, pyqtSignal
 
 
 class NoWheelSlider(QSlider):
+    """
+    Slider without responding wheel event.
+    """
+
     def __init__(self, wget):
+        """
+        Init operation.
+        """
+
         super().__init__(wget)
 
     def wheelEvent(self, event):
         event.ignore()
 
 class NoWheelDoubleSpinBox(QDoubleSpinBox):
+    """
+    DoubleSpinBox without responding wheel event.
+    """
+
     def __init__(self, wget):
+        """
+        Init operation.
+        """
+
         super().__init__(wget)
 
     def wheelEvent(self, event):
         event.ignore()
 
 class SlideText(QWidget):
+    """
+    Box with a text label, a spin box and a slider.
+    """
+
     ps_value_changed = pyqtSignal(float)
 
     def __init__(self, wget, num_range=(0.0, 1.0), maxlen=100000, interval=10000, step=1000, decimals=2, default_value=0.0):
+        """
+        Init operation.
+        """
+
         super().__init__(wget)
         self._num_range = tuple([float(min(num_range)), float(max(num_range))])
         self._maxlen = int(maxlen)
@@ -74,30 +98,54 @@ class SlideText(QWidget):
         self.sdr_local.valueChanged.connect(self.value_changed_from_sdr)
 
     def norm_dsp_value(self, dsp_value):
+        """
+        Normalize value for dsp_local.
+        """
+
         norm_value = float(dsp_value)
         norm_value = self._num_range[0] if norm_value < self._num_range[0] else norm_value
         norm_value = self._num_range[1] if norm_value > self._num_range[1] else norm_value
         return norm_value
 
     def norm_sdr_value(self, sdr_value):
+        """
+        Normalize value for sdr_local.
+        """
+
         norm_value = int(sdr_value)
         norm_value = 0 if norm_value < 0 else norm_value
         norm_value = self._maxlen if norm_value > self._maxlen else norm_value
         return norm_value
 
     def value_dsp_to_sdr(self, dsp_value):
+        """
+        Arg sdr_value from self._num_range[0] to self._num_range[1].
+        """
+
         norm_value = self.norm_dsp_value(dsp_value)
         return int((norm_value - self._num_range[0]) / (self._num_range[1] - self._num_range[0]) * self._maxlen)
 
     def value_sdr_to_dsp(self, sdr_value):
+        """
+        Arg sdr_value from 0 to self._maxlen.
+        """
+
         norm_value = self.norm_sdr_value(sdr_value)
         return float((norm_value / self._maxlen) * (self._num_range[1] - self._num_range[0]) + self._num_range[0])
 
     def set_disabled(self, state):
+        """
+        Set state for tools.
+        """
+
         self.dsp_local.setDisabled(bool(state))
         self.sdr_local.setDisabled(bool(state))
 
     def set_value(self, value):
+        """
+        Set value for SlideText.
+        """
+
         norm_value = self.norm_dsp_value(value)
         self._emitting = False
         self._value = norm_value
@@ -106,6 +154,10 @@ class SlideText(QWidget):
         self._emitting = True
 
     def get_value(self):
+        """
+        Get value for SlideText.
+        """
+
         return self._value
 
     def set_text(self, text):
@@ -126,32 +178,52 @@ class SlideText(QWidget):
         return self._num_range
 
     def value_changed_from_dsp(self, value):
+        """
+        Change dsp_local value.
+        """
+
         if value != self._value:
             self._value = self.norm_dsp_value(value)
             self.sdr_local.setValue(self.value_dsp_to_sdr(self._value))
+
             if self._emitting:
                 self.ps_value_changed.emit(self._value)
 
     def value_changed_from_sdr(self, value):
+        """
+        Change sdr_local value.
+        """
+
         if value != self.value_dsp_to_sdr(self._value):
             self._value = self.value_sdr_to_dsp(value)
             self.dsp_local.setValue(self._value)
+
             if self._emitting:
                 self.ps_value_changed.emit(self._value)
 
 class RGBHSVCkb(QWidget):
+    """
+    Box with a R, G, B, H, S, V ckeckboxes.
+    """
+
     ps_value_changed = pyqtSignal(tuple)
 
     def __init__(self, wget, default_values=[], oneline_mode=True):
+        """
+        Init operation.
+        """
+
         super().__init__(wget)
         self._avi_values = ("r", "g", "b", "h", "s", "v")
         self._values = []
         self._prefix_text = ""
         self._emitting = True
+
         if default_values and isinstance(default_values, (tuple, list)):
             for vl in default_values:
                 if str(vl).lower() in self._avi_values:
                     self._values.append(str(vl).lower())
+
         self._oneline_mode = bool(oneline_mode)
         local_grid_layout = QGridLayout(self)
         local_grid_layout.setContentsMargins(0, 0, 0, 0)
@@ -191,46 +263,70 @@ class RGBHSVCkb(QWidget):
         self.ckb_v.stateChanged.connect(self.set_value_from_ckb("v"))
 
     def inner_set_value(self, name, state):
+        """
+        Inner func for set value.
+
+        Args:
+            name (str): "r", "g", "b", "h", "s" or "v".
+            state (bool): box is checked or unchecked.
+        """
+
         norm_name = str(name).lower()
+
         if norm_name in self._avi_values:
             if state:
                 if self._oneline_mode:
                     changed_values = []
+
                     if norm_name in self._avi_values[:3]:
                         for vl in self._values:
                             if vl in self._avi_values[:3]:
                                 changed_values.append(vl)
+
                     else:
                         for vl in self._values:
                             if vl in self._avi_values[3:]:
                                 changed_values.append(vl)
+
                     self._values = changed_values
                 else:
                     self._values = []
+
                 if norm_name not in self._values:
                     self._values.append(norm_name)
+
             else:
                 changed_values = []
+
                 for vl in self._values:
                     if vl != norm_name:
                         changed_values.append(vl)
+
                 self._values = changed_values
+
         if len(self._values) > 1:
             changed_values = []
+
             for vl in self._avi_values:
                 if vl in self._values:
                     changed_values.append(vl)
+
             self._values = changed_values
+
         for vl in self._avi_values:
             ckb = getattr(self, "ckb_{}".format(vl))
+
             if vl in self._values:
                 if not ckb.isChecked():
                     ckb.setChecked(True)
+
             else:
                 if ckb.isChecked():
                     ckb.setChecked(False)
+
         if self._values:
             self.lab_link.setText(self._prefix_text[1] + " ".join([x.upper() for x in self._values]))
+
         else:
             self.lab_link.setText(self._prefix_text[0])
 
@@ -243,8 +339,10 @@ class RGBHSVCkb(QWidget):
     def set_value_from_ckb(self, value):
         def _func_(state):
             self.inner_set_value(value, state)
+
             if self._values and self._emitting:
                 self.ps_value_changed.emit(tuple(self._values))
+
         return _func_
 
     def get_values(self):
@@ -253,9 +351,12 @@ class RGBHSVCkb(QWidget):
     def set_prefix_text(self, text):
         if isinstance(text, (tuple, list)) and len(text) > 1:
             self._prefix_text = (str(text[0]), str(text[1]))
+
         else:
             self._prefix_text = (str(text), str(text))
+
         if self._values:
             self.lab_link.setText(self._prefix_text[1] + " ".join([x.upper() for x in self._values]))
+
         else:
             self.lab_link.setText(self._prefix_text[0])

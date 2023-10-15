@@ -18,9 +18,17 @@ from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
 
 
 class Channel(QWidget):
+    """
+    Channel object based on QWidget. Init a channel in channel.
+    """
+
     ps_channel_changed = pyqtSignal(bool)
 
     def __init__(self, wget, args):
+        """
+        Init channel.
+        """
+
         super().__init__(wget)
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self._args = args
@@ -49,11 +57,13 @@ class Channel(QWidget):
         gbox_grid_layout.setVerticalSpacing(16)
         scroll_grid_layout.addWidget(self._category_gbox, 0, 1, 1, 1)
         self._category_btns = []
+
         for i in range(8):
             btn = QRadioButton(self._category_gbox)
             gbox_grid_layout.addWidget(btn, i, 0, 1, 1)
             btn.clicked.connect(self.modify_category(i))
             self._category_btns.append(btn)
+
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
         gbox_grid_layout.addItem(spacer, 8, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
@@ -65,11 +75,13 @@ class Channel(QWidget):
         gbox_grid_layout.setVerticalSpacing(16)
         scroll_grid_layout.addWidget(self._channel_gbox, 1, 1, 1, 1)
         self._channel_btns = []
+
         for i in range(7):
             btn = QRadioButton(self._channel_gbox)
             gbox_grid_layout.addWidget(btn, i, 0, 1, 1)
             btn.clicked.connect(self.modify_channel(i))
             self._channel_btns.append(btn)
+
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
         gbox_grid_layout.addItem(spacer, 7, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
@@ -85,32 +97,49 @@ class Channel(QWidget):
         self.update_text()
 
     def modify_category(self, idx):
+        """
+        Modify stored category set by btn.
+        """
+
         def _func_(value):
             self._backups = (self._args.sys_category, self._args.sys_channel)
             self._args.sys_category = idx
             self.ps_channel_changed.emit(True)
             self.update_text()
+
         return _func_
 
     def modify_channel(self, idx):
+        """
+        Modify stored channel set by btn.
+        """
+
         def _func_(value):
             self._backups = (self._args.sys_category, self._args.sys_channel)
             self._args.sys_channel = idx
             self.ps_channel_changed.emit(True)
+
         return _func_
 
     def recover(self):
+        """
+        Recover sys_category and sys_channel from backups.
+        """
+
         self._args.sys_category, self._args.sys_channel = self._backups
         self.reset()
 
     def update_text(self):
         self._category_gbox.setTitle(self._gbox_descs[0])
         self._channel_gbox.setTitle(self._gbox_descs[1])
+
         for i in range(8):
             self._category_btns[i].setText(self._category_descs[i])
+
         if self._args.sys_category in range(4):
             for i in range(7):
                 self._channel_btns[i].setText(self._channel_descs[i])
+
         else:
             for i in range(7):
                 self._channel_btns[i].setText(self._channel_descs[i + 7])
@@ -121,6 +150,7 @@ class Channel(QWidget):
             _translate("Channel", "Category"),
             _translate("Channel", "Channel"),
         )
+
         self._category_descs = (
             _translate("Channel", "Norm RGB"),
             _translate("Channel", "Vtcl RGB"),
@@ -131,6 +161,7 @@ class Channel(QWidget):
             _translate("Channel", "Horz HSV"),
             _translate("Channel", "Finl HSV"),
         )
+
         self._channel_descs = (
             _translate("Channel", "Full RGB"),
             _translate("Channel", "Chnnel R"),
@@ -147,3 +178,4 @@ class Channel(QWidget):
             _translate("Channel", "Not S"),
             _translate("Channel", "Not V"),
         )
+
