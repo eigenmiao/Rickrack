@@ -7,7 +7,7 @@ numpy == 1.19.5
 pefile == 2023.2.7
 Pillow == 10.0.1
 pip == 23.3
-PyInstaller == 3.4
+PyInstaller == 5.13.1
 pyinstaller-hooks-contrib == 2022.0
 PySide2 == 5.12.2
 setuptools == 65.5.1
