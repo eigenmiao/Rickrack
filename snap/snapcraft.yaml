@@ -18,12 +18,14 @@ parts:
         stage-packages:
             - libasound2
             - libasyncns0
+            - libdouble-conversion1v5
             - libdrm2
             - libfcitx-qt5-1
             - libflac8
             - libgtk-3-0
             - libice6
             - libicu55
+            - libjson-c2
             - libogg0
             - libpcre16-3
             - libproxy1v5
@@ -38,6 +40,7 @@ parts:
             - libxcb-dri3-0
             - libxcb-xinerama0
             - libxcb1
+            - appmenu-qt5
             - xdg-user-dirs
             - mesa-utils
             - libgl1-mesa-dri
@@ -59,6 +62,7 @@ apps:
             QML2_IMPORT_PATH: $SNAP/PyQt5/Qt/qml:$QML2_IMPORT_PATH
             QT_PLUGIN_PATH: $SNAP/PyQt5/Qt/plugins:$QT_PLUGIN_PATH
             QT_LINUX_ACCESSIBILITY_ALWAYS_ON: 1
+            QT_QPA_PLATFORMTHEME: appmenu-qt5
             QT_ACCESSIBILITY: 1
             QT_IM_MODULE: fcitx
         command: Rickrack
