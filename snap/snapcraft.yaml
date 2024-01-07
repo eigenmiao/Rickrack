@@ -16,32 +16,37 @@ parts:
             snapcraftctl stage
             echo "{\"store_loc\": false}" > $SNAPCRAFT_STAGE/settings.json
         stage-packages:
-            - libFcitx5Qt5DBusAddons.so.1
-            - libFcitxQt5DBusAddons.so.1
-            - libGL.so.1
-            - libQt53DAnimation.so.5
-            - libQt53DCore.so.5
-            - libQt53DInput.so.5
-            - libQt53DLogic.so.5
-            - libQt53DQuick.so.5
-            - libQt53DQuickScene2D.so.5
-            - libQt53DRender.so.5
-            - libQt5EglFSDeviceIntegration.so.5
-            - libQt5EglFsKmsSupport.so.5
-            - libQt5Gamepad.so.5
-            - libQt5MultimediaQuick.so.5
-            - libasound.so.2
-            - libdrm.so.2
-            - libgtk-3.so.0
-            - libodbc.so.2
-            - libpq.so.5
-            - libpulse-mainloop-glib.so.0
-            - libpulse.so.0
-            - libtinfo.so.5
-            - libxcb-dri2.so.0
-            - libxcb-dri3.so.0
-            - libxcb-xinerama.so.0
-            - libxcb.so.1
+            - libasound2
+            - libasyncns0
+            - libdouble-conversion1v5
+            - libdrm2
+            - libfcitx-qt5-1
+            - libflac8
+            - libgtk-3-0
+            - libice6
+            - libicu55
+            - libjson-c2
+            - libogg0
+            - libpcre16-3
+            - libproxy1v5
+            - libpulse-mainloop-glib0
+            - libpulse0
+            - libsm6
+            - libsndfile1
+            - libtinfo5
+            - libvorbis0a
+            - libvorbisenc2
+            - libxcb-dri2-0
+            - libxcb-dri3-0
+            - libxcb-xinerama0
+            - libxcb1
+            - appmenu-qt5
+            - xdg-user-dirs
+            - mesa-utils
+            - libgl1-mesa-dri
+            - libgl1-mesa-glx
+            - gstreamer1.0-plugins-base
+            - gstreamer1.0-plugins-good
 
 slots:
   dbus-rickrack:

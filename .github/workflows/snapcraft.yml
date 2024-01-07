@@ -1,8 +1,10 @@
 name: Publish to Snapcraft
-on: push
+on:
+  release:
+    types: [released]
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
     - uses: snapcore/action-build@v1
