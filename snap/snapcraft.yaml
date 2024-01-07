@@ -39,7 +39,6 @@ parts:
             - libxcb-dri3-0
             - libxcb-xinerama0
             - libxcb1
-            - appmenu-qt5
             - xdg-user-dirs
             - mesa-utils
             - libgl1-mesa-dri
@@ -61,7 +60,6 @@ apps:
             QML2_IMPORT_PATH: $SNAP/PyQt5/Qt/qml:$QML2_IMPORT_PATH
             QT_PLUGIN_PATH: $SNAP/PyQt5/Qt/plugins:$QT_PLUGIN_PATH
             QT_LINUX_ACCESSIBILITY_ALWAYS_ON: 1
-            QT_QPA_PLATFORMTHEME: appmenu-qt5
             QT_ACCESSIBILITY: 1
             QT_IM_MODULE: fcitx
         command: Rickrack
