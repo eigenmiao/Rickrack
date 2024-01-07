@@ -25,7 +25,6 @@ parts:
             - libgtk-3-0
             - libice6
             - libicu55
-            - libjson-c2
             - libogg0
             - libpcre16-3
             - libproxy1v5
