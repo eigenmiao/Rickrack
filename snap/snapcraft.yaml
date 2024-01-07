@@ -15,6 +15,33 @@ parts:
         override-stage: |
             snapcraftctl stage
             echo "{\"store_loc\": false}" > $SNAPCRAFT_STAGE/settings.json
+        stage-packages:
+            - libFcitx5Qt5DBusAddons.so.1
+            - libFcitxQt5DBusAddons.so.1
+            - libGL.so.1
+            - libQt53DAnimation.so.5
+            - libQt53DCore.so.5
+            - libQt53DInput.so.5
+            - libQt53DLogic.so.5
+            - libQt53DQuick.so.5
+            - libQt53DQuickScene2D.so.5
+            - libQt53DRender.so.5
+            - libQt5EglFSDeviceIntegration.so.5
+            - libQt5EglFsKmsSupport.so.5
+            - libQt5Gamepad.so.5
+            - libQt5MultimediaQuick.so.5
+            - libasound.so.2
+            - libdrm.so.2
+            - libgtk-3.so.0
+            - libodbc.so.2
+            - libpq.so.5
+            - libpulse-mainloop-glib.so.0
+            - libpulse.so.0
+            - libtinfo.so.5
+            - libxcb-dri2.so.0
+            - libxcb-dri3.so.0
+            - libxcb-xinerama.so.0
+            - libxcb.so.1
 
 slots:
   dbus-rickrack:
