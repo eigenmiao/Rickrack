@@ -15,36 +15,6 @@ parts:
         override-stage: |
             snapcraftctl stage
             echo "{\"store_loc\": false}" > $SNAPCRAFT_STAGE/settings.json
-        stage-packages:
-            - libasound2
-            - libasyncns0
-            - libdrm2
-            - libfcitx-qt5-1
-            - libflac8
-            - libgtk-3-0
-            - libice6
-            - libicu55
-            - libjson-c2
-            - libogg0
-            - libpcre16-3
-            - libproxy1v5
-            - libpulse-mainloop-glib0
-            - libpulse0
-            - libsm6
-            - libsndfile1
-            - libtinfo5
-            - libvorbis0a
-            - libvorbisenc2
-            - libxcb-dri2-0
-            - libxcb-dri3-0
-            - libxcb-xinerama0
-            - libxcb1
-            - xdg-user-dirs
-            - mesa-utils
-            - libgl1-mesa-dri
-            - libgl1-mesa-glx
-            - gstreamer1.0-plugins-base
-            - gstreamer1.0-plugins-good
 
 slots:
   dbus-rickrack:
@@ -60,6 +30,7 @@ apps:
             QML2_IMPORT_PATH: $SNAP/PyQt5/Qt/qml:$QML2_IMPORT_PATH
             QT_PLUGIN_PATH: $SNAP/PyQt5/Qt/plugins:$QT_PLUGIN_PATH
             QT_LINUX_ACCESSIBILITY_ALWAYS_ON: 1
+            QT_QPA_PLATFORMTHEME: appmenu-qt5
             QT_ACCESSIBILITY: 1
             QT_IM_MODULE: fcitx
         command: Rickrack
