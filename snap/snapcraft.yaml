@@ -1,0 +1,79 @@
+name: rickrack
+version: 2.8.42
+summary: Generate harmonious colors freely.
+description: |
+    Rickrack is a free and open-source color palette generator. It provides various functionalities to generate a harmonious set of colors, offering you better color combination options. You can easily obtain the desired color combinations through color wheel selection, color picking from images, and more. It offers support for various color palette formats like aco, ase, gpl, and xml, making them easily importable into popular image processing software such as Photoshop, Clip Studio Paint, GIMP, Krita, and Inkscape. You can apply these colors to your own creations or share them with others.
+
+grade: stable
+base: core20
+confinement: strict
+
+parts:
+    rickrack:
+        plugin: dump
+        source: https://github.com/eigenmiao/Rickrack/releases/download/v$SNAPCRAFT_PROJECT_VERSION/Rickrack_v$SNAPCRAFT_PROJECT_VERSION_en_linux_x86_64.tar.gz
+        override-stage: |
+            snapcraftctl stage
+            echo "{\"store_loc\": false}" > $SNAPCRAFT_STAGE/settings.json
+        stage-packages:
+            - libasound2
+            - libasyncns0
+            - libdouble-conversion1v5
+            - libdrm2
+            - libfcitx-qt5-1
+            - libflac8
+            - libgtk-3-0
+            - libice6
+            - libicu55
+            - libjson-c2
+            - libogg0
+            - libpcre16-3
+            - libproxy1v5
+            - libpulse-mainloop-glib0
+            - libpulse0
+            - libsm6
+            - libsndfile1
+            - libtinfo5
+            - libvorbis0a
+            - libvorbisenc2
+            - libxcb-dri2-0
+            - libxcb-dri3-0
+            - libxcb-xinerama0
+            - libxcb1
+            - appmenu-qt5
+            - xdg-user-dirs
+            - mesa-utils
+            - libgl1-mesa-dri
+            - libgl1-mesa-glx
+            - gstreamer1.0-plugins-base
+            - gstreamer1.0-plugins-good
+
+slots:
+  dbus-rickrack:
+    interface: dbus
+    bus: session
+    name: com.eigenmiao.rickrack
+
+apps:
+    rickrack:
+        environment:
+            LD_LIBRARY_PATH: $SNAP:$LD_LIBRARY_PATH
+            PATH: $SNAP:$PATH
+            QML2_IMPORT_PATH: $SNAP/PyQt5/Qt/qml:$QML2_IMPORT_PATH
+            QT_PLUGIN_PATH: $SNAP/PyQt5/Qt/plugins:$QT_PLUGIN_PATH
+            QT_LINUX_ACCESSIBILITY_ALWAYS_ON: 1
+            QT_QPA_PLATFORMTHEME: appmenu-qt5
+            QT_ACCESSIBILITY: 1
+            QT_IM_MODULE: fcitx
+        command: Rickrack
+        plugs:
+            - desktop
+            - framebuffer
+            - camera
+            - network
+            - home
+            - opengl
+            - x11
+            - desktop-legacy
+        slots:
+            - dbus-rickrack

@@ -9,7 +9,7 @@ Public License for more details.
 """
 
 __COPYRIGHT__ = """
-Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
+Copyright (c) 2019-2024 by Eigenmiao. All Rights Reserved.
 """
 
 __WEBSITE__ = """
@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.8.41-x3d3s3-stable
+v2.8.42-x3d3s3-stable
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-October 15, 2023
+October 15, 2024
 """
 
 __HELP__ = """
@@ -751,7 +751,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         Change layout.
         """
 
-        if isinstance(layout_src, str) and self._args.geometry_args:
+        if isinstance(layout_src, str) and os.path.isfile(self._args.geometry_args):
             main_win_layout = 0
             main_win_state = self._geo_args.value('main_win_state', None)
             main_win_geometry = self._geo_args.value('main_win_geometry', None)
@@ -794,9 +794,6 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
         else:
             store_path = self._args.usr_store
-
-        if not os.path.isdir(os.sep.join((store_path, "MyColors"))):
-            os.makedirs(os.sep.join((store_path, "MyColors")))
 
         if os.path.isfile(os.sep.join((store_path, "depot.json"))) and self._sys_argv["reset"] not in ("depot", "work", "all"):
             self._wget_operation.dp_open(os.sep.join((store_path, "depot.json")))
@@ -1902,7 +1899,11 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 print("+")
 
         if self._save_settings_before_close and not self._sys_argv["temporary"]:
-            self.save_main_settings()
+            try:
+                self.save_main_settings()
+
+            except Exception as err:
+                pass
 
         self._args.remove_temp_dir()
         self._wget_wheel.close()

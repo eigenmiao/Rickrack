@@ -1,0 +1,6 @@
+[Desktop Entry]
+Terminal=false
+Name=Rickrack
+Exec=rickrack
+Icon=${SNAP}/meta/gui/rickrack.png
+Type=Application
