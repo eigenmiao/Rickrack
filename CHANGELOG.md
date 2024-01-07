@@ -144,3 +144,9 @@
 * Comments:
 1. Update documents.
 2. Update translations.
+
+# v2.8.42-x3d3s3
+* Date: January 7, 2024
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.42
+* Comments:
+1. Fix "Failed to execute script main" when startup.

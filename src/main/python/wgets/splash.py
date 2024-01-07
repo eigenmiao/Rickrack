@@ -39,8 +39,7 @@ class DPSplash(QSplashScreen):
                 display_lang = "zh"
 
         else:
-            default_locale = locale.getdefaultlocale()[0]
-            default_locale = str(default_locale).lower() if default_locale else ""
+            default_locale = str(locale.getdefaultlocale()[0]).lower()
 
             if len(default_locale) > 1 and default_locale[:2].lower() in ("zh", "ja", "ko"):
                 display_lang = "zh"

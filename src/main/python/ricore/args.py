@@ -34,10 +34,10 @@ class Args(object):
         Init Args object.
         """
 
-        self.info_version_zh = "v2.8.41-x3d3s3-稳定版"
-        self.info_version_en = "v2.8.41-x3d3s3-stable"
-        self.info_date_zh = "2023年10月15日"
-        self.info_date_en = "October 15, 2023"
+        self.info_version_zh = "v2.8.42-x3d3s3-稳定版"
+        self.info_version_en = "v2.8.42-x3d3s3-stable"
+        self.info_date_zh = "2024年1月7日"
+        self.info_date_en = "January 7, 2024"
         self.global_temp_dir = None
         self.global_hm_rules = (
             "analogous",
@@ -90,9 +90,6 @@ class Args(object):
 
         lang_paths = [(41, "default"),]
         langs_dir = os.sep.join((resources, "langs"))
-
-        if not os.path.isdir(langs_dir):
-            os.makedirs(langs_dir)
 
         for lang in os.listdir(langs_dir):
             if os.path.isfile(os.sep.join((langs_dir, lang))) and lang.split(".")[-1] == "qm":
@@ -253,10 +250,18 @@ class Args(object):
             self.usr_image = os.sep.join((self.home_dir, self.pic_name))
 
         if not os.path.isdir(self.usr_color):
-            os.makedirs(self.usr_color)
+            try:
+                os.makedirs(self.usr_color)
+
+            except Exception as err:
+                pass
 
         if not os.path.isdir(self.usr_image):
-            os.makedirs(self.usr_image)
+            try:
+                os.makedirs(self.usr_image)
+
+            except Exception as err:
+                pass
 
         self.hm_rule = "analogous"
         self.overflow = "return"
@@ -416,7 +421,7 @@ class Args(object):
                     json.dump(settings, sf, ensure_ascii=False)
 
                 with open(os.sep.join((self.resources, "settings.json")), "w", encoding="utf-8") as sf:
-                    json.dump({"store_loc": False, "lang": self.lang}, sf, ensure_ascii=False)
+                    json.dump({"version": self.info_version_en, "site": self.info_main_site, "store_loc": False, "lang": self.lang}, sf, ensure_ascii=False)
 
             except Exception as err:
                 if self.global_log:
