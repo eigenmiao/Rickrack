@@ -54,11 +54,14 @@ class ResultServer(QThread):
         Start running in thread.
         """
 
+        self.req.args.d_action(800)
         try:
             self._server = TCPServer(("localhost", self._port), self.req)
 
         except Exception as err:
             self._server = None
+            self.req.args.d_error(800, err)
 
         if self._server:
             self._server.serve_forever()
+            self.req.args.d_action(801)
