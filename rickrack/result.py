@@ -14,7 +14,7 @@ Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
 """
 
 import numpy as np
-from rickrack.color import Color
+from rickrack.color import Color, CTP, OTP
 
 
 class Box(object):
