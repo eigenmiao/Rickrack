@@ -17,9 +17,9 @@ import re
 from PyQt5.QtWidgets import QDialog, QDialogButtonBox, QPushButton, QGroupBox, QGridLayout, QLabel, QLineEdit
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication
 from PyQt5.QtGui import QIcon, QPixmap
-from ricore.check import check_key, check_nonempt_str_lst
 from cguis.design.settings_dialog import Ui_SettingsDialog
 from cguis.resource import view_rc
+from ricore.check import check_key, check_nonempt_str_lst
 
 
 class Settings(QDialog, Ui_SettingsDialog):
@@ -181,8 +181,8 @@ class Settings(QDialog, Ui_SettingsDialog):
         for method in self._args.global_hm_rules:
             self.hm_rule_comb.addItem("")
 
-        for i in range(len(self._color_sys_descs)):
-            self.color_sys_comb.addItem("")
+        for i in range(len(self._color_spc_descs)):
+            self.color_spc_comb.addItem("")
 
         for overfl in self._args.global_overflows:
             self.overflow_comb.addItem("")
@@ -266,7 +266,7 @@ class Settings(QDialog, Ui_SettingsDialog):
         self.win_on_top_cbox.setChecked(self._args.win_on_top)
         self.lang_comb.setCurrentIndex([x[1] for x in self._args.usr_langs].index(self._args.lang))
         self.hm_rule_comb.setCurrentIndex(self._args.global_hm_rules.index(self._args.hm_rule))
-        self.color_sys_comb.setCurrentIndex(self._args.color_sys)
+        self.color_spc_comb.setCurrentIndex(self._args.color_spc)
         self.overflow_comb.setCurrentIndex(self._args.global_overflows.index(self._args.overflow))
         self.export_swatch_ctp_comb.setCurrentText(self._args.export_swatch_ctp.upper())
         self.export_ase_type_comb.setCurrentIndex(("spot", "global", "process").index(self._args.export_ase_type))
@@ -338,7 +338,7 @@ class Settings(QDialog, Ui_SettingsDialog):
         self._args.modify_settings("win_on_top", self.win_on_top_cbox.isChecked())
         hm_rule = self._args.hm_rule
         self._args.modify_settings("hm_rule", self._args.global_hm_rules[self.hm_rule_comb.currentIndex()])
-        self._args.modify_settings("color_sys", self.color_sys_comb.currentIndex())
+        self._args.modify_settings("color_spc", self.color_spc_comb.currentIndex())
 
         if self._args.hm_rule != hm_rule:
             self.ps_rule_changed.emit()
@@ -512,8 +512,8 @@ class Settings(QDialog, Ui_SettingsDialog):
         for idx in range(len(self._args.global_hm_rules)):
             self.hm_rule_comb.setItemText(idx, self._rule_descs[idx])
 
-        for idx in range(len(self._color_sys_descs)):
-            self.color_sys_comb.setItemText(idx, self._color_sys_descs[idx])
+        for idx in range(len(self._color_spc_descs)):
+            self.color_spc_comb.setItemText(idx, self._color_spc_descs[idx])
 
         for idx in range(len(self._args.global_overflows)):
             self.overflow_comb.setItemText(idx, self._overflow_descs[idx])
@@ -560,7 +560,7 @@ class Settings(QDialog, Ui_SettingsDialog):
             _translate("Rule", "Repeat"),
         )
 
-        self._color_sys_descs = (
+        self._color_spc_descs = (
             _translate("Mode", "RGB Space"),
             _translate("Mode", "Rev RGB Space"),
             _translate("Mode", "RYB Space"),

@@ -15,7 +15,6 @@ Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
 
 import os
 import time
-from ricore.color import Color
 from ricore.export import get_export_color_list
 from socketserver import BaseRequestHandler
 
@@ -35,10 +34,12 @@ class Request(BaseRequestHandler):
 
         req = self.request.recv(4)
         req = req.decode("utf-8")
+        self.args.d_info(800, req)
 
         if req == "cidx":
             text = self.request.recv(1024)
             text = text.decode("utf-8")
+            self.args.d_info(801, text)
             text = text.split("; ")
 
             if len(text) > 0 and text[0] and text[0] in [str(i) for i in range(5)]:
@@ -52,6 +53,7 @@ class Request(BaseRequestHandler):
                     color = tuple([float(i) for i in text[1].split(" ")])
 
                 except Exception as err:
+                    self.args.d_error(801, err)
                     color = ()
 
             if len(color) == 3:
@@ -60,6 +62,7 @@ class Request(BaseRequestHandler):
         elif req == "star":
             text = self.request.recv(1024)
             text = text.decode("utf-8")
+            self.args.d_info(801, text)
             text = text.lstrip().rstrip()
 
             if text:
@@ -67,10 +70,13 @@ class Request(BaseRequestHandler):
                 self.ps_star.emit(True)
 
         elif req == "stat":
-            self.request.sendall(str(int(bool(self.args.sys_choice_stat))).encode("utf-8"))
+            text = str(int(bool(self.args.sys_choice_stat)))
+            self.request.sendall(text.encode("utf-8"))
+            self.args.d_info(802, text)
 
         elif req == "iset":
             path = self.request.recv(1024)
+            self.args.d_info(801, path)
             path = path.decode("utf-8")
             path = path.lstrip().rstrip()
 
@@ -79,6 +85,7 @@ class Request(BaseRequestHandler):
 
         elif req == "oset":
             path = self.request.recv(1024)
+            self.args.d_info(801, path)
             path = path.decode("utf-8")
             path = path.lstrip().rstrip()
 
@@ -87,6 +94,7 @@ class Request(BaseRequestHandler):
 
         elif req == "idpt":
             path = self.request.recv(1024)
+            self.args.d_info(801, path)
             path = path.decode("utf-8")
             path = path.lstrip().rstrip()
 
@@ -95,6 +103,7 @@ class Request(BaseRequestHandler):
 
         elif req == "odpt":
             path = self.request.recv(1024)
+            self.args.d_info(801, path)
             path = path.decode("utf-8")
             path = path.lstrip().rstrip()
 
@@ -103,8 +112,8 @@ class Request(BaseRequestHandler):
 
         elif req == "data":
             rule = self.args.hm_rule[0].upper() + self.args.hm_rule[1:]
-            main_color_list, main_cname_list = get_export_color_list([(self.args.sys_color_set, self.args.hm_rule, "RR", "", (time.time(), time.time()), self.args.sys_grid_locations, self.args.sys_grid_assitlocs, self.args.sys_grid_list, self.args.sys_grid_values),], export_grid=False)
-            grid_color_list, grid_cname_list = get_export_color_list([(self.args.sys_color_set, self.args.hm_rule, "RR", "", (time.time(), time.time()), self.args.sys_grid_locations, self.args.sys_grid_assitlocs, self.args.sys_grid_list, self.args.sys_grid_values),], export_grid=True)
+            main_color_list, main_cname_list = get_export_color_list([(self.args.sys_color_set, self.args.hm_rule, "RR", "", (time.time(), time.time()), self.args.sys_grid_locations, self.args.sys_grid_assitlocs, self.args.sys_grid_list, self.args.sys_grid_values),], export_grid=False, useryb=self.args.dep_wtp)
+            grid_color_list, grid_cname_list = get_export_color_list([(self.args.sys_color_set, self.args.hm_rule, "RR", "", (time.time(), time.time()), self.args.sys_grid_locations, self.args.sys_grid_assitlocs, self.args.sys_grid_list, self.args.sys_grid_values),], export_grid=True, useryb=self.args.dep_wtp)
             text = ""
             text += "{}; ".format(rule)
             text += "{}; ".format(self.args.sys_activated_idx)
@@ -115,9 +124,10 @@ class Request(BaseRequestHandler):
             if self.args.sys_grid_list[0]:
                 text += " ".join(['"{}"'.format(i) for i in grid_cname_list])
 
-            text = text.encode("utf-8")
-            text = "{:10d}".format(len(text)).encode("utf-8") + text
-            self.request.sendall(text)
+            text = text
+            text = "{:10d}".format(len(text)) + text
+            self.request.sendall(text.encode("utf-8"))
+            self.args.d_info(802, text)
 
         elif req == "exit":
             text = self.request.recv(1)
