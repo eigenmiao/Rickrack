@@ -18,7 +18,7 @@ import numpy as np
 from PIL import Image, ImageFilter
 from PyQt5.QtCore import QThread, pyqtSignal
 from PyQt5.QtGui import QImage
-from ricore.color import Color
+from ricore.color import Color, CTP
 from ricore.image_act import extract_image
 
 
@@ -29,12 +29,13 @@ class Image3C(QThread):
     ps_enhanced = pyqtSignal(int)
     ps_extracts = pyqtSignal(list)
 
-    def __init__(self, temp_dir):
+    def __init__(self, temp_dir, debug_tools):
         """
         Init image3c with default temp dir.
         """
 
         super().__init__()
+        self._d_error, self._d_info, self._d_action = debug_tools
         self._temp_dir = temp_dir
         self.img_data = None
         self.display = None
@@ -56,6 +57,10 @@ class Image3C(QThread):
         """
         Start running in thread.
         """
+
+        self._d_action(500)
+        self._d_info(500, self.run_category)
+        self._d_info(501, self.run_args)
 
         if isinstance(self.run_category, int):
             func = getattr(self, "run_{}".format(self.run_category))
@@ -115,6 +120,11 @@ class Image3C(QThread):
 
             if script[1] != (0.0, 0.0, 1.0, 1.0):
                 self.img_data = self.img_data.crop((int(round(script[1][0] * self.img_data.size[0])), int(round(script[1][1] * self.img_data.size[1])), int(round(script[1][2] * self.img_data.size[0])), int(round(script[1][3] * self.img_data.size[1]))))
+
+            ratio = max(5.0 / self.img_data.size[0], 5.0 / self.img_data.size[1])
+
+            if ratio > 1.0:
+                self.img_data = self.img_data.resize((int(self.img_data.size[0] * ratio), int(self.img_data.size[1] * ratio)), Image.ANTIALIAS)
 
         else:
             self.ps_describe.emit(1)
@@ -415,6 +425,7 @@ class Image3C(QThread):
             load_image.save(image_path)
 
         except Exception as err:
+            self._d_error(500, err)
             return None
 
         if os.path.isfile(image_path):
@@ -533,6 +544,7 @@ class Image3C(QThread):
                 img_data = Image.open(img_path).convert("RGB")
 
             except Exception as err:
+                self._d_error(501, err)
                 img_data = None
 
             if img_data:
@@ -561,7 +573,7 @@ class Image3C(QThread):
         if not isinstance(self.ori_display_data, np.ndarray):
             return
 
-        reg, separ, fact, res, sigma = values
+        reg, separ, fact, res, sigma, onedir, useryb = values
 
         if res and isinstance(self.res_display_data, np.ndarray):
             display_data = self.res_display_data
@@ -575,36 +587,25 @@ class Image3C(QThread):
         else:
             separ = list(separ)
 
-        for i in range(len(reg)):
-            separ[i] = float(separ[i]) * 1.000000392 # 255.0001 / 255.0
-            separ[i] = 0.0 if separ[i] < 0.0 else separ[i]
-            separ[i] = 255.0001 if separ[i] > 255.0001 else separ[i]
-
         if isinstance(fact, (int, float)):
             fact = [fact,] * len(reg)
 
         else:
             fact = list(fact)
 
-        for i in range(len(reg)):
-            fact[i] = float(fact[i])
-            fact[i] = 0.0 if fact[i] < 0.0 else fact[i]
-            fact[i] = 1.0 if fact[i] > 1.0 else fact[i]
-
         sigma = float(sigma)
         sigma = 0.0 if sigma < 0.0 else sigma
         sigma = 1.0 if sigma > 1.0 else sigma
 
         for k, k_separ, k_fact in zip(reg, separ, fact):
-            if k_fact == 0.0:
+            if abs(k_fact) < 1E-3:
                 continue
 
-            data = np.array(display_data[:, :, k], dtype=np.float64)
-            selection = np.where(data >= k_separ)
+            data = np.array(display_data[:, :, k], dtype=np.float32)
 
             if sigma == 0.0:
                 expd = np.zeros(data.shape)
-                expd[np.where(data == int(k_separ))] = k_fact
+                expd[np.where((data < k_separ + 1) & (data > k_separ - 1))] = k_fact
 
             elif sigma == 1.0:
                 expd = np.ones(data.shape) * k_fact
@@ -613,8 +614,17 @@ class Image3C(QThread):
                 expd = 0.001 * (10 ** (4.5 * sigma)) * -1
                 expd = np.exp(((data - k_separ) / 255.0) ** 2 / expd) * k_fact
 
-            data = data * (1.0 - expd)
-            data[selection] = data[selection] + expd[selection] * 255.0
+            if onedir:
+                data = data + expd * 255.0
+
+            else:
+                expd = np.abs(expd)
+                selection = np.where(data >= k_separ) if k_separ < 125 else np.where(data > k_separ)
+                data = data * (1.0 - expd)
+                data[selection] = data[selection] + expd[selection] * 255.0
+
+            data[np.where(data < 0)] = 0
+            data[np.where(data > 255)] = 255
             display_data[:, :, k] = np.array(data, dtype=np.uint8)
 
         self.res_display_data = display_data
@@ -634,7 +644,7 @@ class Image3C(QThread):
         if not isinstance(self.ori_display_data, np.ndarray):
             return
 
-        reg, separ, fact, res, sigma = values
+        reg, separ, fact, res, sigma, onedir, useryb = values
 
         if res and isinstance(self.rev_display_data, np.ndarray):
             display_data = self.rev_display_data
@@ -651,44 +661,32 @@ class Image3C(QThread):
         else:
             separ = list(separ)
 
-        for i in range(len(reg)):
-            if reg[i] == 0:
-                separ[i] = float(separ[i]) * 1.000000278 # 360.0001 / 360.0
-                separ[i] = 0.0 if separ[i] < 0.0 else separ[i]
-                separ[i] = 360.0001 if separ[i] > 360.0001 else separ[i]
-
-            else:
-                separ[i] = float(separ[i]) * 1.0001
-                separ[i] = 0.0 if separ[i] < 0.0 else separ[i]
-                separ[i] = 1.0001 if separ[i] > 1.0001 else separ[i]
-
         if isinstance(fact, (int, float)):
             fact = [fact,] * len(reg)
 
         else:
             fact = list(fact)
 
-        for i in range(len(reg)):
-            fact[i] = float(fact[i])
-            fact[i] = 0.0 if fact[i] < 0.0 else fact[i]
-            fact[i] = 1.0 if fact[i] > 1.0 else fact[i]
-
         sigma = float(sigma)
         sigma = 0.0 if sigma < 0.0 else sigma
         sigma = 1.0 if sigma > 1.0 else sigma
 
         for k, k_separ, k_fact in zip(reg, separ, fact):
-            if k_fact == 0.0:
+            if abs(k_fact) < 1E-3:
                 continue
 
-            data = np.array(display_data[:, :, k], dtype=np.float64)
+            data = np.array(display_data[:, :, k], dtype=np.float32)
 
             if k == 0:
-                data = Color((k_separ, 1.0, 1.0), tp="hsv").ref_h_array(data)
+                if useryb:
+                    data = Color.spc_rgb2ryb_h_array(data)
+                    k_separ = Color.spc_rgb2ryb_h(k_separ)
+
+                data = Color((k_separ, 1.0, 1.0), tp=CTP.hsv).ref_h_array(data)
 
                 if sigma == 0.0:
                     expd = np.zeros(data.shape)
-                    expd[np.where((data > -1E-5) & (data < 1E-5))] = k_fact
+                    expd[np.where((data > -1E-3) & (data < 1E-3))] = k_fact
 
                 elif sigma == 1.0:
                     expd = np.ones(data.shape) * k_fact
@@ -697,17 +695,22 @@ class Image3C(QThread):
                     expd = 0.001 * (10 ** (4.5 * sigma)) * -1
                     expd = np.exp((data / 180.0) ** 2 / expd) * k_fact
 
-                data = data * (1.0 - expd)
-                selection = np.where(data < 0.0)
-                expd[selection] = expd[selection] * -1
-                data = data + expd * 180.0 + k_separ
+                if onedir:
+                    data = data + expd * 180.0 + k_separ
+
+                else:
+                    data = data * (1.0 - expd)
+                    selection = np.where(data < 0.0)
+                    expd[selection] = expd[selection] * -1
+                    data = data + expd * 180.0 + k_separ
+
+                if useryb:
+                    data = Color.spc_ryb2rgb_h_array(data)
 
             else:
-                selection = np.where(data >= k_separ)
-
                 if sigma == 0.0:
                     expd = np.zeros(data.shape)
-                    expd[np.where((data - k_separ > -1E-5) & (data - k_separ < 1E-5))] = k_fact
+                    expd[np.where((data - k_separ > -1E-3) & (data - k_separ < 1E-3))] = k_fact
 
                 elif sigma == 1.0:
                     expd = np.ones(data.shape) * k_fact
@@ -716,8 +719,17 @@ class Image3C(QThread):
                     expd = 0.001 * (10 ** (4.5 * sigma)) * -1
                     expd = np.exp((data - k_separ) ** 2 / expd) * k_fact
 
-                data = data * (1.0 - expd)
-                data[selection] = data[selection] + expd[selection]
+                if onedir:
+                    data = data + expd
+
+                else:
+                    expd = np.abs(expd)
+                    selection = np.where(data >= k_separ) if k_separ < 0.5 else np.where(data > k_separ)
+                    data = data * (1.0 - expd)
+                    data[selection] = data[selection] + expd[selection]
+
+                data[np.where(data < 0)] = 0
+                data[np.where(data > 1)] = 1
 
             display_data[:, :, k] = data
         self.rev_display_data = display_data
@@ -816,6 +828,7 @@ class Image3C(QThread):
                 data = np.array(data, dtype=np.uint8)
 
             except Exception as err:
+                self._d_error(502, err)
                 data = None
                 self.ps_enhanced.emit(3)
 
@@ -864,6 +877,7 @@ class Image3C(QThread):
                 data = np.array(data, dtype=np.uint8)
 
             except Exception as err:
+                self._d_error(503, err)
                 data = None
                 self.ps_enhanced.emit(3)
 
@@ -898,7 +912,7 @@ class Image3C(QThread):
         if not isinstance(self.ori_display_data, np.ndarray):
             return
 
-        rand_num, color_type = values
+        rand_num, color_type, useryb = values
 
         if isinstance(self.res_display_data, np.ndarray):
             display_data = self.res_display_data
@@ -906,5 +920,5 @@ class Image3C(QThread):
         else:
             display_data = self.ori_display_data
 
-        extracts = extract_image(display_data, rand_num, color_type)
+        extracts = extract_image(display_data, rand_num, color_type, useryb=useryb)
         self.ps_extracts.emit(extracts)
