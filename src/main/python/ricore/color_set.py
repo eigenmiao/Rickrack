@@ -14,7 +14,7 @@ Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
 import random
-from ricore.color import Color
+from ricore.color import Color, CTP
 
 
 class ColorSet(object):
@@ -26,27 +26,27 @@ class ColorSet(object):
             h_range (tuple or list): the initial range of h value. such as (0.0, 360.0).
             s_range (tuple or list): the initial range of s value. such as (0.8, 1.0).
             v_range (tuple or list): the initial range of v value. such as (0.8, 1.0).
-            overflow (str): method to manipulate overflowed s and v values, in "cutoff", "return" and "repeat".
+            overflow (str): method to manipulate overflowed s and v values, in "cutoff", "revert" and "repeat".
         """
 
         self.synchronization = 0
         self.dep_wtp = dep_wtp
         self.set_hsv_ranges(h_range, s_range, v_range)
-        assert 0.0 <= self._h_range[0] <= 360.0
-        assert 0.0 <= self._h_range[1] <= 360.0
-        assert self._h_range[0] <= self._h_range[1]
-        assert 0.0 <= self._s_range[0] <= 1.0
-        assert 0.0 <= self._s_range[1] <= 1.0
-        assert self._s_range[0] <= self._s_range[1]
-        assert 0.0 <= self._v_range[0] <= 1.0
-        assert 0.0 <= self._v_range[1] <= 1.0
-        assert self._v_range[0] <= self._v_range[1]
+        assert 0.0 <= self._h_range[0] <= 360.0, self._h_range
+        assert 0.0 <= self._h_range[1] <= 360.0, self._h_range
+        assert self._h_range[0] <= self._h_range[1], self._h_range
+        assert 0.0 <= self._s_range[0] <= 1.0, self._s_range
+        assert 0.0 <= self._s_range[1] <= 1.0, self._s_range
+        assert self._s_range[0] <= self._s_range[1], self._s_range
+        assert 0.0 <= self._v_range[0] <= 1.0, self._v_range
+        assert 0.0 <= self._v_range[1] <= 1.0, self._v_range
+        assert self._v_range[0] <= self._v_range[1], self._v_range
         self._color_set = [
-            Color((0, 0, 0), tp="rgb", overflow=overflow),
-            Color((0, 0, 0), tp="rgb", overflow=overflow),
-            Color((0, 0, 0), tp="rgb", overflow=overflow),
-            Color((0, 0, 0), tp="rgb", overflow=overflow),
-            Color((0, 0, 0), tp="rgb", overflow=overflow),
+            Color((0, 0, 0), tp=CTP.rgb, overflow=overflow),
+            Color((0, 0, 0), tp=CTP.rgb, overflow=overflow),
+            Color((0, 0, 0), tp=CTP.rgb, overflow=overflow),
+            Color((0, 0, 0), tp=CTP.rgb, overflow=overflow),
+            Color((0, 0, 0), tp=CTP.rgb, overflow=overflow),
             ]
 
         self.initialize()
@@ -56,15 +56,12 @@ class ColorSet(object):
         Set the h, s, v ranges for creating color set.
         """
 
-        if isinstance(h_range, (tuple, list)) and isinstance(s_range, (tuple, list)) and isinstance(v_range, (tuple, list)):
-            self._h_range = tuple([float(i) for i in h_range[:2]])
-            self._s_range = tuple([float(i) for i in s_range[:2]])
-            self._v_range = tuple([float(i) for i in v_range[:2]])
+        assert isinstance(h_range, (tuple, list)) and isinstance(s_range, (tuple, list)) and isinstance(v_range, (tuple, list)), (h_range, s_range, v_range)
+        self._h_range = tuple([float(i) for i in h_range[:2]])
+        self._s_range = tuple([float(i) for i in s_range[:2]])
+        self._v_range = tuple([float(i) for i in v_range[:2]])
 
-        else:
-            raise ValueError("expect h, s, v ranges in tuple or list type: {}, {}, {}.".format(h_range, s_range, v_range))
-
-    def set_color_system(self, dep_wtp):
+    def set_color_spctem(self, dep_wtp):
         """
         Set the color space.
 
@@ -79,7 +76,7 @@ class ColorSet(object):
         Set the overflow method for each color in color set.
 
         Args:
-            overflow (str): method to manipulate overflowed s and v values, in "cutoff", "return" and "repeat".
+            overflow (str): method to manipulate overflowed s and v values, in "cutoff", "revert" and "repeat".
         """
 
         for color in self._color_set:
@@ -90,10 +87,13 @@ class ColorSet(object):
         Get the overflow method of first color in color set.
         """
 
-        assert self._color_set[1].get_overflow() == self._color_set[0].get_overflow()
-        assert self._color_set[2].get_overflow() == self._color_set[0].get_overflow()
-        assert self._color_set[3].get_overflow() == self._color_set[0].get_overflow()
-        assert self._color_set[4].get_overflow() == self._color_set[0].get_overflow()
+        assert False not in [
+            self._color_set[i].get_overflow() == self._color_set[4].get_overflow() for i in range(4)
+
+        ], [
+            self._color_set[i].get_overflow() == self._color_set[4].get_overflow() for i in range(4)
+        ]
+
         return self._color_set[0].get_overflow()
 
     def __str__(self):
@@ -130,11 +130,11 @@ class ColorSet(object):
         """
 
         color_set = (
-            Color(self._color_set[0], tp="color", overflow=self.get_overflow()),
-            Color(self._color_set[1], tp="color", overflow=self.get_overflow()),
-            Color(self._color_set[2], tp="color", overflow=self.get_overflow()),
-            Color(self._color_set[3], tp="color", overflow=self.get_overflow()),
-            Color(self._color_set[4], tp="color", overflow=self.get_overflow()),
+            Color(self._color_set[0], tp=CTP.color, overflow=self.get_overflow()),
+            Color(self._color_set[1], tp=CTP.color, overflow=self.get_overflow()),
+            Color(self._color_set[2], tp=CTP.color, overflow=self.get_overflow()),
+            Color(self._color_set[3], tp=CTP.color, overflow=self.get_overflow()),
+            Color(self._color_set[4], tp=CTP.color, overflow=self.get_overflow()),
         )
 
         return color_set
@@ -145,11 +145,11 @@ class ColorSet(object):
         """
 
         self._color_set = [
-            Color(color_set[0], tp="color", overflow=self.get_overflow()),
-            Color(color_set[1], tp="color", overflow=self.get_overflow()),
-            Color(color_set[2], tp="color", overflow=self.get_overflow()),
-            Color(color_set[3], tp="color", overflow=self.get_overflow()),
-            Color(color_set[4], tp="color", overflow=self.get_overflow()),
+            Color(color_set[0], tp=CTP.color, overflow=self.get_overflow()),
+            Color(color_set[1], tp=CTP.color, overflow=self.get_overflow()),
+            Color(color_set[2], tp=CTP.color, overflow=self.get_overflow()),
+            Color(color_set[3], tp=CTP.color, overflow=self.get_overflow()),
+            Color(color_set[4], tp=CTP.color, overflow=self.get_overflow()),
         ]
 
     def initialize(self):
@@ -163,7 +163,7 @@ class ColorSet(object):
             v = self._v_range[0] + (self._v_range[1] - self._v_range[0]) * random.random()
 
             if self.dep_wtp:
-                h = Color.sys_ryb2rgb(h)
+                h = Color.spc_ryb2rgb_h(h)
 
             self._color_set[i].hsv = (h, s, v)
 
@@ -188,11 +188,8 @@ class ColorSet(object):
             "shades": self._shades_create,
         }
 
-        if harmony_rule in methods:
-            methods[harmony_rule]()
-
-        else:
-            raise ValueError("expect harmony rule in list 'analogous', 'monochromatic', etc.: {}.".format(harmony_rule))
+        assert harmony_rule in methods, harmony_rule
+        methods[harmony_rule]()
 
     def modify(self, harmony_rule, idx, color, do_sync=True):
         """
@@ -220,11 +217,8 @@ class ColorSet(object):
                 "custom": self._custom_modify,
             }
 
-            if harmony_rule in methods:
-                methods[harmony_rule](idx, color)
-
-            else:
-                raise ValueError("unexpect harmony rule name for modify: {}.".format(harmony_rule))
+            assert harmony_rule in methods, harmony_rule
+            methods[harmony_rule](idx, color)
 
     def _rotate(self, delta_h, delta_s, delta_v):
         """
@@ -238,7 +232,7 @@ class ColorSet(object):
 
         for idx in range(5):
             if self.dep_wtp:
-                self._color_set[idx].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[idx].h) + delta_h)
+                self._color_set[idx].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[idx].h) + delta_h)
 
             else:
                 self._color_set[idx].h = self._color_set[idx].h + delta_h
@@ -252,7 +246,7 @@ class ColorSet(object):
         """
 
         if self.dep_wtp:
-            angle = (Color.sys_rgb2ryb(self._color_set[3].h) - Color.sys_rgb2ryb(self._color_set[1].h)) / 2
+            angle = (Color.spc_rgb2ryb_h(self._color_set[3].h) - Color.spc_rgb2ryb_h(self._color_set[1].h)) / 2
 
         else:
             angle = (self._color_set[3].h - self._color_set[1].h) / 2
@@ -261,10 +255,10 @@ class ColorSet(object):
             angle = angle / 1.5
 
         if self.dep_wtp:
-            self._color_set[1].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - angle)
-            self._color_set[2].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - angle * 2)
-            self._color_set[3].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + angle)
-            self._color_set[4].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + angle * 2)
+            self._color_set[1].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - angle)
+            self._color_set[2].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - angle * 2)
+            self._color_set[3].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + angle)
+            self._color_set[4].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + angle * 2)
 
         else:
             self._color_set[1].h = self._color_set[0].h - angle
@@ -283,7 +277,7 @@ class ColorSet(object):
 
         if idx == 0:
             if self.dep_wtp:
-                delta_h = Color.sys_rgb2ryb(pr_color.h) - Color.sys_rgb2ryb(self._color_set[0].h)
+                delta_h = Color.spc_rgb2ryb_h(pr_color.h) - Color.spc_rgb2ryb_h(self._color_set[0].h)
 
             else:
                 delta_h = pr_color.h - self._color_set[0].h
@@ -295,14 +289,14 @@ class ColorSet(object):
         else:
             if idx in (1, 2):
                 if self.dep_wtp:
-                    angle = Color.sys_rgb2ryb(self._color_set[0].h) - Color.sys_rgb2ryb(pr_color.h)
+                    angle = Color.spc_rgb2ryb_h(self._color_set[0].h) - Color.spc_rgb2ryb_h(pr_color.h)
 
                 else:
                     angle = self._color_set[0].h - pr_color.h
 
             else:
                 if self.dep_wtp:
-                    angle = Color.sys_rgb2ryb(pr_color.h) - Color.sys_rgb2ryb(self._color_set[0].h)
+                    angle = Color.spc_rgb2ryb_h(pr_color.h) - Color.spc_rgb2ryb_h(self._color_set[0].h)
 
                 else:
                     angle = pr_color.h - self._color_set[0].h
@@ -313,10 +307,10 @@ class ColorSet(object):
                 angle /= 2
 
             if self.dep_wtp:
-                self._color_set[1].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - angle)
-                self._color_set[2].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - angle * 2)
-                self._color_set[3].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + angle)
-                self._color_set[4].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + angle * 2)
+                self._color_set[1].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - angle)
+                self._color_set[2].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - angle * 2)
+                self._color_set[3].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + angle)
+                self._color_set[4].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + angle * 2)
 
             else:
                 self._color_set[1].h = self._color_set[0].h - angle
@@ -386,10 +380,10 @@ class ColorSet(object):
         """
 
         if self.dep_wtp:
-            self._color_set[1].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - 120.0)
-            self._color_set[2].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - 120.0)
-            self._color_set[3].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + 120.0)
-            self._color_set[4].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + 120.0)
+            self._color_set[1].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - 120.0)
+            self._color_set[2].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - 120.0)
+            self._color_set[3].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + 120.0)
+            self._color_set[4].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + 120.0)
 
         else:
             self._color_set[1].h = self._color_set[0].h - 120.0
@@ -407,7 +401,7 @@ class ColorSet(object):
         """
 
         if self.dep_wtp:
-            delta_h = Color.sys_rgb2ryb(pr_color.h) - Color.sys_rgb2ryb(self._color_set[idx].h)
+            delta_h = Color.spc_rgb2ryb_h(pr_color.h) - Color.spc_rgb2ryb_h(self._color_set[idx].h)
 
         else:
             delta_h = pr_color.h - self._color_set[idx].h
@@ -420,7 +414,7 @@ class ColorSet(object):
         else:
             if self.dep_wtp:
                 for i in range(5):
-                    self._color_set[i].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[i].h) + delta_h)
+                    self._color_set[i].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[i].h) + delta_h)
 
             else:
                 for i in range(5):
@@ -434,10 +428,10 @@ class ColorSet(object):
         """
 
         if self.dep_wtp:
-            self._color_set[1].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - 90)
-            self._color_set[2].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - 180)
-            self._color_set[3].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + 90)
-            self._color_set[4].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + 180)
+            self._color_set[1].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - 90)
+            self._color_set[2].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - 180)
+            self._color_set[3].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + 90)
+            self._color_set[4].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + 180)
 
         else:
             self._color_set[1].h = self._color_set[0].h - 90
@@ -455,7 +449,7 @@ class ColorSet(object):
         """
 
         if self.dep_wtp:
-            delta_h = Color.sys_rgb2ryb(pr_color.h) - Color.sys_rgb2ryb(self._color_set[idx].h)
+            delta_h = Color.spc_rgb2ryb_h(pr_color.h) - Color.spc_rgb2ryb_h(self._color_set[idx].h)
 
         else:
             delta_h = pr_color.h - self._color_set[idx].h
@@ -483,10 +477,10 @@ class ColorSet(object):
         """
 
         if self.dep_wtp:
-            self._color_set[1].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - 72)
-            self._color_set[2].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) - 144)
-            self._color_set[3].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + 72)
-            self._color_set[4].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + 144)
+            self._color_set[1].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - 72)
+            self._color_set[2].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) - 144)
+            self._color_set[3].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + 72)
+            self._color_set[4].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + 144)
 
         else:
             self._color_set[1].h = self._color_set[0].h - 72
@@ -503,8 +497,8 @@ class ColorSet(object):
         self._color_set[3].h = self._color_set[0].h
 
         if self.dep_wtp:
-            self._color_set[2].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + 180.0)
-            self._color_set[4].h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._color_set[0].h) + 180.0)
+            self._color_set[2].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + 180.0)
+            self._color_set[4].h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._color_set[0].h) + 180.0)
 
         else:
             self._color_set[2].h = self._color_set[0].h + 180.0
@@ -579,11 +573,7 @@ class ColorSet(object):
             pr_color (Color): replace the selected color with this color.
         """
 
-        if idx in range(5):
-            self._color_set[idx].hsv = pr_color.hsv
-
-        else:
-            raise ValueError("expect idx in range 0 ~ 4: {}.".format(idx))
+        self._color_set[idx].hsv = pr_color.hsv
 
     def _sync_modify(self, idx, pr_color):
         """
@@ -595,7 +585,7 @@ class ColorSet(object):
         """
 
         if self.dep_wtp:
-            delta_h = Color.sys_rgb2ryb(pr_color.h) - Color.sys_rgb2ryb(self._color_set[idx].h)
+            delta_h = Color.spc_rgb2ryb_h(pr_color.h) - Color.spc_rgb2ryb_h(self._color_set[idx].h)
 
         else:
             delta_h = pr_color.h - self._color_set[idx].h
@@ -664,7 +654,7 @@ class ColorSet(object):
             delta_s = 0
             delta_v = 0
 
-        elif self.synchronization == 6:
+        else: # self.synchronization == 6:
             self._color_set[idx].s = pr_color.s
             self._color_set[idx].v = pr_color.v
 
@@ -692,8 +682,5 @@ class ColorSet(object):
 
             delta_s = 0
             delta_v = 0
-
-        else:
-            raise ValueError("unexpect synchronization code for special rule: {}.".format(self.synchronization))
 
         self._rotate(delta_h, delta_s, delta_v)
