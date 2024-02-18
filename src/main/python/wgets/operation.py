@@ -17,15 +17,16 @@ import os
 import time
 import json
 import numpy as np
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QFileDialog, QMessageBox
+from PyQt5.QtWidgets import QPushButton, QSpacerItem, QSizePolicy, QFileDialog, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
+from wgets.general import FoldingBox, SideWidget
+from ricore.color import Color, CTP
 from ricore.export import export_list, export_text, export_swatch, export_ase, export_gpl, export_xml, import_text, import_swatch, import_ase, import_gpl, import_xml
 from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values
 from ricore.check import fmt_im_time
-from ricore.color import Color
 
 
-class Operation(QWidget):
+class Operation(SideWidget):
     """
     Operation object based on QWidget. Init a operation in operation.
     """
@@ -43,32 +44,13 @@ class Operation(QWidget):
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self._args = args
         self._func_tr_()
-        operation_grid_layout = QGridLayout(self)
-        operation_grid_layout.setContentsMargins(0, 0, 0, 0)
-        operation_grid_layout.setHorizontalSpacing(0)
-        operation_grid_layout.setVerticalSpacing(0)
-        scroll_area = QScrollArea(self)
-        scroll_area.setFrameShape(QFrame.Box)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll_area.setWidgetResizable(True)
-        operation_grid_layout.addWidget(scroll_area)
-        scroll_contents = QWidget()
-        scroll_grid_layout = QGridLayout(scroll_contents)
-        scroll_grid_layout.setContentsMargins(3, 9, 3, 3)
-        scroll_grid_layout.setHorizontalSpacing(3)
-        scroll_grid_layout.setVerticalSpacing(12)
-        scroll_area.setWidget(scroll_contents)
-        self._file_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._file_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._file_gbox, 0, 1, 1, 1)
-        self.import_btn = QPushButton(self._file_gbox)
+        self._file_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._file_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._file_fbox, 1, 1, 1, 1)
+        self.import_btn = QPushButton(self._file_fbox.gbox)
         gbox_grid_layout.addWidget(self.import_btn, 0, 1, 1, 1)
         self.import_btn.clicked.connect(self.exec_import)
-        self.export_btn = QPushButton(self._file_gbox)
+        self.export_btn = QPushButton(self._file_fbox.gbox)
         gbox_grid_layout.addWidget(self.export_btn, 1, 1, 1, 1)
         self.export_btn.clicked.connect(self.exec_export)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -77,23 +59,20 @@ class Operation(QWidget):
         gbox_grid_layout.addItem(spacer, 2, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
-        self._view_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._view_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._view_gbox, 1, 1, 1, 1)
+        self._view_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._view_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._view_fbox, 2, 1, 1, 1)
         self.functn = []
-        self.functn.append(QPushButton(self._view_gbox))
+        self.functn.append(QPushButton(self._view_fbox.gbox))
         gbox_grid_layout.addWidget(self.functn[0], 0, 1, 1, 1)
         self.functn[0].clicked.connect(lambda x: self.ps_functn.emit(0))
-        self.functn.append(QPushButton(self._view_gbox))
+        self.functn.append(QPushButton(self._view_fbox.gbox))
         gbox_grid_layout.addWidget(self.functn[1], 1, 1, 1, 1)
         self.functn[1].clicked.connect(lambda x: self.ps_functn.emit(1))
-        self.functn.append(QPushButton(self._view_gbox))
+        self.functn.append(QPushButton(self._view_fbox.gbox))
         gbox_grid_layout.addWidget(self.functn[2], 2, 1, 1, 1)
         self.functn[2].clicked.connect(lambda x: self.ps_functn.emit(2))
-        self.functn.append(QPushButton(self._view_gbox))
+        self.functn.append(QPushButton(self._view_fbox.gbox))
         gbox_grid_layout.addWidget(self.functn[3], 3, 1, 1, 1)
         self.functn[3].clicked.connect(lambda x: self.ps_functn.emit(3))
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -102,6 +81,10 @@ class Operation(QWidget):
         gbox_grid_layout.addItem(spacer, 4, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 4, 2, 1, 1)
+        self.scroll_grid_layout.addItem(self.over_spacer, 3, 1, 1, 1)
+        self._all_fboxes = (self._file_fbox, self._view_fbox)
+        self.scroll_grid_layout.addWidget(self._exp_all_btn, 0, 1, 1, 1)
+        self.connect_by_fboxes()
         self.update_text()
 
     def sizeHint(self):
@@ -352,7 +335,7 @@ class Operation(QWidget):
                     f.write("# Please refer to website {} for more information.\n".format(self._args.info_main_site))
                     f.write("# Version: {}\n".format(self._args.info_version_en))
                     f.write("# Total: {}\n\n".format(len(color_list)))
-                    f.write(export_text(color_list))
+                    f.write(export_text(color_list, useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -361,14 +344,14 @@ class Operation(QWidget):
         elif depot_file.split(".")[-1].lower() == "aco":
             try:
                 with open(depot_file, "wb") as f:
-                    f.write(export_swatch(color_list, ctp=self._args.export_swatch_ctp, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer]))
+                    f.write(export_swatch(color_list, ctp=self._args.export_swatch_ctp, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer], useryb=self._args.dep_wtp))
 
                 if self._args.export_grid_extns:
                     grid_file = depot_file.split(".")
                     grid_file[-2] = grid_file[-2] + self._args.export_grid_extns
                     grid_file = ".".join(grid_file)
                     with open(grid_file, "wb") as f:
-                        f.write(export_swatch(color_list, ctp=self._args.export_swatch_ctp, export_grid=True, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer]))
+                        f.write(export_swatch(color_list, ctp=self._args.export_swatch_ctp, export_grid=True, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer], useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -377,14 +360,14 @@ class Operation(QWidget):
         elif depot_file.split(".")[-1].lower() == "ase":
             try:
                 with open(depot_file, "wb") as f:
-                    f.write(export_ase(color_list, ctp=self._args.export_swatch_ctp, asetp=self._args.export_ase_type, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer]))
+                    f.write(export_ase(color_list, ctp=self._args.export_swatch_ctp, asetp=self._args.export_ase_type, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer], useryb=self._args.dep_wtp))
 
                 if self._args.export_grid_extns:
                     grid_file = depot_file.split(".")
                     grid_file[-2] = grid_file[-2] + self._args.export_grid_extns
                     grid_file = ".".join(grid_file)
                     with open(grid_file, "wb") as f:
-                        f.write(export_ase(color_list, ctp=self._args.export_swatch_ctp, asetp=self._args.export_ase_type, export_grid=True, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer]))
+                        f.write(export_ase(color_list, ctp=self._args.export_swatch_ctp, asetp=self._args.export_ase_type, export_grid=True, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer], useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -393,7 +376,7 @@ class Operation(QWidget):
         elif depot_file.split(".")[-1].lower() == "gpl":
             try:
                 with open(depot_file, "w", encoding="utf-8") as f:
-                    f.write(export_gpl(color_list))
+                    f.write(export_gpl(color_list, useryb=self._args.dep_wtp))
 
                 if self._args.export_grid_extns:
                     grid_file = depot_file.split(".")
@@ -401,7 +384,7 @@ class Operation(QWidget):
                     grid_file = ".".join(grid_file)
 
                 with open(grid_file, "w", encoding="utf-8") as f:
-                    f.write(export_gpl(color_list, export_grid=True))
+                    f.write(export_gpl(color_list, export_grid=True, useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -410,7 +393,7 @@ class Operation(QWidget):
         elif depot_file.split(".")[-1].lower() == "xml":
             try:
                 with open(depot_file, "w", encoding="utf-8") as f:
-                    f.write(export_xml(color_list))
+                    f.write(export_xml(color_list, useryb=self._args.dep_wtp))
 
                 if self._args.export_grid_extns:
                     grid_file = depot_file.split(".")
@@ -418,7 +401,7 @@ class Operation(QWidget):
                     grid_file = ".".join(grid_file)
 
                 with open(grid_file, "w", encoding="utf-8") as f:
-                    f.write(export_xml(color_list, export_grid=True))
+                    f.write(export_xml(color_list, export_grid=True, useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -466,12 +449,7 @@ class Operation(QWidget):
                     return
 
             if set_file.split(".")[-1].lower() == "aco":
-                try:
-                    grid_list, name_list = import_swatch(set_file, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer])
-
-                except Exception as err:
-                    self.warning(self._operation_errs[20] + "\n{}\n{}".format(self._operation_errs[17], err))
-                    return
+                grid_list, name_list = import_swatch(set_file, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer])
 
             if set_file.split(".")[-1].lower() == "ase":
                 try:
@@ -568,12 +546,12 @@ class Operation(QWidget):
 
         for i in range(5):
             if "color_{}".format(i) in color_dict:
-                curr_color = Color((0.0, 0.0, 1.0), tp="hsv")
+                curr_color = Color((0.0, 0.0, 1.0), tp=CTP.hsv)
 
                 if "hsv" in color_dict["color_{}".format(i)]:
                     try:
                         hsv = color_dict["color_{}".format(i)]["hsv"]
-                        curr_color = Color(hsv, tp="hsv", overflow=self._args.sys_color_set.get_overflow())
+                        curr_color = Color(hsv, tp=CTP.hsv, overflow=self._args.sys_color_set.get_overflow())
 
                     except Exception as err:
                         self.warning(self._operation_errs[5] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -582,7 +560,7 @@ class Operation(QWidget):
                 elif "rgb" in color_dict["color_{}".format(i)]:
                     try:
                         hsv = color_dict["color_{}".format(i)]["rgb"]
-                        curr_color = Color(hsv, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
+                        curr_color = Color(hsv, tp=CTP.rgb, overflow=self._args.sys_color_set.get_overflow())
 
                     except Exception as err:
                         self.warning(self._operation_errs[5] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -591,7 +569,7 @@ class Operation(QWidget):
                 elif "hex_code" in color_dict["color_{}".format(i)]:
                     try:
                         hsv = color_dict["color_{}".format(i)]["hex_code"]
-                        curr_color = Color(hsv, tp="hec", overflow=self._args.sys_color_set.get_overflow())
+                        curr_color = Color(hsv, tp=CTP.hec, overflow=self._args.sys_color_set.get_overflow())
 
                     except Exception as err:
                         self.warning(self._operation_errs[5] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -600,7 +578,7 @@ class Operation(QWidget):
                 elif "hex code" in color_dict["color_{}".format(i)]:
                     try:
                         hsv = color_dict["color_{}".format(i)]["hex code"]
-                        curr_color = Color(hsv, tp="hec", overflow=self._args.sys_color_set.get_overflow())
+                        curr_color = Color(hsv, tp=CTP.hec, overflow=self._args.sys_color_set.get_overflow())
 
                     except Exception as err:
                         self.warning(self._operation_errs[5] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -743,7 +721,7 @@ class Operation(QWidget):
                     f.write("# Please refer to website {} for more information.\n".format(self._args.info_main_site))
                     f.write("# Version: {}\n".format(self._args.info_version_en))
                     f.write("# Total: {}\n\n".format(len(color_list)))
-                    f.write(export_text(color_list))
+                    f.write(export_text(color_list, useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -752,14 +730,14 @@ class Operation(QWidget):
         elif set_file.split(".")[-1].lower() == "aco":
             try:
                 with open(set_file, "wb") as f:
-                    f.write(export_swatch(color_list, ctp=self._args.export_swatch_ctp, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer]))
+                    f.write(export_swatch(color_list, ctp=self._args.export_swatch_ctp, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer], useryb=self._args.dep_wtp))
 
                 if self._args.export_grid_extns:
                     grid_file = set_file.split(".")
                     grid_file[-2] = grid_file[-2] + self._args.export_grid_extns
                     grid_file = ".".join(grid_file)
                     with open(grid_file, "wb") as f:
-                        f.write(export_swatch(color_list, ctp=self._args.export_swatch_ctp, export_grid=True, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer]))
+                        f.write(export_swatch(color_list, ctp=self._args.export_swatch_ctp, export_grid=True, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer], useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -768,14 +746,14 @@ class Operation(QWidget):
         elif set_file.split(".")[-1].lower() == "ase":
             try:
                 with open(set_file, "wb") as f:
-                    f.write(export_ase(color_list, ctp=self._args.export_swatch_ctp, asetp=self._args.export_ase_type, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer]))
+                    f.write(export_ase(color_list, ctp=self._args.export_swatch_ctp, asetp=self._args.export_ase_type, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer], useryb=self._args.dep_wtp))
 
                 if self._args.export_grid_extns:
                     grid_file = set_file.split(".")
                     grid_file[-2] = grid_file[-2] + self._args.export_grid_extns
                     grid_file = ".".join(grid_file)
                     with open(grid_file, "wb") as f:
-                        f.write(export_ase(color_list, ctp=self._args.export_swatch_ctp, asetp=self._args.export_ase_type, export_grid=True, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer]))
+                        f.write(export_ase(color_list, ctp=self._args.export_swatch_ctp, asetp=self._args.export_ase_type, export_grid=True, white_ref=self._args.global_white_ref[self._args.white_illuminant][self._args.white_observer], useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -784,14 +762,14 @@ class Operation(QWidget):
         elif set_file.split(".")[-1].lower() == "gpl":
             try:
                 with open(set_file, "w", encoding="utf-8") as f:
-                    f.write(export_gpl(color_list))
+                    f.write(export_gpl(color_list, useryb=self._args.dep_wtp))
 
                 if self._args.export_grid_extns:
                     grid_file = set_file.split(".")
                     grid_file[-2] = grid_file[-2] + self._args.export_grid_extns
                     grid_file = ".".join(grid_file)
                     with open(grid_file, "w", encoding="utf-8") as f:
-                        f.write(export_gpl(color_list, export_grid=True))
+                        f.write(export_gpl(color_list, export_grid=True, useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -800,14 +778,14 @@ class Operation(QWidget):
         elif set_file.split(".")[-1].lower() == "xml":
             try:
                 with open(set_file, "w", encoding="utf-8") as f:
-                    f.write(export_xml(color_list))
+                    f.write(export_xml(color_list, useryb=self._args.dep_wtp))
 
                 if self._args.export_grid_extns:
                     grid_file = set_file.split(".")
                     grid_file[-2] = grid_file[-2] + self._args.export_grid_extns
                     grid_file = ".".join(grid_file)
                     with open(grid_file, "w", encoding="utf-8") as f:
-                        f.write(export_xml(color_list, export_grid=True))
+                        f.write(export_xml(color_list, export_grid=True, useryb=self._args.dep_wtp))
 
             except Exception as err:
                 self.warning(self._operation_errs[23] + "\n{}\n{}".format(self._operation_errs[17], err))
@@ -849,8 +827,9 @@ class Operation(QWidget):
         box.exec_()
 
     def update_text(self):
-        self._file_gbox.setTitle(self._gbox_descs[0])
-        self._view_gbox.setTitle(self._gbox_descs[1])
+        self.sw_update_text(force=True)
+        self._file_fbox.set_title(self._gbox_descs[0])
+        self._view_fbox.set_title(self._gbox_descs[1])
         self.import_btn.setText(self._operation_descs[0])
         self.export_btn.setText(self._operation_descs[1])
 
@@ -882,8 +861,8 @@ class Operation(QWidget):
     def _func_tr_(self):
         _translate = QCoreApplication.translate
         self._gbox_descs = (
-            _translate("MainWindow", "File"),
-            _translate("MainWindow", "View"),
+            _translate("Operation", "File"),
+            _translate("Operation", "View"),
         )
 
         self._shortcut_descs = (

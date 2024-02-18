@@ -13,12 +13,12 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
+from PyQt5.QtWidgets import QPushButton, QSpacerItem, QSizePolicy
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
-from wgets.general import SlideText
+from wgets.general import SlideText, FoldingBox, SideWidget
 
 
-class Script(QWidget):
+class Script(SideWidget):
     """
     Script object based on QWidget. Init a script in script.
     """
@@ -38,32 +38,13 @@ class Script(QWidget):
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self._args = args
         self._func_tr_()
-        script_grid_layout = QGridLayout(self)
-        script_grid_layout.setContentsMargins(0, 0, 0, 0)
-        script_grid_layout.setHorizontalSpacing(0)
-        script_grid_layout.setVerticalSpacing(0)
-        scroll_area = QScrollArea(self)
-        scroll_area.setFrameShape(QFrame.Box)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll_area.setWidgetResizable(True)
-        script_grid_layout.addWidget(scroll_area)
-        scroll_contents = QWidget()
-        scroll_grid_layout = QGridLayout(scroll_contents)
-        scroll_grid_layout.setContentsMargins(3, 9, 3, 3)
-        scroll_grid_layout.setHorizontalSpacing(3)
-        scroll_grid_layout.setVerticalSpacing(12)
-        scroll_area.setWidget(scroll_contents)
-        self._filter_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._filter_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._filter_gbox, 1, 1, 1, 1)
+        self._filter_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._filter_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._filter_fbox, 2, 1, 1, 1)
         self._filter_btns = []
 
         for i in range(10):
-            btn = QPushButton(self._filter_gbox)
+            btn = QPushButton(self._filter_fbox.gbox)
             self._filter_btns.append(btn)
 
         gbox_grid_layout.addWidget(self._filter_btns[0], 0, 1, 1, 1)
@@ -92,16 +73,13 @@ class Script(QWidget):
         gbox_grid_layout.addItem(spacer, 10, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 10, 2, 1, 1)
-        self._zoom_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._zoom_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._zoom_gbox, 4, 1, 1, 1)
-        self.sdt_zoom = SlideText(self._zoom_gbox, num_range=(0.0, 3.0), default_value=1.0)
+        self._zoom_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._zoom_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._zoom_fbox, 5, 1, 1, 1)
+        self.sdt_zoom = SlideText(self._zoom_fbox.gbox, num_range=(0.0, 3.0), default_value=1.0)
         gbox_grid_layout.addWidget(self.sdt_zoom, 0, 1, 1, 1)
         self.sdt_zoom.ps_value_changed.connect(self.update_zoom)
-        self.btn_zoom = QPushButton(self._zoom_gbox)
+        self.btn_zoom = QPushButton(self._zoom_fbox.gbox)
         gbox_grid_layout.addWidget(self.btn_zoom, 1, 1, 1, 1)
         self.btn_zoom.clicked.connect(lambda x: self.ps_filter.emit(("ZOOM", self.sdt_zoom.get_value())))
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -110,16 +88,13 @@ class Script(QWidget):
         gbox_grid_layout.addItem(spacer, 2, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
-        self._crop_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._crop_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._crop_gbox, 3, 1, 1, 1)
-        self.btn_crop = QPushButton(self._crop_gbox)
+        self._crop_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._crop_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._crop_fbox, 4, 1, 1, 1)
+        self.btn_crop = QPushButton(self._crop_fbox.gbox)
         gbox_grid_layout.addWidget(self.btn_crop, 0, 1, 1, 1)
         self.btn_crop.clicked.connect(lambda x: self.ps_crop.emit(True))
-        self.btn_cancel = QPushButton(self._crop_gbox)
+        self.btn_cancel = QPushButton(self._crop_fbox.gbox)
         gbox_grid_layout.addWidget(self.btn_cancel, 1, 1, 1, 1)
         self.btn_cancel.clicked.connect(lambda x: self.ps_crop.emit(False))
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -128,16 +103,13 @@ class Script(QWidget):
         gbox_grid_layout.addItem(spacer, 2, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
-        self._snap_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._snap_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._snap_gbox, 2, 1, 1, 1)
-        self.btn_freeze = QPushButton(self._snap_gbox)
+        self._snap_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._snap_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._snap_fbox, 3, 1, 1, 1)
+        self.btn_freeze = QPushButton(self._snap_fbox.gbox)
         gbox_grid_layout.addWidget(self.btn_freeze, 0, 1, 1, 1)
         self.btn_freeze.clicked.connect(lambda x: self.ps_freeze.emit(True))
-        self.btn_print = QPushButton(self._snap_gbox)
+        self.btn_print = QPushButton(self._snap_fbox.gbox)
         gbox_grid_layout.addWidget(self.btn_print, 1, 1, 1, 1)
         self.btn_print.clicked.connect(lambda x: self.ps_print.emit(True))
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -146,16 +118,13 @@ class Script(QWidget):
         gbox_grid_layout.addItem(spacer, 2, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 2, 2, 1, 1)
-        self._extract_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._extract_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._extract_gbox, 0, 1, 1, 1)
+        self._extract_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._extract_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._extract_fbox, 1, 1, 1, 1)
         self._extract_btns = []
 
         for i in range(6):
-            btn = QPushButton(self._extract_gbox)
+            btn = QPushButton(self._extract_fbox.gbox)
             self._extract_btns.append(btn)
 
         gbox_grid_layout.addWidget(self._extract_btns[0], 0, 1, 1, 1)
@@ -176,6 +145,10 @@ class Script(QWidget):
         gbox_grid_layout.addItem(spacer, 6, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 6, 2, 1, 1)
+        self.scroll_grid_layout.addItem(self.over_spacer, 6, 1, 1, 1)
+        self._all_fboxes = (self._filter_fbox, self._zoom_fbox, self._crop_fbox, self._snap_fbox, self._extract_fbox)
+        self.scroll_grid_layout.addWidget(self._exp_all_btn, 0, 1, 1, 1)
+        self.connect_by_fboxes()
         self.update_text()
 
     def sizeHint(self):
@@ -196,21 +169,22 @@ class Script(QWidget):
             self.btn_zoom.setText(self._zoom_descs[3])
 
     def update_text(self):
-        self._filter_gbox.setTitle(self._gbox_descs[0])
+        self.sw_update_text(force=True)
+        self._filter_fbox.set_title(self._gbox_descs[0])
 
         for i in range(10):
             self._filter_btns[i].setText(self._filter_descs[i])
 
-        self._zoom_gbox.setTitle(self._gbox_descs[1])
+        self._zoom_fbox.set_title(self._gbox_descs[1])
         self.sdt_zoom.set_text(self._zoom_descs[0])
         self.update_zoom()
-        self._crop_gbox.setTitle(self._gbox_descs[2])
+        self._crop_fbox.set_title(self._gbox_descs[2])
         self.btn_crop.setText(self._crop_descs[0])
         self.btn_cancel.setText(self._crop_descs[1])
-        self._snap_gbox.setTitle(self._gbox_descs[3])
+        self._snap_fbox.set_title(self._gbox_descs[3])
         self.btn_freeze.setText(self._snap_descs[0])
         self.btn_print.setText(self._snap_descs[1])
-        self._extract_gbox.setTitle(self._gbox_descs[4])
+        self._extract_fbox.set_title(self._gbox_descs[4])
 
         for i in range(6):
             self._extract_btns[i].setText(self._extract_descs[i])
