@@ -151,7 +151,7 @@ import time
 import types
 import socket
 import hashlib
-from rickrack.color import Color
+from rickrack.color import Color, CTP, OTP
 from rickrack.result import Grid, Result
 from threading import Thread
 from getopt import getopt
