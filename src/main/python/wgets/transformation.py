@@ -13,12 +13,12 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QWidget, QPushButton, QGridLayout, QScrollArea, QFrame, QGroupBox, QSpacerItem, QSizePolicy, QCheckBox
+from PyQt5.QtWidgets import QPushButton, QSpacerItem, QSizePolicy, QCheckBox
 from PyQt5.QtCore import Qt, pyqtSignal, QSize, QCoreApplication
-from wgets.general import SlideText, RGBHSVCkb
+from wgets.general import SlideText, RGBHSVCkb, FoldingBox, SideWidget
 
 
-class Transformation(QWidget):
+class Transformation(SideWidget):
     """
     Transformation object based on QWidget. Init a transformation in transformation.
     """
@@ -38,58 +38,39 @@ class Transformation(QWidget):
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self._args = args
         self._func_tr_()
-        transf_grid_layout = QGridLayout(self)
-        transf_grid_layout.setContentsMargins(0, 0, 0, 0)
-        transf_grid_layout.setHorizontalSpacing(0)
-        transf_grid_layout.setVerticalSpacing(0)
-        scroll_area = QScrollArea(self)
-        scroll_area.setFrameShape(QFrame.Box)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll_area.setWidgetResizable(True)
-        transf_grid_layout.addWidget(scroll_area)
-        scroll_contents = QWidget()
-        scroll_grid_layout = QGridLayout(scroll_contents)
-        scroll_grid_layout.setContentsMargins(3, 9, 3, 3)
-        scroll_grid_layout.setHorizontalSpacing(3)
-        scroll_grid_layout.setVerticalSpacing(12)
-        scroll_area.setWidget(scroll_contents)
-        self._move_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._move_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(6)
-        gbox_grid_layout.setVerticalSpacing(6)
-        scroll_grid_layout.addWidget(self._move_gbox, 0, 1, 1, 1)
+        self._move_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._move_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._move_fbox, 1, 1, 1, 1)
         self.move_btns = []
-        btn = QPushButton(self._move_gbox)
+        btn = QPushButton(self._move_fbox.gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
         self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 0, 2, 1, 1)
         btn.clicked.connect(lambda x: self.move_up())
-        btn = QPushButton(self._move_gbox)
+        btn = QPushButton(self._move_fbox.gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
         self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 2, 2, 1, 1)
         btn.clicked.connect(lambda x: self.move_down())
-        btn = QPushButton(self._move_gbox)
+        btn = QPushButton(self._move_fbox.gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
         self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 1, 1, 1, 1)
         btn.clicked.connect(lambda x: self.move_left())
-        btn = QPushButton(self._move_gbox)
+        btn = QPushButton(self._move_fbox.gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
         self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 1, 3, 1, 1)
         btn.clicked.connect(lambda x: self.move_right())
-        btn = QPushButton(self._move_gbox)
+        btn = QPushButton(self._move_fbox.gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
         self.move_btns.append(btn)
@@ -102,20 +83,17 @@ class Transformation(QWidget):
         gbox_grid_layout.addItem(spacer, 3, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 3, 4, 1, 1)
-        self._zoom_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._zoom_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(6)
-        gbox_grid_layout.setVerticalSpacing(6)
-        scroll_grid_layout.addWidget(self._zoom_gbox, 1, 1, 1, 1)
-        btn = QPushButton(self._zoom_gbox)
+        self._zoom_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._zoom_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._zoom_fbox, 2, 1, 1, 1)
+        btn = QPushButton(self._zoom_fbox.gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
         self.move_btns.append(btn)
         btn.setStyleSheet("padding: 0px 0px 0px 0px;")
         gbox_grid_layout.addWidget(btn, 0, 1, 1, 1)
         btn.clicked.connect(lambda x: self.zoom_in())
-        btn = QPushButton(self._zoom_gbox)
+        btn = QPushButton(self._zoom_fbox.gbox)
         btn.setMinimumSize(40, 40)
         btn.setMaximumSize(40, 40)
         self.move_btns.append(btn)
@@ -128,51 +106,49 @@ class Transformation(QWidget):
         gbox_grid_layout.addItem(spacer, 1, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 1, 4, 1, 1)
-        self._enhance_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._enhance_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._enhance_gbox, 2, 1, 1, 1)
-        self.rhc_ehs = RGBHSVCkb(self._enhance_gbox, default_values=("r", "g", "b"), oneline_mode=True)
+        self._enhance_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._enhance_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._enhance_fbox, 3, 1, 1, 1)
+        self.rhc_ehs = RGBHSVCkb(self._enhance_fbox.gbox, default_values=("r", "g", "b"), oneline_mode=True)
         gbox_grid_layout.addWidget(self.rhc_ehs, 0, 1, 1, 3)
-        self.ckb_reserve_ehs = QCheckBox(self._enhance_gbox)
+        self.ckb_reserve_ehs = QCheckBox(self._enhance_fbox.gbox)
         self.ckb_reserve_ehs.setChecked(False)
         gbox_grid_layout.addWidget(self.ckb_reserve_ehs, 1, 1, 1, 3)
         self.ckb_reserve_ehs.stateChanged.connect(self.sync_reserve)
-        self.ckb_ubox_ehs = QCheckBox(self._enhance_gbox)
+        self.ckb_ubox_ehs = QCheckBox(self._enhance_fbox.gbox)
         self.ckb_ubox_ehs.setChecked(False)
         gbox_grid_layout.addWidget(self.ckb_ubox_ehs, 2, 1, 1, 3)
-        self.sdt_extd_ehs = SlideText(self._enhance_gbox, num_range=(0.0, 100.0), default_value=100.0)
-        gbox_grid_layout.addWidget(self.sdt_extd_ehs, 3, 1, 1, 3)
+        self.ckb_onedir = QCheckBox(self._enhance_fbox.gbox)
+        self.ckb_onedir.setChecked(False)
+        gbox_grid_layout.addWidget(self.ckb_onedir, 3, 1, 1, 3)
+        self.ckb_onedir.stateChanged.connect(self.change_dir)
+        self.sdt_extd_ehs = SlideText(self._enhance_fbox.gbox, num_range=(0.0, 100.0), default_value=100.0)
+        gbox_grid_layout.addWidget(self.sdt_extd_ehs, 4, 1, 1, 3)
         self.sdt_extd_ehs.ps_value_changed.connect(self.sync_extd)
-        self.sdt_sepr_ehs = SlideText(self._enhance_gbox, num_range=(0.0, 100.0))
-        gbox_grid_layout.addWidget(self.sdt_sepr_ehs, 4, 1, 1, 3)
+        self.sdt_sepr_ehs = SlideText(self._enhance_fbox.gbox, num_range=(0.0, 100.0))
+        gbox_grid_layout.addWidget(self.sdt_sepr_ehs, 5, 1, 1, 3)
         self.ckb_ubox_ehs.stateChanged.connect(lambda x: self.sdt_sepr_ehs.set_disabled(x))
-        self.sdt_fact_ehs = SlideText(self._enhance_gbox, num_range=(0.0, 100.0))
-        gbox_grid_layout.addWidget(self.sdt_fact_ehs, 5, 1, 1, 3)
-        self.btn_enhs = QPushButton(self._enhance_gbox)
-        gbox_grid_layout.addWidget(self.btn_enhs, 6, 1, 1, 3)
+        self.sdt_fact_ehs = SlideText(self._enhance_fbox.gbox, num_range=(0.0, 100.0))
+        gbox_grid_layout.addWidget(self.sdt_fact_ehs, 6, 1, 1, 3)
+        self.btn_enhs = QPushButton(self._enhance_fbox.gbox)
+        gbox_grid_layout.addWidget(self.btn_enhs, 7, 1, 1, 3)
         self.btn_enhs.clicked.connect(self.emit_enhance)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
-        gbox_grid_layout.addItem(spacer, 7, 1, 1, 3)
+        gbox_grid_layout.addItem(spacer, 8, 1, 1, 3)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        gbox_grid_layout.addItem(spacer, 7, 0, 1, 1)
+        gbox_grid_layout.addItem(spacer, 8, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
-        gbox_grid_layout.addItem(spacer, 7, 4, 1, 1)
-        self._inverse_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._inverse_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._inverse_gbox, 3, 1, 1, 1)
-        self.rhc_inv = RGBHSVCkb(self._enhance_gbox, default_values=("r", "g", "b"), oneline_mode=True)
+        gbox_grid_layout.addItem(spacer, 8, 4, 1, 1)
+        self._inverse_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._inverse_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._inverse_fbox, 5, 1, 1, 1)
+        self.rhc_inv = RGBHSVCkb(self._enhance_fbox.gbox, default_values=("r", "g", "b"), oneline_mode=True)
         gbox_grid_layout.addWidget(self.rhc_inv, 0, 1, 1, 3)
-        self.ckb_reserve_inv = QCheckBox(self._inverse_gbox)
+        self.ckb_reserve_inv = QCheckBox(self._inverse_fbox.gbox)
         self.ckb_reserve_inv.setChecked(False)
         gbox_grid_layout.addWidget(self.ckb_reserve_inv, 1, 1, 1, 3)
         self.ckb_reserve_inv.stateChanged.connect(self.sync_reserve)
-        self.btn_invs = QPushButton(self._inverse_gbox)
+        self.btn_invs = QPushButton(self._inverse_fbox.gbox)
         gbox_grid_layout.addWidget(self.btn_invs, 2, 1, 1, 3)
         self.btn_invs.clicked.connect(self.emit_inverse)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -181,19 +157,41 @@ class Transformation(QWidget):
         gbox_grid_layout.addItem(spacer, 3, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 3, 4, 1, 1)
-        self._cover_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._cover_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(12)
-        scroll_grid_layout.addWidget(self._cover_gbox, 5, 1, 1, 1)
-        self.rhc_cov = RGBHSVCkb(self._enhance_gbox, default_values=("r", "g", "b"), oneline_mode=True)
+        self._replace_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._replace_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._replace_fbox, 4, 1, 1, 1)
+        self.ckb_reserve_rep = QCheckBox(self._replace_fbox.gbox)
+        self.ckb_reserve_rep.setChecked(False)
+        gbox_grid_layout.addWidget(self.ckb_reserve_rep, 0, 1, 1, 3)
+        self.ckb_reserve_rep.stateChanged.connect(self.sync_reserve)
+        self.sdt_extd_rep = SlideText(self._replace_fbox.gbox, num_range=(0.0, 100.0), default_value=100.0)
+        gbox_grid_layout.addWidget(self.sdt_extd_rep, 2, 1, 1, 3)
+        self.sdt_extd_rep.ps_value_changed.connect(self.sync_extd)
+        self.btn_replace_rgb = QPushButton(self._replace_fbox.gbox)
+        gbox_grid_layout.addWidget(self.btn_replace_rgb, 4, 1, 1, 3)
+        self.btn_replace_rgb.clicked.connect(lambda x: self.ps_replace.emit((1, self.ckb_reserve_rep.isChecked(), self.sdt_extd_rep.get_value() / 100.0)))
+        self.btn_replace_hsv = QPushButton(self._replace_fbox.gbox)
+        gbox_grid_layout.addWidget(self.btn_replace_hsv, 5, 1, 1, 3)
+        self.btn_replace_hsv.clicked.connect(lambda x: self.ps_replace.emit((2, self.ckb_reserve_rep.isChecked(), self.sdt_extd_rep.get_value() / 100.0)))
+        self.btn_replace_cancel = QPushButton(self._replace_fbox.gbox)
+        gbox_grid_layout.addWidget(self.btn_replace_cancel, 6, 1, 1, 3)
+        self.btn_replace_cancel.clicked.connect(lambda x: self.ps_replace.emit((0, None, None)))
+        spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        gbox_grid_layout.addItem(spacer, 7, 1, 1, 3)
+        spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        gbox_grid_layout.addItem(spacer, 7, 0, 1, 1)
+        spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
+        gbox_grid_layout.addItem(spacer, 7, 4, 1, 1)
+        self._cover_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._cover_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._cover_fbox, 6, 1, 1, 1)
+        self.rhc_cov = RGBHSVCkb(self._enhance_fbox.gbox, default_values=("r", "g", "b"), oneline_mode=True)
         gbox_grid_layout.addWidget(self.rhc_cov, 0, 1, 1, 3)
-        self.ckb_reserve_cov = QCheckBox(self._cover_gbox)
+        self.ckb_reserve_cov = QCheckBox(self._cover_fbox.gbox)
         self.ckb_reserve_cov.setChecked(False)
         gbox_grid_layout.addWidget(self.ckb_reserve_cov, 1, 1, 1, 3)
         self.ckb_reserve_cov.stateChanged.connect(self.sync_reserve)
-        self.btn_cover = QPushButton(self._cover_gbox)
+        self.btn_cover = QPushButton(self._cover_fbox.gbox)
         gbox_grid_layout.addWidget(self.btn_cover, 2, 1, 1, 3)
         self.btn_cover.clicked.connect(self.emit_cover)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -202,6 +200,10 @@ class Transformation(QWidget):
         gbox_grid_layout.addItem(spacer, 3, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 3, 4, 1, 1)
+        self.scroll_grid_layout.addItem(self.over_spacer, 7, 1, 1, 1)
+        self._all_fboxes = (self._move_fbox, self._zoom_fbox, self._enhance_fbox, self._inverse_fbox, self._replace_fbox, self._cover_fbox)
+        self.scroll_grid_layout.addWidget(self._exp_all_btn, 0, 1, 1, 1)
+        self.connect_by_fboxes()
         self.update_text()
 
     def sizeHint(self):
@@ -243,6 +245,21 @@ class Transformation(QWidget):
 
     def zoom_out(self):
         self.ps_zoom.emit(1 / self._args.zoom_step)
+
+    def change_dir(self, state):
+        """
+        Change one dir (same direction, -100 - 100) and bin dir (binary direction, 0 - 100).
+        """
+
+        val = abs(self.sdt_fact_ehs.get_value())
+
+        if self.ckb_onedir.isChecked():
+            self.sdt_fact_ehs.set_num_range((-100.0, 100.0))
+            self.sdt_fact_ehs.set_value(val)
+
+        else:
+            self.sdt_fact_ehs.set_num_range((0.0, 100.0))
+            self.sdt_fact_ehs.set_value(val)
 
     def sync_reserve(self, state):
         """
@@ -295,7 +312,7 @@ class Transformation(QWidget):
                 sepr = self.sdt_sepr_ehs.get_value() / 100.0
                 separ = (sepr * 255.0, sepr * 255.0, sepr * 255.0)
 
-            self.ps_enhance.emit(("enhance_rgb", tuple(region), tuple(separ), self.sdt_fact_ehs.get_value() / 100.0, self.ckb_reserve_ehs.isChecked(), self.sdt_extd_ehs.get_value() / 100.0))
+            self.ps_enhance.emit(("enhance_rgb", tuple(region), tuple(separ), self.sdt_fact_ehs.get_value() / 100.0, self.ckb_reserve_ehs.isChecked(), self.sdt_extd_ehs.get_value() / 100.0, self.ckb_onedir.isChecked(), self._args.dep_wtp))
         else:
             for vl in checked_values:
                 reg = {"h": 0, "s": 1, "v": 2}[vl]
@@ -307,7 +324,7 @@ class Transformation(QWidget):
                 sepr = self.sdt_sepr_ehs.get_value() / 100.0
                 separ = (sepr * 360.0, sepr, sepr)
 
-            self.ps_enhance.emit(("enhance_hsv", tuple(region), tuple(separ), self.sdt_fact_ehs.get_value() / 100.0, self.ckb_reserve_ehs.isChecked(), self.sdt_extd_ehs.get_value() / 100.0))
+            self.ps_enhance.emit(("enhance_hsv", tuple(region), tuple(separ), self.sdt_fact_ehs.get_value() / 100.0, self.ckb_reserve_ehs.isChecked(), self.sdt_extd_ehs.get_value() / 100.0, self.ckb_onedir.isChecked(), self._args.dep_wtp))
 
     def emit_inverse(self, value):
         """
@@ -354,21 +371,29 @@ class Transformation(QWidget):
             self.ps_enhance.emit(("cover_hsv", region, self.ckb_reserve_cov.isChecked()))
 
     def update_text(self):
-        self._move_gbox.setTitle(self._gbox_descs[0])
-        self._zoom_gbox.setTitle(self._gbox_descs[1])
+        self.sw_update_text(force=True)
+        self._move_fbox.set_title(self._gbox_descs[0])
+        self._zoom_fbox.set_title(self._gbox_descs[1])
         self.sdt_sepr_ehs.set_text(self._enhance_descs[1])
         self.sdt_fact_ehs.set_text(self._enhance_descs[2])
         self.sdt_extd_ehs.set_text(self._enhance_descs[6])
+        self.sdt_extd_rep.set_text(self._enhance_descs[6])
         self.ckb_ubox_ehs.setText(self._enhance_descs[10])
-        self._enhance_gbox.setTitle(self._gbox_descs[3])
+        self.ckb_onedir.setText(self._enhance_descs[11])
+        self._replace_fbox.set_title(self._gbox_descs[2])
+        self.ckb_reserve_rep.setText(self._enhance_descs[3])
+        self.btn_replace_rgb.setText(self._replace_descs[0])
+        self.btn_replace_hsv.setText(self._replace_descs[1])
+        self.btn_replace_cancel.setText(self._replace_descs[2])
+        self._enhance_fbox.set_title(self._gbox_descs[3])
         self.rhc_ehs.set_prefix_text((self._enhance_descs[0], self._enhance_descs[9]))
         self.ckb_reserve_ehs.setText(self._enhance_descs[3])
         self.btn_enhs.setText(self._enhance_descs[4])
-        self._inverse_gbox.setTitle(self._gbox_descs[4])
+        self._inverse_fbox.set_title(self._gbox_descs[4])
         self.rhc_inv.set_prefix_text((self._enhance_descs[0], self._enhance_descs[9]))
         self.ckb_reserve_inv.setText(self._enhance_descs[3])
         self.btn_invs.setText(self._enhance_descs[5])
-        self._cover_gbox.setTitle(self._gbox_descs[5])
+        self._cover_fbox.set_title(self._gbox_descs[5])
         self.rhc_cov.set_prefix_text((self._enhance_descs[0], self._enhance_descs[9]))
         self.ckb_reserve_cov.setText(self._enhance_descs[3])
         self.btn_cover.setText(self._enhance_descs[8])
@@ -413,6 +438,7 @@ class Transformation(QWidget):
             _translate("Transformation", "Cover"),
             _translate("Transformation", "Linked: "),
             _translate("Transformation", "Use Result Color"),
+            _translate("Transformation", "Same Direction"),
         )
 
         self._extend_descs = (

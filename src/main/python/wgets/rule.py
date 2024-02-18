@@ -13,11 +13,12 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QWidget, QRadioButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
+from PyQt5.QtWidgets import QRadioButton, QSpacerItem, QSizePolicy
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
+from wgets.general import FoldingBox, SideWidget
 
 
-class Rule(QWidget):
+class Rule(SideWidget):
     """
     Rule object based on QWidget. Init a rule in rule.
     """
@@ -33,32 +34,13 @@ class Rule(QWidget):
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self._args = args
         self._func_tr_()
-        rule_grid_layout = QGridLayout(self)
-        rule_grid_layout.setContentsMargins(0, 0, 0, 0)
-        rule_grid_layout.setHorizontalSpacing(0)
-        rule_grid_layout.setVerticalSpacing(0)
-        scroll_area = QScrollArea(self)
-        scroll_area.setFrameShape(QFrame.Box)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll_area.setWidgetResizable(True)
-        rule_grid_layout.addWidget(scroll_area)
-        scroll_contents = QWidget()
-        scroll_grid_layout = QGridLayout(scroll_contents)
-        scroll_grid_layout.setContentsMargins(3, 9, 3, 3)
-        scroll_grid_layout.setHorizontalSpacing(3)
-        scroll_grid_layout.setVerticalSpacing(12)
-        scroll_area.setWidget(scroll_contents)
-        self._rule_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._rule_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(16)
-        scroll_grid_layout.addWidget(self._rule_gbox, 0, 1, 1, 1)
+        self._rule_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._rule_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._rule_fbox, 1, 1, 1, 1)
         self._rule_btns = []
 
         for i in range(8):
-            btn = QRadioButton(self._rule_gbox)
+            btn = QRadioButton(self._rule_fbox.gbox)
             gbox_grid_layout.addWidget(btn, i, 0, 1, 1)
             btn.clicked.connect(self.modify_rule(i))
             self._rule_btns.append(btn)
@@ -67,16 +49,13 @@ class Rule(QWidget):
         gbox_grid_layout.addItem(spacer, 8, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 8, 1, 1, 1)
-        self._synchronization_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._synchronization_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(16)
-        scroll_grid_layout.addWidget(self._synchronization_gbox, 1, 1, 1, 1)
+        self._synchronization_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._synchronization_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._synchronization_fbox, 2, 1, 1, 1)
         self._synchronization_btns = []
 
         for i in range(7):
-            btn = QRadioButton(self._synchronization_gbox)
+            btn = QRadioButton(self._synchronization_fbox.gbox)
             gbox_grid_layout.addWidget(btn, i, 0, 1, 1)
             btn.clicked.connect(self.modify_synchronization(i))
             self._synchronization_btns.append(btn)
@@ -85,6 +64,10 @@ class Rule(QWidget):
         gbox_grid_layout.addItem(spacer, 7, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 7, 1, 1, 1)
+        self.scroll_grid_layout.addItem(self.over_spacer, 3, 1, 1, 1)
+        self._all_fboxes = (self._rule_fbox, self._synchronization_fbox)
+        self.scroll_grid_layout.addWidget(self._exp_all_btn, 0, 1, 1, 1)
+        self.connect_by_fboxes()
         self.update_rule()
         self._synchronization_btns[self._args.sys_color_set.synchronization].setChecked(True)
         self.update_text()
@@ -122,8 +105,9 @@ class Rule(QWidget):
         self._rule_btns[idx].setChecked(True)
 
     def update_text(self):
-        self._rule_gbox.setTitle(self._gbox_descs[0])
-        self._synchronization_gbox.setTitle(self._gbox_descs[1])
+        self.sw_update_text(force=True)
+        self._rule_fbox.set_title(self._gbox_descs[0])
+        self._synchronization_fbox.set_title(self._gbox_descs[1])
 
         for i in range(8):
             self._rule_btns[i].setText(self._rule_descs[i])
@@ -134,8 +118,8 @@ class Rule(QWidget):
     def _func_tr_(self):
         _translate = QCoreApplication.translate
         self._gbox_descs = (
-            _translate("Channel", "Harmony"),
-            _translate("Channel", "Synchronization"),
+            _translate("Rule", "Harmony"),
+            _translate("Rule", "Synchronization"),
         )
 
         self._rule_descs = (

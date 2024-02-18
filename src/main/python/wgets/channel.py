@@ -13,11 +13,12 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QWidget, QRadioButton, QGridLayout, QScrollArea, QFrame, QSpacerItem, QSizePolicy, QGroupBox
+from PyQt5.QtWidgets import QRadioButton, QSpacerItem, QSizePolicy
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QSize
+from wgets.general import FoldingBox, SideWidget
 
 
-class Channel(QWidget):
+class Channel(SideWidget):
     """
     Channel object based on QWidget. Init a channel in channel.
     """
@@ -34,32 +35,13 @@ class Channel(QWidget):
         self._args = args
         self._backups = ()
         self._func_tr_()
-        channel_grid_layout = QGridLayout(self)
-        channel_grid_layout.setContentsMargins(0, 0, 0, 0)
-        channel_grid_layout.setHorizontalSpacing(0)
-        channel_grid_layout.setVerticalSpacing(0)
-        scroll_area = QScrollArea(self)
-        scroll_area.setFrameShape(QFrame.Box)
-        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scroll_area.setWidgetResizable(True)
-        channel_grid_layout.addWidget(scroll_area)
-        scroll_contents = QWidget()
-        scroll_grid_layout = QGridLayout(scroll_contents)
-        scroll_grid_layout.setContentsMargins(3, 9, 3, 3)
-        scroll_grid_layout.setHorizontalSpacing(3)
-        scroll_grid_layout.setVerticalSpacing(12)
-        scroll_area.setWidget(scroll_contents)
-        self._category_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._category_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(16)
-        scroll_grid_layout.addWidget(self._category_gbox, 0, 1, 1, 1)
+        self._category_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._category_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._category_fbox, 1, 1, 1, 1)
         self._category_btns = []
 
         for i in range(8):
-            btn = QRadioButton(self._category_gbox)
+            btn = QRadioButton(self._category_fbox.gbox)
             gbox_grid_layout.addWidget(btn, i, 0, 1, 1)
             btn.clicked.connect(self.modify_category(i))
             self._category_btns.append(btn)
@@ -68,16 +50,13 @@ class Channel(QWidget):
         gbox_grid_layout.addItem(spacer, 8, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 8, 1, 1, 1)
-        self._channel_gbox = QGroupBox(scroll_contents)
-        gbox_grid_layout = QGridLayout(self._channel_gbox)
-        gbox_grid_layout.setContentsMargins(3, 12, 3, 12)
-        gbox_grid_layout.setHorizontalSpacing(3)
-        gbox_grid_layout.setVerticalSpacing(16)
-        scroll_grid_layout.addWidget(self._channel_gbox, 1, 1, 1, 1)
+        self._channel_fbox = FoldingBox(self.scroll_contents)
+        gbox_grid_layout = self._channel_fbox.gbox_grid_layout
+        self.scroll_grid_layout.addWidget(self._channel_fbox, 2, 1, 1, 1)
         self._channel_btns = []
 
         for i in range(7):
-            btn = QRadioButton(self._channel_gbox)
+            btn = QRadioButton(self._channel_fbox.gbox)
             gbox_grid_layout.addWidget(btn, i, 0, 1, 1)
             btn.clicked.connect(self.modify_channel(i))
             self._channel_btns.append(btn)
@@ -86,6 +65,10 @@ class Channel(QWidget):
         gbox_grid_layout.addItem(spacer, 7, 0, 1, 1)
         spacer = QSpacerItem(5, 5, QSizePolicy.Expanding, QSizePolicy.Minimum)
         gbox_grid_layout.addItem(spacer, 7, 1, 1, 1)
+        self.scroll_grid_layout.addItem(self.over_spacer, 3, 1, 1, 1)
+        self._all_fboxes = (self._category_fbox, self._channel_fbox)
+        self.scroll_grid_layout.addWidget(self._exp_all_btn, 0, 1, 1, 1)
+        self.connect_by_fboxes()
         self.reset()
 
     def sizeHint(self):
@@ -130,8 +113,9 @@ class Channel(QWidget):
         self.reset()
 
     def update_text(self):
-        self._category_gbox.setTitle(self._gbox_descs[0])
-        self._channel_gbox.setTitle(self._gbox_descs[1])
+        self.sw_update_text(force=True)
+        self._category_fbox.set_title(self._gbox_descs[0])
+        self._channel_fbox.set_title(self._gbox_descs[1])
 
         for i in range(8):
             self._category_btns[i].setText(self._category_descs[i])
