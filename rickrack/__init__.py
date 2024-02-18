@@ -13,5 +13,5 @@ about Rickrack.
 Copyright (c) 2019-2023 by Eigenmiao. All Rights Reserved.
 """
 
-from rickrack.color import Color
+from rickrack.color import Color, CTP, OTP
 from rickrack.rickrack import Rickrack
