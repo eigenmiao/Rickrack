@@ -14,12 +14,11 @@ Copyright (c) 2019-2022 by Eigenmiao. All Rights Reserved.
 """
 
 import re
-import time
 import numpy as np
-from ricore.color import Color
+from ricore.color import Color, CTP
 
 
-def gen_color_grid(color_set, grid_locations, grid_assitlocs, grid_list=None, col=9, ctp=("r", "g", "b"), sum_factor=1.0, dim_factor=1.0, assist_factor=0.4, rev_grid=False):
+def gen_color_grid(color_set, grid_locations, grid_assitlocs, grid_list=None, col=9, ctp=("r", "g", "b"), sum_factor=1.0, dim_factor=1.0, assist_factor=0.4, rev_grid=False, useryb=False):
     """
     Generate color grid (board) from peroid colors and points (or fixed point list).
 
@@ -34,6 +33,7 @@ def gen_color_grid(color_set, grid_locations, grid_assitlocs, grid_list=None, co
         dim_factor (int or float): dim factor, suggest 0~1. The larger the dim_factor is, the lighter the circile is.
         assist_factor (int or float): weight for assistant points, suggest 0~1. The larger the assist_factor is, the heavier the weight is.
         rev_grid (bool): if rgb grid generation reversed.
+        useryb (bool): if use ryb color space.
 
     Returns:
         color grid in rgb type.
@@ -56,6 +56,12 @@ def gen_color_grid(color_set, grid_locations, grid_assitlocs, grid_list=None, co
         return final_grid
 
     else:
+        if useryb and "h" in ctp:
+            fmt_color_set = [Color.spc_rgb2ryb(c) for c in color_set]
+
+        else:
+            fmt_color_set = color_set
+
         assi_colors = [[], [], [], [], []]
         assi_points = [[], [], [], [], []]
         colors = []
@@ -68,16 +74,21 @@ def gen_color_grid(color_set, grid_locations, grid_assitlocs, grid_list=None, co
                 assit_rpt = pt_rxy + np.array(grid_assitlocs[idx][assit_idx][0:2])
                 assi_points[idx].append(assit_rpt)
                 assit_color = gen_assit_color(color_set[idx], *grid_assitlocs[idx][assit_idx][2:6])
-                assi_colors[idx].append(assit_color)
+
+                if useryb and "h" in ctp:
+                    assi_colors[idx].append(Color.spc_rgb2ryb(assit_color))
+
+                else:
+                    assi_colors[idx].append(assit_color)
 
             for shift_i in (-1, 0, 1):
                 for shift_j in (-1, 0, 1):
                     if "r" in ctp or "g" in ctp or "b" in ctp:
-                        pt_color = color_set[idx].rgb
+                        pt_color = fmt_color_set[idx].rgb
 
                     else:
-                        pt_color = list(color_set[idx].hsv)
-                        pt_color[0] = color_set[0].ref_h(pt_color[0])
+                        pt_color = list(fmt_color_set[idx].hsv)
+                        pt_color[0] = fmt_color_set[0].ref_h(pt_color[0])
 
                     colors.append(pt_color)
                     points.append(np.array(grid_locations[idx]) + np.array((shift_i, shift_j)))
@@ -89,7 +100,7 @@ def gen_color_grid(color_set, grid_locations, grid_assitlocs, grid_list=None, co
 
                 else:
                     pt_color = list(assi_colors[idx][assidx].hsv)
-                    pt_color[0] = color_set[0].ref_h(pt_color[0])
+                    pt_color[0] = fmt_color_set[0].ref_h(pt_color[0])
 
                 colors.append(pt_color)
                 points.append(np.array(assi_points[idx][assidx]))
@@ -117,29 +128,29 @@ def gen_color_grid(color_set, grid_locations, grid_assitlocs, grid_list=None, co
 
         if rev_grid:
             if "r" in ctp or "g" in ctp or "b" in ctp:
-                color_grid_a = distance_grid.dot(255.0 - colors[:, 0]) if "r" in ctp else np.ones((col, col)) * (255.0 - color_set[0].r)
-                color_grid_b = distance_grid.dot(255.0 - colors[:, 1]) if "g" in ctp else np.ones((col, col)) * (255.0 - color_set[0].g)
-                color_grid_c = distance_grid.dot(255.0 - colors[:, 2]) if "b" in ctp else np.ones((col, col)) * (255.0 - color_set[0].b)
+                color_grid_a = distance_grid.dot(255.0 - colors[:, 0]) if "r" in ctp else np.ones((col, col)) * (255.0 - fmt_color_set[0].r)
+                color_grid_b = distance_grid.dot(255.0 - colors[:, 1]) if "g" in ctp else np.ones((col, col)) * (255.0 - fmt_color_set[0].g)
+                color_grid_c = distance_grid.dot(255.0 - colors[:, 2]) if "b" in ctp else np.ones((col, col)) * (255.0 - fmt_color_set[0].b)
                 color_grid_a = 255.0 - color_grid_a
                 color_grid_b = 255.0 - color_grid_b
                 color_grid_c = 255.0 - color_grid_c
 
             else:
-                color_grid_a = distance_grid.dot(      colors[:, 0]) + color_set[0].h if "h" in ctp else np.ones((col, col)) * (      color_set[0].h)
-                color_grid_b = distance_grid.dot(      colors[:, 1])                  if "s" in ctp else np.ones((col, col)) * (      color_set[0].s)
-                color_grid_c = distance_grid.dot(1.0 - colors[:, 2])                  if "v" in ctp else np.ones((col, col)) * (1.0 - color_set[0].v)
+                color_grid_a = distance_grid.dot(      colors[:, 0]) + fmt_color_set[0].h if "h" in ctp else np.ones((col, col)) * (      fmt_color_set[0].h)
+                color_grid_b = distance_grid.dot(      colors[:, 1])                      if "s" in ctp else np.ones((col, col)) * (      fmt_color_set[0].s)
+                color_grid_c = distance_grid.dot(1.0 - colors[:, 2])                      if "v" in ctp else np.ones((col, col)) * (1.0 - fmt_color_set[0].v)
                 color_grid_c = 1.0 - color_grid_c
 
         else:
             if "r" in ctp or "g" in ctp or "b" in ctp:
-                color_grid_a = distance_grid.dot(colors[:, 0]) if "r" in ctp else np.ones((col, col)) * color_set[0].r
-                color_grid_b = distance_grid.dot(colors[:, 1]) if "g" in ctp else np.ones((col, col)) * color_set[0].g
-                color_grid_c = distance_grid.dot(colors[:, 2]) if "b" in ctp else np.ones((col, col)) * color_set[0].b
+                color_grid_a = distance_grid.dot(colors[:, 0]) if "r" in ctp else np.ones((col, col)) * fmt_color_set[0].r
+                color_grid_b = distance_grid.dot(colors[:, 1]) if "g" in ctp else np.ones((col, col)) * fmt_color_set[0].g
+                color_grid_c = distance_grid.dot(colors[:, 2]) if "b" in ctp else np.ones((col, col)) * fmt_color_set[0].b
 
             else:
-                color_grid_a = distance_grid.dot(colors[:, 0]) + color_set[0].h if "h" in ctp else np.ones((col, col)) * color_set[0].h
-                color_grid_b = distance_grid.dot(colors[:, 1])                  if "s" in ctp else np.ones((col, col)) * color_set[0].s
-                color_grid_c = distance_grid.dot(colors[:, 2])                  if "v" in ctp else np.ones((col, col)) * color_set[0].v
+                color_grid_a = distance_grid.dot(colors[:, 0]) + fmt_color_set[0].h if "h" in ctp else np.ones((col, col)) * fmt_color_set[0].h
+                color_grid_b = distance_grid.dot(colors[:, 1])                      if "s" in ctp else np.ones((col, col)) * fmt_color_set[0].s
+                color_grid_c = distance_grid.dot(colors[:, 2])                      if "v" in ctp else np.ones((col, col)) * fmt_color_set[0].v
 
         final_grid = np.stack((color_grid_a, color_grid_b, color_grid_c), axis=2)
 
@@ -147,8 +158,10 @@ def gen_color_grid(color_set, grid_locations, grid_assitlocs, grid_list=None, co
             final_grid = Color.fmt_rgb_array(final_grid)
 
         else:
-            final_grid = Color.hsv2rgb_array(final_grid)
+            if useryb:
+                final_grid = Color.spc_ryb2rgb_array(final_grid)
 
+            final_grid = Color.hsv2rgb_array(final_grid)
         return final_grid
 
 def norm_grid_locations(grid_locations, grid_assitlocs):
@@ -396,14 +409,14 @@ def gen_assit_color(curr_color, assit_h, assit_s, assit_v, relativity):
             curr_color.s + assit_s,
             curr_color.v + assit_v,
 
-        ), tp="hsv", overflow=curr_color.get_overflow())
+        ), tp=CTP.hsv, overflow=curr_color.get_overflow())
     else:
         assit_color = Color((
             assit_h,
             assit_s,
             assit_v,
 
-        ), tp="hsv", overflow=curr_color.get_overflow())
+        ), tp=CTP.hsv, overflow=curr_color.get_overflow())
     return assit_color
 
 def gen_assit_args(curr_color, assit_color, relativity):
