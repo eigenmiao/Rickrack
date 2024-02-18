@@ -4,6 +4,7 @@ These versions of Rickrack are currently being supported with security updates.
 
 | Version               | Supported          |
 | --------------------- | ------------------ |
+| v2.9.9-x3d3s3-pre     | :white_check_mark: |
 | v2.8.42-x3d3s3-stable | :white_check_mark: |
 | v2.8.41-x3d3s3-stable | :x:                |
 | v2.8.40-x3d3s3-stable | :x:                |
@@ -19,7 +20,7 @@ These versions of Rickrack are currently being supported with security updates.
 | v2.5.24-x2d2s2-stable | :x:                |
 
 ## Reporting a Vulnerability
-Please send email to eigenmiao@outlook.com with the requested information listed below (as much as you can provide):
+Please send email to eigenmiao#outlook.com (replace "#" with "@") with the requested information listed below (as much as you can provide):
 
 * Type of issue (e.g. buffer overflow, etc.)
 * Full paths of source file(s) related to the manifestation of the issue
