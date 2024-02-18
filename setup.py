@@ -18,7 +18,7 @@ from setuptools import setup
 
 setup(
     name="Rickrack",
-    version="2.8.42",
+    version="2.9.9",
     author="Eigenmiao",
     author_email="eigenmiao@outlook.com",
     description="Generate harmonious colors freely.",
