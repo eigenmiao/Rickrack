@@ -18,36 +18,37 @@ import unittest
 import numpy as np
 
 
-class FakeColor(object):
-    """
-    FakeColor object. Storing rgb, hsv and hex code (hec) color without functional methods.
-    """
+class CTP(object):
+    color = 0
+    rgb = 1
+    hsv = 2
+    hec = 3
+    r = 4
+    g = 5
+    b = 6
+    h = 7
+    s = 8
+    v = 9
 
-    def __init__(self, rgb, hsv, hec):
-        """
-        Init FakeColor ojbect.
+    rgcorh = tuple(range(4))
+    rgfull = tuple(range(10))
+    rgrgb = (4, 5, 6)
+    rghsv = (7, 8, 9)
+    rgele = (4, 5, 6, 7, 8, 9)
 
-        Args:
-            rgb (tuple or list): rgb color.
-            rgb (tuple or list): hsv color.
-            hec (str): hex code (hec).
-        """
+    n2s = ("color", "rgb", "hsv", "hec", "r", "g", "b", "h", "s", "v",)
+    s2n = dict(zip(n2s, range(len(n2s))))
 
-        self.rgb = Color.fmt_rgb(rgb)
-        self.hsv = Color.fmt_hsv(hsv)
-        self.hec = Color.fmt_hec(hec)
 
-    # ---------- ---------- ---------- Public Funcs ---------- ---------- ---------- #
+class OTP(object):
+    cutoff = 0
+    revert = 1
+    repeat = 2
 
-    def export(self):
-        """
-        Export color in dict type (for json file).
+    rgfull = tuple(range(3))
 
-        Returns:
-          color dict {"rgb": rgb_color_list, "hsv": hsv_color_list, "hex_code": hex code (hec)}.
-        """
-
-        return {"rgb": self.rgb.tolist(), "hsv": self.hsv.tolist(), "hex_code": self.hec}
+    n2s = ("cutoff", "revert", "repeat")
+    s2n = dict(zip(n2s, range(len(n2s))))
 
 
 class Color(object):
@@ -55,23 +56,20 @@ class Color(object):
     Color object. Storing rgb, hsv and hex code (hec) color.
     """
 
-    def __init__(self, item, tp="color", overflow="cutoff"):
+    def __init__(self, item, tp=CTP.color, overflow=OTP.cutoff):
         """
         Init Color ojbect.
 
         Args:
             item (tuple, list, str or Color): rgb, hsv, hex code (hec) or another Color object.
-            tp (str): type of color, in "rgb", "hsv", "hec" and "color".
-            overflow (str): method to manipulate overflowed s and v values, in "cutoff", "return" and "repeat".
+            tp (int): type of color, in "rgb", "hsv", "hec" and "color".
+            overflow (int): method to manipulate overflowed s and v values, in "cutoff", "revert" and "repeat".
         """
 
+        assert isinstance(tp, int) and tp in CTP.rgcorh, tp
+
         self.set_overflow(overflow)
-
-        if isinstance(tp, str) and tp in ("rgb", "hsv", "hec", "color"):
-            self.setti(item, tp)
-
-        else:
-            raise ValueError("expect tp in str type and list 'rgb', 'hsv', 'hec' and 'color': {}.".format(tp))
+        self.setti(item, tp)
 
     # ---------- ---------- ---------- Setting and Getting Funcs ---------- ---------- ---------- #
 
@@ -81,134 +79,104 @@ class Color(object):
 
         Args:
             item (tuple, list, str, int, float or Color): rgb, hsv, hex code (hec), r, g, b, h, s, v or another Color object.
-            tp (str): type of color, in  "rgb", "hsv", "hec", "r", "g", "b", "h", "s", "v" and "color".
+            tp (int): type of color, in  "rgb", "hsv", "hec", "r", "g", "b", "h", "s", "v" and "color".
         """
 
-        if not isinstance(tp, str):
-            raise ValueError("expect tp in str type: {}.".format(tp))
+        assert isinstance(tp, int) and tp in CTP.rgfull, tp
 
-        if tp.lower() == "color":
-            if isinstance(item, (Color, FakeColor)):
-                self._rgb, self._hsv, self._hec = self.fmt_rgb(item.rgb), self.fmt_hsv(item.hsv), self.fmt_hec(item.hec)
+        if tp == CTP.rgb:
+            self.rgb = item
 
-            else:
-                raise ValueError("expect item in Color type: {}.".format(item))
+        elif tp == CTP.hsv:
+            self.hsv = item
 
-        elif tp.lower() == "rgb":
-            self._rgb = self.fmt_rgb(item)
-            self._hsv = self.rgb2hsv(self._rgb)
-            self._hec = self.rgb2hec(self._rgb)
+        elif tp == CTP.hec:
+            self.hec = item
 
-        elif tp.lower() == "hsv":
-            self._hsv = self.fmt_hsv(item, overflow=self._overflow)
-            self._rgb = self.hsv2rgb(self._hsv)
-            self._hec = self.hsv2hec(self._hsv)
+        elif tp == CTP.r:
+            self.r = item
 
-        elif tp.lower() == "hec":
-            self._hec = self.fmt_hec(item)
-            self._rgb = self.hec2rgb(self._hec)
-            self._hsv = self.hec2hsv(self._hec)
+        elif tp == CTP.g:
+            self.g = item
 
-        elif tp.lower() == "r":
-            rgb = list(self._rgb)
-            rgb[0] = item
-            self.setti(rgb, "rgb")
+        elif tp == CTP.b:
+            self.b = item
 
-        elif tp.lower() == "g":
-            rgb = list(self._rgb)
-            rgb[1] = item
-            self.setti(rgb, "rgb")
+        elif tp == CTP.h:
+            self.h = item
 
-        elif tp.lower() == "b":
-            rgb = list(self._rgb)
-            rgb[2] = item
-            self.setti(rgb, "rgb")
+        elif tp == CTP.s:
+            self.s = item
 
-        elif tp.lower() == "h":
-            hsv = list(self._hsv)
-            hsv[0] = item
-            self.setti(hsv, "hsv")
+        elif tp == CTP.v:
+            self.v = item
 
-        elif tp.lower() == "s":
-            hsv = list(self._hsv)
-            hsv[1] = item
-            self.setti(hsv, "hsv")
-
-        elif tp.lower() == "v":
-            hsv = list(self._hsv)
-            hsv[2] = item
-            self.setti(hsv, "hsv")
-
-        else:
-            raise ValueError("expect tp in list 'rgb', 'hsv', 'hec', 'r', 'g', 'b', 'h', 's', 'v' and 'color'.")
+        else: # CTP.color
+            self.color = item
 
     def getti(self, tp):
         """
         Get color item.
 
         Args:
-            tp (str): type of color, in  "rgb", "hsv", "hec", "r", "g", "b", "h", "s", "v" and "color".
+            tp (int): type of color, in  "rgb", "hsv", "hec", "r", "g", "b", "h", "s", "v" and "color".
 
         Returns:
             rgb, hsv, hex code (hec), r, g, b, h, s, v or another Color object.
         """
 
-        if not isinstance(tp, str):
-            raise ValueError("expect tp in str type: {}.".format(tp))
+        assert isinstance(tp, int) and tp in CTP.rgfull, tp
 
-        if tp.lower() == "color":
-            return Color(self)
+        if tp == CTP.rgb:
+            return self._rgb
 
-        elif tp.lower() == "rgb":
-            return tuple(self._rgb)
+        elif tp == CTP.hsv:
+            return self._hsv
 
-        elif tp.lower() == "hsv":
-            return tuple(self._hsv)
+        elif tp == CTP.hec:
+            return self._hec
 
-        elif tp.lower() == "hec":
-            return str(self._hec)
+        elif tp == CTP.r:
+            return self._rgb[0]
 
-        elif tp.lower() == "r":
-            return int(self._rgb[0])
+        elif tp == CTP.g:
+            return self._rgb[1]
 
-        elif tp.lower() == "g":
-            return int(self._rgb[1])
+        elif tp == CTP.b:
+            return self._rgb[2]
 
-        elif tp.lower() == "b":
-            return int(self._rgb[2])
+        elif tp == CTP.h:
+            return self._hsv[0]
 
-        elif tp.lower() == "h":
-            return float(self._hsv[0])
+        elif tp == CTP.s:
+            return self._hsv[1]
 
-        elif tp.lower() == "s":
-            return float(self._hsv[1])
+        elif tp == CTP.v:
+            return self._hsv[2]
 
-        elif tp.lower() == "v":
-            return float(self._hsv[2])
-
-        else:
-            raise ValueError("expect tp in list 'rgb', 'hsv', 'hec', 'r', 'g', 'b', 'h', 's', 'v' and 'color'.")
+        else: # CTP.color
+            return self
 
     def set_overflow(self, overflow):
         """
         Set the overflow method.
 
         Args:
-            overflow (str): method to manipulate overflowed s and v values, in "cutoff", "return" and "repeat".
+            overflow (int): method to manipulate overflowed s and v values, in "cutoff", "revert" and "repeat".
         """
 
-        if isinstance(overflow, str) and overflow in ("cutoff", "return", "repeat"):
-            self._overflow = str(overflow)
+        _overflow = overflow if isinstance(overflow, int) else OTP.s2n[overflow]
 
-        else:
-            raise ValueError("expect value in str type and list 'cutoff', 'return', 'repeat': {}.".format(overflow))
+        assert isinstance(_overflow, int) and _overflow in OTP.rgfull, _overflow
+
+        self._overflow = _overflow
 
     def get_overflow(self):
         """
         Get the overflow method.
         """
 
-        return str(self._overflow)
+        return self._overflow
 
     # ---------- ---------- ---------- Inner Funcs ---------- ---------- ---------- #
 
@@ -226,123 +194,105 @@ class Color(object):
 
         return "Color(hec {})".format(self.hec)
 
-    '''
-    def __eq__(self, other):
-        """
-        Compare two colors by equal.
-
-        Args:
-            other (Color): another Color object for compare.
-
-        Returns:
-            True or False.
-        """
-
-        if isinstance(other, Color):
-            return self._hec == other.hec
-
-        else:
-            raise ValueError("expect other in Color type: {}.".format(other))
-
-    def __ne__(self, other):
-        """
-        Compare two colors by not equal.
-
-        Args:
-            other (Color): another Color object for compare.
-
-        Returns:
-            True or False.
-        """
-
-        if isinstance(other, Color):
-            return self._hec != other.hec
-
-        else:
-            raise ValueError("expect other in Color type: {}.".format(other))
-    '''
-
     # ---------- ---------- ---------- Properties and Setters ---------- ---------- ---------- #
 
     @property
     def rgb(self):
-        return self.getti("rgb")
+        return self._rgb
 
     @property
     def hsv(self):
-        return self.getti("hsv")
+        return self._hsv
 
     @property
     def hec(self):
-        return self.getti("hec")
+        return self._hec
 
     @property
     def r(self):
-        return self.getti("r")
+        return self._rgb[0]
 
     @property
     def g(self):
-        return self.getti("g")
+        return self._rgb[1]
 
     @property
     def b(self):
-        return self.getti("b")
+        return self._rgb[2]
 
     @property
     def h(self):
-        return self.getti("h")
+        return self._hsv[0]
 
     @property
     def s(self):
-        return self.getti("s")
+        return self._hsv[1]
 
     @property
     def v(self):
-        return self.getti("v")
+        return self._hsv[2]
 
     @property
     def color(self):
-        return self.getti("color")
+        return self
 
     @rgb.setter
     def rgb(self, item):
-        self.setti(item, "rgb")
+        self._rgb = self.fmt_rgb(item)
+        self._hsv = self.rgb2hsv(self._rgb)
+        self._hec = self.rgb2hec(self._rgb)
 
     @hsv.setter
     def hsv(self, item):
-        self.setti(item, "hsv")
+        self._hsv = self.fmt_hsv(item, overflow=self._overflow)
+        self._rgb = self.hsv2rgb(self._hsv)
+        self._hec = self.hsv2hec(self._hsv)
 
     @hec.setter
     def hec(self, item):
-        self.setti(item, "hec")
+        self._hec = self.fmt_hec(item)
+        self._rgb = self.hec2rgb(self._hec)
+        self._hsv = self.hec2hsv(self._hec)
 
     @r.setter
     def r(self, item):
-        self.setti(item, "r")
+        rgb = list(self._rgb)
+        rgb[0] = item
+        self.rgb = rgb
 
     @g.setter
     def g(self, item):
-        self.setti(item, "g")
+        rgb = list(self._rgb)
+        rgb[1] = item
+        self.rgb = rgb
 
     @b.setter
     def b(self, item):
-        self.setti(item, "b")
+        rgb = list(self._rgb)
+        rgb[2] = item
+        self.rgb = rgb
 
     @h.setter
     def h(self, item):
-        self.setti(item, "h")
+        hsv = list(self._hsv)
+        hsv[0] = item
+        self.hsv = hsv
 
     @s.setter
     def s(self, item):
-        self.setti(item, "s")
+        hsv = list(self._hsv)
+        hsv[1] = item
+        self.hsv = hsv
 
     @v.setter
     def v(self, item):
-        self.setti(item, "v")
+        hsv = list(self._hsv)
+        hsv[2] = item
+        self.hsv = hsv
 
     @color.setter
     def color(self, item):
-        self.setti(item, "color")
+        self._rgb, self._hsv, self._hec = self.fmt_rgb(item.rgb), self.fmt_hsv(item.hsv), self.fmt_hec(item.hec)
 
     # ---------- ---------- ---------- Public Funcs ---------- ---------- ---------- #
 
@@ -392,7 +342,7 @@ class Color(object):
             relative hue angle array.
         """
 
-        data = np.array(hue_array, dtype=np.float64)
+        data = np.array(hue_array, dtype=np.float32)
 
         if self.h < 180.0:
             p1 = np.where(data < self.h + 180.0)
@@ -424,15 +374,13 @@ class Color(object):
             standard rgb color.
         """
 
-        if len(rgb) == 3:
-            _rgb = np.rint(rgb)
-            _rgb[np.where(_rgb < 0)] = 0
-            _rgb[np.where(_rgb > 255)] = 255
+        assert len(rgb) == 3, rgb
 
-            return _rgb.astype(np.uint8)
+        _rgb = np.rint(rgb)
+        _rgb[np.where(_rgb < 0)] = 0
+        _rgb[np.where(_rgb > 255)] = 255
 
-        else:
-            raise ValueError("expect rgb color in length 3 and int: {}.".format(rgb))
+        return _rgb.astype(np.uint8)
 
     @classmethod
     def fmt_rgb_array(cls, rgb_array):
@@ -446,61 +394,52 @@ class Color(object):
             standard rgb array.
         """
 
-        if isinstance(rgb_array, np.ndarray) and len(rgb_array.shape) == 3 and rgb_array.shape[2] == 3:
-            _rgb = np.rint(rgb_array)
-            _rgb[np.where(_rgb < 0)] = 0
-            _rgb[np.where(_rgb > 255)] = 255
+        assert isinstance(rgb_array, np.ndarray) and len(rgb_array.shape) == 3 and rgb_array.shape[2] == 3, rgb_array
 
-            return _rgb.astype(np.uint8)
+        _rgb = np.rint(rgb_array)
+        _rgb[np.where(_rgb < 0)] = 0
+        _rgb[np.where(_rgb > 255)] = 255
 
-        else:
-            raise ValueError("expect rgb array in length 3: {}.".format(rgb_array))
+        return _rgb.astype(np.uint8)
 
     @classmethod
-    def fmt_hsv(cls, hsv, overflow="cutoff"):
+    def fmt_hsv(cls, hsv, overflow=OTP.cutoff):
         """
         Class method. Format item to standard hsv color.
 
         Args:
             hsv (tuple or list): color item to be formated.
-            overflow (str): method to manipulate overflowed s and v values, in "cutoff", "return" and "repeat".
+            overflow (int): method to manipulate overflowed s and v values, in "cutoff", "revert" and "repeat".
 
         Returns:
             standard hsv color.
         """
 
-        if not isinstance(overflow, str):
-            raise ValueError("expect overflow in str type: {}.".format(overflow))
+        assert isinstance(overflow, int) and overflow in OTP.rgfull, overflow
+        assert len(hsv) == 3, hsv
 
-        if len(hsv) == 3:
-            _h, _s, _v = hsv
+        _h, _s, _v = hsv
 
-            if not (0.0 <= _s <= 1.0 and 0.0 <= _v <= 1.0):
-                if overflow.lower() == "cutoff":
-                    _s = 0.0 if _s < 0.0 else _s
-                    _s = 1.0 if _s > 1.0 else _s
-                    _v = 0.0 if _v < 0.0 else _v
-                    _v = 1.0 if _v > 1.0 else _v
+        if _s < 0.0 or _s > 1.0 or _v < 0.0 or _v > 1.0:
+            if overflow == 0: # "cutoff":
+                _s = 0.0 if _s < 0.0 else _s
+                _s = 1.0 if _s > 1.0 else _s
+                _v = 0.0 if _v < 0.0 else _v
+                _v = 1.0 if _v > 1.0 else _v
 
-                elif overflow.lower() == "return":
-                    _s = _s % 1.0 if _s // 1.0 % 2.0 == 0.0 else 1.0 - (_s % 1.0)
-                    _v = _v % 1.0 if _v // 1.0 % 2.0 == 0.0 else 1.0 - (_v % 1.0)
+            elif overflow == 1: # "revert":
+                _s = _s % 1.0 if _s // 1.0 % 2.0 == 0.0 else 1.0 - (_s % 1.0)
+                _v = _v % 1.0 if _v // 1.0 % 2.0 == 0.0 else 1.0 - (_v % 1.0)
 
-                elif overflow.lower() == "repeat":
-                    _s = _s % 1.0
-                    _v = _v % 1.0
+            else: # "repeat":
+                _s = _s % 1.0
+                _v = _v % 1.0
 
-                else:
-                    raise ValueError("expect overflow in list 'cutoff', 'return' and 'repeat'.")
+        _h = round(_h % 360.0 * 1E5) / 1E5
+        _s = round(_s * 1E5) / 1E5
+        _v = round(_v * 1E5) / 1E5
 
-            _h = round(_h % 360.0 * 1E5) / 1E5
-            _s = round(_s * 1E5) / 1E5
-            _v = round(_v * 1E5) / 1E5
-
-            return np.array((_h, _s, _v), dtype=np.float32)
-
-        else:
-            raise ValueError("expect hsv color in length 3 and float: {}.".format(hsv))
+        return np.array((_h, _s, _v), dtype=np.float32)
 
     @classmethod
     def fmt_hsv_array(cls, hsv_array):
@@ -514,24 +453,22 @@ class Color(object):
             standard hsv array.
         """
 
-        if isinstance(hsv_array, np.ndarray) and len(hsv_array.shape) == 3 and hsv_array.shape[2] == 3:
-            _h = hsv_array[:, :, 0]
-            _s = hsv_array[:, :, 1]
-            _v = hsv_array[:, :, 2]
+        assert isinstance(hsv_array, np.ndarray) and len(hsv_array.shape) == 3 and hsv_array.shape[2] == 3, hsv_array
 
-            _s[np.where(_s < 0.0)] = 0.0
-            _s[np.where(_s > 1.0)] = 1.0
-            _v[np.where(_v < 0.0)] = 0.0
-            _v[np.where(_v > 1.0)] = 1.0
+        _h = hsv_array[:, :, 0]
+        _s = hsv_array[:, :, 1]
+        _v = hsv_array[:, :, 2]
 
-            _h = np.round(_h % 360.0 * 1E5) / 1E5
-            _s = np.round(_s * 1E5) / 1E5
-            _v = np.round(_v * 1E5) / 1E5
+        _s[np.where(_s < 0.0)] = 0.0
+        _s[np.where(_s > 1.0)] = 1.0
+        _v[np.where(_v < 0.0)] = 0.0
+        _v[np.where(_v > 1.0)] = 1.0
 
-            return np.stack((_h, _s, _v), axis=2).astype(np.float32)
+        _h = np.round(_h % 360.0 * 1E5) / 1E5
+        _s = np.round(_s * 1E5) / 1E5
+        _v = np.round(_v * 1E5) / 1E5
 
-        else:
-            raise ValueError("expect hsv color in length 3: {}.".format(hsv_array))
+        return np.stack((_h, _s, _v), axis=2).astype(np.float32)
 
     @classmethod
     def fmt_hec(cls, hec):
@@ -545,13 +482,7 @@ class Color(object):
             standard hex code (hec) color.
         """
 
-        _hec = re.match(r"[0-9A-F]+", str(hec).upper())
-
-        if _hec and len(_hec[0]) == 6:
-            return _hec[0]
-
-        else:
-            raise ValueError("expect hec color in hex type and length 6: {}.".format(hec))
+        return str(hec)
 
     @classmethod
     def fmt_lab(cls, lab):
@@ -565,22 +496,20 @@ class Color(object):
             standard lab color.
         """
 
-        if len(lab) == 3:
-            _l, _a, _b = lab
+        assert len(lab) == 3, lab
 
-            _l = 0.0 if _l < 0.0 else _l
-            _l = 100.0 if _l > 100.0 else _l
+        _l, _a, _b = lab
 
-            _a = -128.0 if _a < -128.0 else _a
-            _a = 128.0 if _a > 128.0 else _a
+        _l = 0.0 if _l < 0.0 else _l
+        _l = 100.0 if _l > 100.0 else _l
 
-            _b = -128.0 if _b < -128.0 else _b
-            _b = 128.0 if _b > 128.0 else _b
+        _a = -128.0 if _a < -128.0 else _a
+        _a = 128.0 if _a > 128.0 else _a
 
-            return np.array((_l, _a, _b), dtype=np.float32)
+        _b = -128.0 if _b < -128.0 else _b
+        _b = 128.0 if _b > 128.0 else _b
 
-        else:
-            raise ValueError("expect lab color in length 3 and float: {}.".format(lab))
+        return np.array((_l, _a, _b), dtype=np.float32)
 
     @classmethod
     def fmt_cmyk(cls, cmyk):
@@ -594,15 +523,13 @@ class Color(object):
             standard cmyk color.
         """
 
-        if len(cmyk) == 4:
-            _cmyk = np.array(cmyk)
-            _cmyk[np.where(_cmyk < 0.0)] = 0.0
-            _cmyk[np.where(_cmyk > 1.0)] = 1.0
+        assert len(cmyk) == 4, cmyk
 
-            return _cmyk.astype(np.float32)
+        _cmyk = np.array(cmyk)
+        _cmyk[np.where(_cmyk < 0.0)] = 0.0
+        _cmyk[np.where(_cmyk > 1.0)] = 1.0
 
-        else:
-            raise ValueError("expect cmyk color in length 4 and float: {}.".format(cmyk))
+        return _cmyk.astype(np.float32)
 
     @classmethod
     def findall_hec_lst(cls, hec):
@@ -625,12 +552,12 @@ class Color(object):
         return _hec
 
     @classmethod
-    def sys_rgb2ryb(cls, h):
+    def spc_rgb2ryb_h(cls, hue):
         """
         Class method. Transfer hue of rgb to hue of ryb.
         """
 
-        _h = h % 360
+        _h = hue % 360
 
         if 0 <= _h < 60:
             return _h / 60 * 120
@@ -642,12 +569,51 @@ class Color(object):
             return _h
 
     @classmethod
-    def sys_ryb2rgb(cls, h):
+    def spc_rgb2ryb_h_array(cls, hue_array):
+        """
+        Class method. Transfer hue of rgb array to hue of ryb array.
+        """
+
+        _h_array = np.array(hue_array, dtype=np.float32)
+        _h_array = _h_array % 360
+
+        sel_1 = np.where((_h_array >=   0) & (_h_array <  60))
+        sel_2 = np.where((_h_array >=  60) & (_h_array < 240))
+
+        _h_array[sel_1] = _h_array[sel_1] / 60 * 120
+        _h_array[sel_2] = (_h_array[sel_2] - 60) / 180 * 120 + 120
+
+        return _h_array
+
+    @classmethod
+    def spc_rgb2ryb(cls, rgb):
+        """
+        Class method. Transfer rgb to ryb.
+        """
+
+        ryb = Color(rgb)
+        ryb.h = cls.spc_rgb2ryb_h(ryb.h)
+
+        return ryb
+
+    @classmethod
+    def spc_rgb2ryb_array(cls, rgb_array):
+        """
+        Class method. Transfer rgb array to ryb array.
+        """
+
+        colors = cls.fmt_hsv_array(rgb_array)
+        colors[:, :, 0] = cls.spc_rgb2ryb_h_array(colors[:, :, 0])
+
+        return colors
+
+    @classmethod
+    def spc_ryb2rgb_h(cls, hue):
         """
         Class method. Transfer hue of ryb to hue of rgb.
         """
 
-        _h = h % 360
+        _h = hue % 360
 
         if 0 <= _h < 120:
             return _h / 120 * 60
@@ -657,6 +623,45 @@ class Color(object):
 
         else:
             return _h
+
+    @classmethod
+    def spc_ryb2rgb_h_array(cls, hue_array):
+        """
+        Class method. Transfer hue of ryb array to hue of rgb array.
+        """
+
+        _h_array = np.array(hue_array, dtype=np.float32)
+        _h_array = _h_array % 360
+
+        sel_1 = np.where((_h_array >=   0) & (_h_array < 120))
+        sel_2 = np.where((_h_array >= 120) & (_h_array < 240))
+
+        _h_array[sel_1] = _h_array[sel_1] / 120 * 60
+        _h_array[sel_2] = (_h_array[sel_2] - 120) / 120 * 180 + 60
+
+        return _h_array
+
+    @classmethod
+    def spc_ryb2rgb(cls, ryb):
+        """
+        Class method. Transfer ryb to rgb.
+        """
+
+        rgb = Color(ryb)
+        rgb.h = cls.spc_ryb2rgb_h(rgb.h)
+
+        return rgb
+
+    @classmethod
+    def spc_ryb2rgb_array(cls, ryb_array):
+        """
+        Class method. Transfer ryb array to rgb array.
+        """
+
+        colors = cls.fmt_hsv_array(ryb_array)
+        colors[:, :, 0] = cls.spc_ryb2rgb_h_array(colors[:, :, 0])
+
+        return colors
 
     @classmethod
     def stri2color(cls, stri):
@@ -682,23 +687,23 @@ class Color(object):
                 _c = float(".".join(_c.split(".")[:2])) if "." in _c else int(_c)
 
                 if _a > 255:
-                    return Color((_a, _b, _c), tp="hsv")
+                    return Color((_a, _b, _c), tp=CTP.hsv)
 
                 elif _b > 1.0 or _c > 1.0:
-                    return Color((_a, _b, _c), tp="rgb")
+                    return Color((_a, _b, _c), tp=CTP.rgb)
 
                 elif isinstance(_a, float) or isinstance(_b, float) or isinstance(_c, float):
-                    return Color((_a, _b, _c), tp="hsv")
+                    return Color((_a, _b, _c), tp=CTP.hsv)
 
                 else:
-                    return Color((_a, _b, _c), tp="rgb")
+                    return Color((_a, _b, _c), tp=CTP.rgb)
 
             else:
                 return None
 
         elif len(_stri) > 0:
             if len(_stri[0]) > 5:
-                return Color(Color.fmt_hec(_stri[0]), tp="hec")
+                return Color(Color.fmt_hec(_stri[0]), tp=CTP.hec)
 
             return None
 
@@ -717,7 +722,7 @@ class Color(object):
             hsv color.
         """
 
-        color = cls.fmt_rgb(rgb)
+        color = rgb
 
         v = max(color) / 255.0
         if abs(v - 0) < 1E-5:
@@ -739,39 +744,27 @@ class Color(object):
                 # red to yellow, 0 to 60.
                 h = color[1] / 255 * 60
 
-            elif color[1] == 0:
+            else: # color[1] == 0:
                 # magenta to red, 300 to 360.
                 h = 360 - color[2] / 255 * 60
-
-            else:
-                raise ValueError("value 0 is not found in red area: {}.".format(color))
 
         elif color[1] == 255:
             if color[0] == 0:
                 # green to cyan, 120 to 180.
                 h = 120 + color[2] / 255 * 60
 
-            elif color[2] == 0:
+            else: # color[2] == 0:
                 # yellow to green, 60 to 120.
                 h = 120 - color[0] / 255 * 60
 
-            else:
-                raise ValueError("value 0 is not found in green area: {}.".format(color))
-
-        elif color[2] == 255:
+        else: # color[2] == 255:
             if color[1] == 0:
                 # blue to magenta, 240 to 300.
                 h = 240 + color[0] / 255 * 60
 
-            elif color[0] == 0:
+            else: # color[0] == 0:
                 # cyan to blue, 180 to 240.
                 h = 240 - color[1] / 255 * 60
-
-            else:
-                raise ValueError("value 0 is not found in blue area: {}.".format(color))
-
-        else:
-            raise ValueError("value 255 is not found in color: {}.".format(color))
 
         return cls.fmt_hsv((h, s, v))
 
@@ -787,7 +780,7 @@ class Color(object):
             hsv array.
         """
 
-        colors = cls.fmt_rgb_array(rgb_array).astype(np.float64)
+        colors = cls.fmt_rgb_array(rgb_array).astype(np.float32)
 
         v = np.max(colors, axis=2) / 255.0
         v[np.where(v < 1E-5)] = 1E-12
@@ -848,7 +841,7 @@ class Color(object):
             rgb color.
         """
 
-        h, s, v = cls.fmt_hsv(hsv)
+        h, s, v = hsv
 
         # red to yellow.
         if 0 <= h < 60:
@@ -876,12 +869,9 @@ class Color(object):
             color = np.array((r, 0, 255))
 
         # magenta to red.
-        elif 300 <= h < 360:
+        else: # 300 <= h < 360:
             b = round((1 - (h - 300) / 60) * 255)
             color = np.array((255, 0, b))
-
-        else:
-            raise ValueError("unexpect h: {}.".format(h))
 
         color = color + (color * -1 + 255) * (1 - s)
         color = color * v
@@ -958,11 +948,17 @@ class Color(object):
             hex code (hec) color.
         """
 
-        r, g, b = cls.fmt_rgb(rgb)
+        # File "D:\Store\Documents\Python\VioletPy.rc.3.6\src\main\python\ricore\export.py", line 308, in import_swatch
+        # color = Color.rgb2hec((color_a / 257, color_b / 257, color_c / 257))
+        # File "D:\Store\Documents\Python\VioletPy.rc.3.6\src\main\python\ricore\color.py", line 956, in rgb2hec
+        # hec_r = hex(r)[2:].upper()
+        # TypeError: 'float' object cannot be interpreted as an integer
 
-        hec_r = hex(r)[2:].upper()
-        hec_g = hex(g)[2:].upper()
-        hec_b = hex(b)[2:].upper()
+        r, g, b = rgb
+
+        hec_r = hex(int(r))[2:].upper()
+        hec_g = hex(int(g))[2:].upper()
+        hec_b = hex(int(b))[2:].upper()
 
         hec_r = "0" + hec_r if len(hec_r) < 2 else hec_r
         hec_g = "0" + hec_g if len(hec_g) < 2 else hec_g
@@ -982,11 +978,9 @@ class Color(object):
             rgb color.
         """
 
-        pr_hec_code = cls.fmt_hec(hec)
-
-        hec_r = pr_hec_code[0:2]
-        hec_g = pr_hec_code[2:4]
-        hec_b = pr_hec_code[4:6]
+        hec_r = hec[0:2]
+        hec_g = hec[2:4]
+        hec_b = hec[4:6]
 
         r = int("0x{}".format(hec_r), 16)
         g = int("0x{}".format(hec_g), 16)
@@ -1071,7 +1065,7 @@ class Color(object):
             rgb color.
         """
 
-        l, a, b = cls.fmt_lab(lab)
+        l, a, b = lab
 
         y = (l + 16) / 116
         x = a / 500 + y
@@ -1103,7 +1097,7 @@ class Color(object):
             cmyk color.
         """
 
-        r, g, b = cls.fmt_rgb(rgb)
+        r, g, b = rgb
 
         c = 1.0 - (r / 255.0)
         m = 1.0 - (g / 255.0)
@@ -1133,7 +1127,7 @@ class Color(object):
             rgb color.
         """
 
-        c, m, y, k = cls.fmt_cmyk(cmyk)
+        c, m, y, k = cmyk
 
         c = (c * (1.0 - k) + k)
         m = (m * (1.0 - k) + k)
@@ -1171,7 +1165,7 @@ class Color(object):
             serial number of color name.
         """
 
-        h, s, v = cls.fmt_hsv(hsv)
+        h, s, v = hsv
 
         if v < 0.08:
             return (0, 0)
@@ -1226,14 +1220,14 @@ class TestColor(unittest.TestCase):
     """
 
     def test_translate(self):
-        pr_color = Color((0, 0, 0), tp="rgb")
+        pr_color = Color((0, 0, 0), tp=CTP.rgb)
 
         for r in range(256):
             for g in range(256):
                 print("testing rgb2hsv with r, g = {}, {}.".format(r, g))
 
                 for b in range(256):
-                    color = Color((r, g, b), tp="rgb")
+                    color = Color((r, g, b), tp=CTP.rgb)
                     self.assertEqual(color.rgb, (r, g, b))
                     self.assertEqual(color.r, r)
                     self.assertEqual(color.g, g)
@@ -1272,14 +1266,14 @@ class TestColor(unittest.TestCase):
 
                 for v in range(101):
                     hsv = np.array([h, s / 100, v / 100])
-                    color = Color(hsv, tp="hsv")
+                    color = Color(hsv, tp=CTP.hsv)
 
                     rgb = Color.hsv2rgb(hsv)
                     ar_hsv = Color.rgb2hsv(rgb)
                     ar_rgb = Color.hsv2rgb(ar_hsv)
                     self.assertTrue((rgb == ar_rgb).all())
 
-                    ar_color = Color(ar_rgb, tp="rgb")
+                    ar_color = Color(ar_rgb, tp=CTP.rgb)
                     self.assertEqual(color, ar_color)
 
 

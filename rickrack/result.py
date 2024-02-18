@@ -37,7 +37,7 @@ class Box(object):
         """
 
         if idx in (0, "color"):
-            return Color(self._color, tp="hec")
+            return Color(self._color, tp=CTP.hec)
 
         elif idx in (1, "name"):
             return str(self._name)
@@ -60,7 +60,7 @@ class Box(object):
 
     @property
     def color(self):
-        return Color(self._color, tp="hec")
+        return Color(self._color, tp=CTP.hec)
 
     @property
     def name(self):
