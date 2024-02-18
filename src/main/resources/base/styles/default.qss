@@ -23,6 +23,11 @@ QWidget {
     color: $qc_char;
 }
 
+QWidget.gbox {
+    border: 2px solid $qc_list_selected;
+    border-radius: 6px;
+}
+
 /*
 WorkArea styles.
 */
@@ -268,7 +273,7 @@ QPushButton {
     padding: 2px 16px 2px 16px;
     border: 2px solid $qc_list_over;
     border-radius: 8px;
-    height: 36px;
+    height: 32px;
 }
 
 QPushButton:hover {
@@ -281,6 +286,32 @@ QPushButton:hover {
 QPushButton:pressed {
     background-color: $qc_list_over;
     color: $qc_char_over;
+}
+
+QPushButton.fbox {
+    text-align: left;
+    background-color: $qc_workarea_over;
+    padding: 0px 16px 0px 16px;
+    border: 0px;
+    border-radius: 0px;
+    height: 1.2em;
+}
+
+QPushButton.fbox:hover {
+    background-color: $qc_list_over;
+}
+
+QPushButton.ebox {
+    text-align: center;
+    background-color: $qc_workarea_over;
+    padding: 0px 16px 0px 16px;
+    border: 0px;
+    border-radius: 0px;
+    height: 12px;
+}
+
+QPushButton.ebox:hover {
+    background-color: $qc_list_over;
 }
 
 /*
