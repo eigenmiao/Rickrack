@@ -23,7 +23,7 @@ from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QConicalGradient, QRadia
 from cguis.resource import view_rc
 from ricore.transpt import get_outer_box, rotate_point_center, get_theta_center, get_outer_circles
 from ricore.grid import gen_assit_color
-from ricore.color import Color
+from ricore.color import Color, CTP
 from ricore.export import export_list
 
 
@@ -281,7 +281,7 @@ class Wheel(QWidget):
                 outer_circle = self._outer_circles[4][2]
                 painter.drawEllipse(*outer_circle[0])
 
-                if self._outer_circles[1] < len(self._args.sys_grid_assitlocs[self._outer_circles[0]]) and self._args.sys_grid_assitlocs[self._outer_circles[0]][self._outer_circles[1]][5]:
+                if not (self._outer_circles[1] < len(self._args.sys_grid_assitlocs[self._outer_circles[0]]) and self._args.sys_grid_assitlocs[self._outer_circles[0]][self._outer_circles[1]][5]):
                     line = outer_circle[1]
                     painter.drawLine(QPoint(*line[0]), QPoint(*line[1]))
 
@@ -387,7 +387,7 @@ class Wheel(QWidget):
                 assit_h = get_theta_center(self._center, point)
 
                 if self._args.dep_wtp:
-                    assit_h = Color.sys_ryb2rgb(assit_h)
+                    assit_h = Color.spc_ryb2rgb_h(assit_h)
 
                 delta_point = [assit_h - curr_color.h, 0.0, 0.0]
                 delta_point[self._args.dep_wtp_n] = np.linalg.norm(point - self._center) / self._radius - curr_color.hsv[self._args.dep_wtp_n]
@@ -457,13 +457,13 @@ class Wheel(QWidget):
             self._outer_circles = None
 
             if self._args.sys_activated_assit_idx < 0:
-                color = Color(self._backup[self._args.sys_activated_idx], tp="color", overflow=self._backup[0].get_overflow())
+                color = Color(self._backup[self._args.sys_activated_idx], tp=CTP.color, overflow=self._backup[0].get_overflow())
                 color.setti(np.linalg.norm(point - self._center) / self._radius, self._args.dep_wtp_s)
                 color.h = get_theta_center(self._center, point)
 
                 if self._args.dep_wtp:
                     previous_color_set = self._args.sys_color_set.backup()
-                    color.h = Color.sys_ryb2rgb(color.h)
+                    color.h = Color.spc_ryb2rgb_h(color.h)
                     self._args.sys_color_set.recover(self._backup)
                     self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
 
@@ -472,8 +472,8 @@ class Wheel(QWidget):
                             if self._args.sys_grid_assitlocs[main_i][assit_i][5]:
                                 relative_h = self._args.sys_grid_assitlocs[main_i][assit_i][2]
                                 relative_h = previous_color_set[main_i].h + relative_h
-                                relative_h = Color.sys_rgb2ryb(relative_h) - Color.sys_rgb2ryb(previous_color_set[main_i].h)
-                                relative_h = Color.sys_ryb2rgb(Color.sys_rgb2ryb(self._args.sys_color_set[main_i].h) + relative_h)
+                                relative_h = Color.spc_rgb2ryb_h(relative_h) - Color.spc_rgb2ryb_h(previous_color_set[main_i].h)
+                                relative_h = Color.spc_ryb2rgb_h(Color.spc_rgb2ryb_h(self._args.sys_color_set[main_i].h) + relative_h)
                                 relative_h = relative_h - self._args.sys_color_set[main_i].h
                                 self._args.sys_grid_assitlocs[main_i][assit_i][2] = relative_h
 
@@ -489,7 +489,7 @@ class Wheel(QWidget):
                     curr_color = self._args.sys_color_set[self._args.sys_activated_idx]
 
                     if self._args.dep_wtp:
-                        delta_h = Color.sys_ryb2rgb(assit_h) - curr_color.h
+                        delta_h = Color.spc_ryb2rgb_h(assit_h) - curr_color.h
 
                     else:
                         delta_h = assit_h - curr_color.h
@@ -499,7 +499,7 @@ class Wheel(QWidget):
 
                 else:
                     if self._args.dep_wtp:
-                        assit_h = Color.sys_ryb2rgb(assit_h)
+                        assit_h = Color.spc_ryb2rgb_h(assit_h)
 
                     self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][2] = assit_h
                     self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][2 + self._args.dep_wtp_n] = assit_i
@@ -512,7 +512,7 @@ class Wheel(QWidget):
             val = (point[1] - self._bar_1_box[1]) / self._bar_1_box[3]
 
             if self._args.sys_activated_assit_idx < 0:
-                color = Color(self._backup[self._args.sys_activated_idx], tp="color", overflow=self._backup[0].get_overflow())
+                color = Color(self._backup[self._args.sys_activated_idx], tp=CTP.color, overflow=self._backup[0].get_overflow())
                 color.setti(val, self._args.dep_wtp_rev_s)
                 self._args.sys_color_set.recover(self._backup)
                 self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
@@ -533,7 +533,7 @@ class Wheel(QWidget):
             val = (point[1] - self._bar_2_box[1]) / self._bar_2_box[3]
 
             if self._args.sys_activated_assit_idx < 0:
-                color = Color(self._backup[self._args.sys_activated_idx], tp="color", overflow=self._backup[0].get_overflow())
+                color = Color(self._backup[self._args.sys_activated_idx], tp=CTP.color, overflow=self._backup[0].get_overflow())
                 color.setti(val, self._args.dep_wtp_rev_s)
                 self._args.sys_color_set.recover(self._backup)
                 self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
@@ -643,7 +643,7 @@ class Wheel(QWidget):
             angle = self._args.sys_color_set[idx].h
 
             if self._args.dep_wtp:
-                angle = Color.sys_rgb2ryb(angle)
+                angle = Color.spc_rgb2ryb_h(angle)
 
             color_center = np.array([self._args.sys_color_set[idx].hsv[self._args.dep_wtp_n] * self._radius, 0], dtype=int) + self._center
             color_center = rotate_point_center(self._center, color_center, angle)
@@ -656,8 +656,8 @@ class Wheel(QWidget):
                 sum_angle = angle + assit_angle
 
                 if self._args.dep_wtp:
-                    sum_angle = Color.sys_rgb2ryb(sum_angle)
-                    assit_angle = Color.sys_rgb2ryb(assit_angle)
+                    sum_angle = Color.spc_rgb2ryb_h(sum_angle)
+                    assit_angle = Color.spc_rgb2ryb_h(assit_angle)
 
                 if assit_relativity:
                     assit_center = np.array([(self._args.sys_color_set[idx].hsv[self._args.dep_wtp_n] + (assit_s, assit_v)[self._args.dep_wtp_n - 1]) * self._radius, 0], dtype=int) + self._center
@@ -801,7 +801,7 @@ class Wheel(QWidget):
             for i in (2, 1, 0, 3, 4):
                 color = self._args.sys_color_set[i].getti(ctp)
 
-                if ctp == "hec":
+                if ctp == CTP.hec:
                     color = self._args.hec_prefix[0] + str(color) + self._args.hec_prefix[1]
 
                 else:
@@ -850,13 +850,13 @@ class Wheel(QWidget):
         self._action_paste.triggered.connect(self.clipboard_in)
         self._menu.addAction(self._action_paste)
         self._action_copy_rgb = QAction(self)
-        self._action_copy_rgb.triggered.connect(self.clipboard_all("rgb"))
+        self._action_copy_rgb.triggered.connect(self.clipboard_all(CTP.rgb))
         self._menu.addAction(self._action_copy_rgb)
         self._action_copy_hsv = QAction(self)
-        self._action_copy_hsv.triggered.connect(self.clipboard_all("hsv"))
+        self._action_copy_hsv.triggered.connect(self.clipboard_all(CTP.hsv))
         self._menu.addAction(self._action_copy_hsv)
         self._action_copy_hec = QAction(self)
-        self._action_copy_hec.triggered.connect(self.clipboard_all("hec"))
+        self._action_copy_hec.triggered.connect(self.clipboard_all(CTP.hec))
         self._menu.addAction(self._action_copy_hec)
         self._action_insert = QAction(self)
         self._action_insert.triggered.connect(lambda: self.insert_assit_point((15 * np.random.random() + 15) * np.random.choice([1,-1]), 0.3 * np.random.random() - 0.15, 0))
@@ -921,7 +921,7 @@ class Wheel(QWidget):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self.clipboard_all("hec"))
+            shortcut.activated.connect(self.clipboard_all(CTP.hec))
 
         for skey in self._args.shortcut_keymaps[46]:
             if skey in self._connected_keymaps:

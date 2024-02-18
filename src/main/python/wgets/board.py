@@ -24,7 +24,7 @@ from PyQt5.QtWidgets import QWidget, QShortcut, QMenu, QAction, QLabel, QDialog,
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QPoint, QMimeData, QUrl
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QIcon, QDrag, QPolygon
 from cguis.design.box_dialog import Ui_BoxDialog
-from ricore.color import Color
+from ricore.color import Color, CTP
 from ricore.transpt import get_outer_box, get_link_tag, rotate_point, snap_point, get_outer_circles
 from ricore.grid import gen_color_grid, norm_grid_locations, norm_grid_values, gen_assit_color
 from ricore.export import export_list
@@ -130,11 +130,7 @@ class ColorBox(QDialog, Ui_BoxDialog):
         idx = self.index_spb.value() - 1
         hec_color = self.box_sqr.color.hec
 
-        if idx == len(self._args.sys_grid_list[0]) and self._init_idx == len(self._args.sys_grid_list[0]):
-            self._args.sys_grid_list[0].append(hec_color)
-            self._args.sys_grid_list[1].append(name)
-
-        elif 0 <= idx < len(self._args.sys_grid_list[0]) and 0 <= self._init_idx < len(self._args.sys_grid_list[0]):
+        if 0 <= idx < len(self._args.sys_grid_list[0]) and 0 <= self._init_idx < len(self._args.sys_grid_list[0]):
             if idx == self._init_idx:
                 self._args.sys_grid_list[0][idx] = hec_color
                 self._args.sys_grid_list[1][idx] = name
@@ -144,6 +140,10 @@ class ColorBox(QDialog, Ui_BoxDialog):
                 self._args.sys_grid_list[1].pop(self._init_idx)
                 self._args.sys_grid_list[0].insert(idx, hec_color)
                 self._args.sys_grid_list[1].insert(idx, name)
+
+        else: # if idx == len(self._args.sys_grid_list[0]) and self._init_idx == len(self._args.sys_grid_list[0]):
+            self._args.sys_grid_list[0].append(hec_color)
+            self._args.sys_grid_list[1].append(name)
 
         self.ps_value_changed.emit(True)
 
@@ -198,7 +198,7 @@ class BoxSqr(QWidget):
 
         super().__init__(wget)
         self._args = args
-        self.color = Color(hec_color, tp="hec")
+        self.color = Color(hec_color, tp=CTP.hec)
 
     def paintEvent(self, event):
         rto = (1.0 - self._args.cubic_ratio) / 2
@@ -222,7 +222,7 @@ class BoxSqr(QWidget):
                 dialog = QColorDialog.getColor(QColor(*self.color.rgb))
 
                 if dialog.isValid():
-                    self.color = Color((dialog.red(), dialog.green(), dialog.blue()), tp="rgb")
+                    self.color = Color((dialog.red(), dialog.green(), dialog.blue()), tp=CTP.rgb)
                     self.ps_color_changed.emit(self.color.hec)
 
                 event.accept()
@@ -309,7 +309,7 @@ class Board(QWidget):
         painter.setRenderHint(QPainter.SmoothPixmapTransform, True)
         idx_seq = list(range(5))
         idx_seq = idx_seq[self._args.sys_activated_idx + 1: ] + idx_seq[: self._args.sys_activated_idx + 1]
-        self._color_grid = gen_color_grid(self._args.sys_color_set, self._args.sys_grid_locations, self._args.sys_grid_assitlocs, grid_list=self._args.sys_grid_list, **self._args.sys_grid_values)
+        self._color_grid = gen_color_grid(self._args.sys_color_set, self._args.sys_grid_locations, self._args.sys_grid_assitlocs, grid_list=self._args.sys_grid_list, **self._args.sys_grid_values, useryb=self._args.dep_wtp)
         grid_img = QImage(self._color_grid, self._color_grid.shape[1], self._color_grid.shape[0], self._color_grid.shape[1] * 3, QImage.Format_RGB888)
         grid_img = grid_img.scaled(self._cs_box[2], self._cs_box[3], Qt.KeepAspectRatio)
         painter.drawPixmap(*self._cs_box, QPixmap.fromImage(grid_img))
@@ -474,7 +474,7 @@ class Board(QWidget):
                     outer_circle = self._outer_circles[4][2]
                     painter.drawEllipse(*outer_circle[0])
 
-                    if self._outer_circles[1] < len(self._args.sys_grid_assitlocs[self._outer_circles[0]]) and self._args.sys_grid_assitlocs[self._outer_circles[0]][self._outer_circles[1]][5]:
+                    if not (self._outer_circles[1] < len(self._args.sys_grid_assitlocs[self._outer_circles[0]]) and self._args.sys_grid_assitlocs[self._outer_circles[0]][self._outer_circles[1]][5]):
                         line = outer_circle[1]
                         painter.drawLine(QPoint(*line[0]), QPoint(*line[1]))
 
@@ -1080,7 +1080,7 @@ class Board(QWidget):
             return
 
         if self._args.sys_grid_list[0] and self._selecting_idx < len(self._args.sys_grid_list[0]):
-            color = Color(self._args.sys_grid_list[0][self._selecting_idx], tp="hec", overflow=self._args.sys_color_set.get_overflow())
+            color = Color(self._args.sys_grid_list[0][self._selecting_idx], tp=CTP.hec, overflow=self._args.sys_color_set.get_overflow())
             self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
             self.ps_color_changed.emit(True)
             self.update_select_idx()
@@ -1358,12 +1358,12 @@ class Board(QWidget):
 
         def _func_():
             if self._args.sys_grid_list[0] and 0 <= self._selecting_idx < len(self._args.sys_grid_list[0]):
-                color = Color(self._args.sys_grid_list[0][self._selecting_idx], tp="hec").getti(ctp)
+                color = Color(self._args.sys_grid_list[0][self._selecting_idx], tp=CTP.hec).getti(ctp)
 
             else:
                 color = self._args.sys_color_set[self._args.sys_activated_idx].getti(ctp)
 
-            if ctp == "hec":
+            if ctp == CTP.hec:
                 color = self._args.hec_prefix[0] + str(color) + self._args.hec_prefix[1]
 
             else:
@@ -1405,13 +1405,13 @@ class Board(QWidget):
         self._action_paste.triggered.connect(self.clipboard_in)
         self._menu.addAction(self._action_paste)
         self._action_copy_rgb = QAction(self)
-        self._action_copy_rgb.triggered.connect(self.clipboard_cur("rgb"))
+        self._action_copy_rgb.triggered.connect(self.clipboard_cur(CTP.rgb))
         self._menu.addAction(self._action_copy_rgb)
         self._action_copy_hsv = QAction(self)
-        self._action_copy_hsv.triggered.connect(self.clipboard_cur("hsv"))
+        self._action_copy_hsv.triggered.connect(self.clipboard_cur(CTP.hsv))
         self._menu.addAction(self._action_copy_hsv)
         self._action_copy_hec = QAction(self)
-        self._action_copy_hec.triggered.connect(self.clipboard_cur("hec"))
+        self._action_copy_hec.triggered.connect(self.clipboard_cur(CTP.hec))
         self._menu.addAction(self._action_copy_hec)
         self._action_copy_img = QAction(self)
         self._action_copy_img.triggered.connect(self.clipboard_img)
@@ -1630,7 +1630,7 @@ class Board(QWidget):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self.clipboard_cur("rgb"))
+            shortcut.activated.connect(self.clipboard_cur(CTP.rgb))
 
         for skey in self._args.shortcut_keymaps[21]:
             if skey in self._connected_keymaps:
@@ -1641,7 +1641,7 @@ class Board(QWidget):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self.clipboard_cur("hsv"))
+            shortcut.activated.connect(self.clipboard_cur(CTP.hsv))
 
         for skey in self._args.shortcut_keymaps[22]:
             if skey in self._connected_keymaps:
@@ -1652,7 +1652,7 @@ class Board(QWidget):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self.clipboard_cur("hec"))
+            shortcut.activated.connect(self.clipboard_cur(CTP.hec))
 
         for skey in self._args.shortcut_keymaps[45]:
             if skey in self._connected_keymaps:

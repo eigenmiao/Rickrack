@@ -14,7 +14,6 @@ Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
 import os
-import sys
 import time
 import numpy as np
 from PIL import ImageQt
@@ -24,9 +23,9 @@ from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QRect, QPoint, QMimeD
 from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QPixmap, QImage, QCursor, QKeySequence, QPolygon
 from cguis.resource import view_rc
 from clibs.image3c import Image3C
+from ricore.color import Color, CTP
 from ricore.transpt import get_outer_box, get_outer_circles
 from ricore.grid import gen_assit_color, gen_assit_args
-from ricore.color import Color
 
 
 class Image(QWidget):
@@ -56,7 +55,9 @@ class Image(QWidget):
         self._enhance_lock = False
         self._home_image = False
         self._croping_img = False
+        self._croping_img_loc = None
         self._locating_img = False
+        self._locating_img_loc = None
         self._resized_img_pos = None
         self._locating_colors = False
         self._connected_keymaps = {}
@@ -73,7 +74,7 @@ class Image(QWidget):
         self._ico = None
         self.init_icon()
         self._ico_label = QLabel(self)
-        self.image3c = Image3C(self._args.global_temp_dir)
+        self.image3c = Image3C(self._args.global_temp_dir, (self._args.d_error, self._args.d_info, self._args.d_action))
         self.image3c.ps_describe.connect(self.update_loading_label)
         self.image3c.ps_proceses.connect(self.update_loading_bar)
         self.image3c.ps_finished.connect(self.loading_finished)
@@ -228,7 +229,7 @@ class Image(QWidget):
                             painter.setBrush(QColor(*pt_rgb))
                         painter.drawEllipse(*pt_box)
 
-                if isinstance(self._croping_img, tuple):
+                if isinstance(self._croping_img_loc, tuple):
                     sted_croping = self.get_sorted_croping()
                     painter.setPen(QPen(Qt.NoPen))
                     painter.setBrush(QColor(255, 255, 255, 160))
@@ -236,22 +237,22 @@ class Image(QWidget):
                     self.draw_twopt_rect(painter, sted_croping[2], 0, self.width(), self.height())
                     self.draw_twopt_rect(painter, sted_croping[0], 0, sted_croping[2], sted_croping[1])
                     self.draw_twopt_rect(painter, sted_croping[0], sted_croping[3], sted_croping[2], self.height())
-                    painter.setPen(QPen(QColor(*self._args.positive_color), self._args.positive_wid))
+                    painter.setPen(QPen(QColor(*self._args.positive_color), self._args.negative_wid))
                     painter.drawLine(QPoint(sted_croping[0] + self.x(), 0), QPoint(sted_croping[0] + self.x(), self.height()))
                     painter.drawLine(QPoint(0, sted_croping[1] + self.y()), QPoint(self.width(), sted_croping[1] + self.y()))
                     painter.drawLine(QPoint(sted_croping[2] + self.x(), 0), QPoint(sted_croping[2] + self.x(), self.height()))
                     painter.drawLine(QPoint(0, sted_croping[3] + self.y()), QPoint(self.width(), sted_croping[3] + self.y()))
-                    self.ps_status_changed.emit((self.image3c.rgb_data.shape[1], self.image3c.rgb_data.shape[0], "{:.1f}".format((self._croping_img[2] - self._resized_img_pos[0]) * 100 / self._resized_img_pos[2]), "{:.1f}".format((self._croping_img[3] - self._resized_img_pos[1]) * 100 / self._resized_img_pos[3])))
+                    self.ps_status_changed.emit((self.image3c.rgb_data.shape[1], self.image3c.rgb_data.shape[0], "{:.1f}".format((self._croping_img_loc[2] - self._resized_img_pos[0]) * 100 / self._resized_img_pos[2]), "{:.1f}".format((self._croping_img_loc[3] - self._resized_img_pos[1]) * 100 / self._resized_img_pos[3])))
 
-                elif isinstance(self._locating_img, tuple):
+                elif isinstance(self._locating_img_loc, tuple):
                     sted_locating = self.get_sorted_locating()
                     painter.setPen(QPen(Qt.NoPen))
                     painter.setBrush(QColor(255, 255, 255, 160))
                     painter.drawRect(0, 0, self.width(), self.height())
-                    painter.setPen(QPen(QColor(*self._args.positive_color), self._args.positive_wid))
+                    painter.setPen(QPen(QColor(*self._args.positive_color), self._args.negative_wid))
                     painter.drawLine(QPoint(sted_locating[0] + self.x(), 0), QPoint(sted_locating[0] + self.x(), self.height()))
                     painter.drawLine(QPoint(0, sted_locating[1] + self.y()), QPoint(self.width(), sted_locating[1] + self.y()))
-                    self.ps_status_changed.emit((self.image3c.rgb_data.shape[1], self.image3c.rgb_data.shape[0], "{:.1f}".format((self._locating_img[0] - self._resized_img_pos[0]) * 100 / self._resized_img_pos[2]), "{:.1f}".format((self._locating_img[1] - self._resized_img_pos[1]) * 100 / self._resized_img_pos[3])))
+                    self.ps_status_changed.emit((self.image3c.rgb_data.shape[1], self.image3c.rgb_data.shape[0], "{:.1f}".format((self._locating_img_loc[0] - self._resized_img_pos[0]) * 100 / self._resized_img_pos[2]), "{:.1f}".format((self._locating_img_loc[1] - self._resized_img_pos[1]) * 100 / self._resized_img_pos[3])))
 
                 elif self._croping_img or self._locating_img:
                     painter.setPen(QPen(Qt.NoPen))
@@ -315,7 +316,7 @@ class Image(QWidget):
                     outer_circle = self._outer_circles[4][2]
                     painter.drawEllipse(*outer_circle[0])
 
-                    if self._outer_circles[1] < len(self._args.sys_grid_assitlocs[self._outer_circles[0]]) and self._args.sys_grid_assitlocs[self._outer_circles[0]][self._outer_circles[1]][5]:
+                    if not (self._outer_circles[1] < len(self._args.sys_grid_assitlocs[self._outer_circles[0]]) and self._args.sys_grid_assitlocs[self._outer_circles[0]][self._outer_circles[1]][5]):
                         line = outer_circle[1]
                         painter.drawLine(QPoint(*line[0]), QPoint(*line[1]))
 
@@ -450,18 +451,30 @@ class Image(QWidget):
                 self.update()
 
             elif event.button() == Qt.LeftButton and self._croping_img:
-                self._croping_img = (
-                    event.x() - self.x(),
-                    event.y() - self.y(),
-                    event.x() - self.x(),
-                    event.y() - self.y(),
-                )
+                if isinstance(self._croping_img_loc, tuple) and self._croping_img == 1:
+                    self._croping_img = 2
+                    self._croping_img_loc = (
+                        self._croping_img_loc[0],
+                        self._croping_img_loc[1],
+                        event.x() - self.x(),
+                        event.y() - self.y(),
+                    )
+
+                else:
+                    self._croping_img = 1
+                    self._croping_img_loc = (
+                        event.x() - self.x(),
+                        event.y() - self.y(),
+                        event.x() - self.x(),
+                        event.y() - self.y(),
+                    )
 
                 event.accept()
                 self.update()
 
             elif event.button() == Qt.LeftButton and self._locating_img:
-                self._locating_img = (
+                self._locating_img = 2
+                self._locating_img_loc = (
                     event.x() - self.x(),
                     event.y() - self.y(),
                 )
@@ -469,13 +482,11 @@ class Image(QWidget):
                 event.accept()
                 self.update()
 
-            elif event.button() == Qt.RightButton and self._croping_img:
+            elif event.button() == Qt.RightButton and (self._croping_img or self._locating_img):
                 self._croping_img = False
-                event.accept()
-                self.update()
-
-            elif event.button() == Qt.RightButton and self._locating_img:
+                self._croping_img_loc = None
                 self._locating_img = False
+                self._locating_img_loc = None
                 event.accept()
                 self.update()
 
@@ -576,11 +587,11 @@ class Image(QWidget):
             self._start_pt = point
             event.accept()
 
-        elif self._croping_img:
+        elif self._croping_img == 1 and isinstance(self._croping_img_loc, tuple):
             self._outer_circles = None
-            self._croping_img = (
-                self._croping_img[0],
-                self._croping_img[1],
+            self._croping_img_loc = (
+                self._croping_img_loc[0],
+                self._croping_img_loc[1],
                 event.x() - self.x(),
                 event.y() - self.y(),
             )
@@ -588,9 +599,9 @@ class Image(QWidget):
             event.accept()
             self.update()
 
-        elif self._locating_img:
+        elif self._locating_img in (1, 2):
             self._outer_circles = None
-            self._locating_img = (
+            self._locating_img_loc = (
                 event.x() - self.x(),
                 event.y() - self.y(),
             )
@@ -638,6 +649,9 @@ class Image(QWidget):
         self._locating_colors = False
         self._start_pt = None
 
+        if self._locating_img == 2:
+            self._locating_img = 3
+
         if event.button() == Qt.LeftButton:
             self.ps_history_backup.emit(True)
 
@@ -665,9 +679,9 @@ class Image(QWidget):
         Sort the croping value from mouse move to standard value.
         """
 
-        croping = list(self._croping_img)
-        min_wid_rto = 10
-        min_hig_rto = 10
+        croping = list(self._croping_img_loc)
+        min_wid_rto = max(10, int(self._resized_img_pos[2] / self.image3c.display.width() * 5))
+        min_hig_rto = max(10, int(self._resized_img_pos[2] / self.image3c.display.width() * 5))
         x_lim = (self.x() - min_wid_rto, self.x() + self.width() + min_wid_rto)
         y_lim = (self.y() - min_hig_rto, self.y() + self.height() + min_hig_rto)
         croping[0] = x_lim[0] if croping[0] < x_lim[0] else croping[0]
@@ -706,7 +720,7 @@ class Image(QWidget):
         Sort the locating value from mouse move to standard value.
         """
 
-        locating = list(self._locating_img)
+        locating = list(self._locating_img_loc)
         min_wid_rto = 10
         min_hig_rto = 10
         x_lim = (self.x() - min_wid_rto, self.x() + self.width() + min_wid_rto)
@@ -730,7 +744,7 @@ class Image(QWidget):
             (st_croping[3] - self._resized_img_pos[1]) / self._resized_img_pos[3],
         ]
 
-        if relative_loc[0] > 1.0 or relative_loc[1] > 1.0 or relative_loc[2] < 0.0 or relative_loc[3] < 0.0:
+        if relative_loc[0] > 1.0 - 1.5 / self.image3c.display.width() or relative_loc[1] > 1.0 - 1.5 / self.image3c.display.height() or relative_loc[2] < 1.5 / self.image3c.display.width() or relative_loc[3] < 1.5 / self.image3c.display.height():
             return None
 
         else:
@@ -985,14 +999,14 @@ class Image(QWidget):
             self.warning(self._image_errs[1])
             return
 
-        self.image3c.run_args = (self._args.rand_num, values)
+        self.image3c.run_args = (self._args.rand_num, values, self._args.dep_wtp)
         self.image3c.run_category = "extract"
         self.image3c.start()
         self.update()
 
     def enhance_image(self, values):
         """
-        Modify r, g or (and) b values to enhance or inverse the contrast of image.
+        Modify r, g or (and) b values to cover, enhance or inverse the contrast of image.
         """
 
         if not (self.isVisible() and self.image3c.display):
@@ -1022,7 +1036,9 @@ class Image(QWidget):
     def cancel_croping_or_locating(self):
         if self._croping_img or self._locating_img:
             self._croping_img = False
+            self._croping_img_loc = None
             self._locating_img = False
+            self._locating_img_loc = None
             self.update()
             return True
 
@@ -1045,7 +1061,7 @@ class Image(QWidget):
             return
 
         if value:
-            if isinstance(self._croping_img, tuple):
+            if isinstance(self._croping_img_loc, tuple) and self._croping_img == 2:
                 revised_croping_value = self.get_revised_croping_in_img()
 
                 if revised_croping_value:
@@ -1053,12 +1069,14 @@ class Image(QWidget):
 
                 else:
                     self._croping_img = False
+                    self._croping_img_loc = None
 
             else:
-                self._croping_img = True
+                self._croping_img = 1
 
         else:
             self._croping_img = False
+            self._croping_img_loc = None
 
         self.update()
 
@@ -1078,117 +1096,41 @@ class Image(QWidget):
             return
 
         if value[0]:
-            if isinstance(self._locating_img, tuple):
+            if isinstance(self._locating_img_loc, tuple):
                 shape = self.image3c.rgb_data.shape
                 revised_locating_value = self.get_revised_locating_in_img()
 
-                if revised_locating_value and value[4]:
+                if revised_locating_value:
                     rgb = self.image3c.rgb_data[int(round(revised_locating_value[1] * (shape[0] - 1)))][int(round(revised_locating_value[0] * (shape[1] - 1)))]
+                    rgb = np.array(rgb, dtype=float)
                     separ = []
                     fact = []
 
                     if value[0] == 1:
                         for i in range(3):
-                            if self._args.sys_color_set[self._args.sys_activated_idx].rgb[i] > rgb[i]:
-                                separ.append(rgb[i] - rgb[i] * value[3])
-                                fact.append((self._args.sys_color_set[self._args.sys_activated_idx].rgb[i] - rgb[i]) / (255 - (rgb[i] - 0.00001))) # divide by zero error.
+                            separ.append(rgb[i])
+                            fact.append((self._args.sys_color_set[self._args.sys_activated_idx].rgb[i] - rgb[i]) / 255.0)
 
-                            else:
-                                separ.append(rgb[i] + 0.00001 + (255.0 - rgb[i]) * value[3])
-                                fact.append((rgb[i] - self._args.sys_color_set[self._args.sys_activated_idx].rgb[i]) / (rgb[i] + 0.00001)) # divide by zero error.
-
-                        self.image3c.run_args = ((0, 1, 2), tuple(separ), tuple(fact), value[1], value[2])
+                        self.image3c.run_args = ((0, 1, 2), tuple(separ), tuple(fact), value[1], value[2], True, self._args.dep_wtp)
                         self.image3c.run_category = "enhance_rgb"
 
                     elif value[0] == 2:
-                        point = Color(rgb, tp="rgb")
-                        angle = self._args.sys_color_set[self._args.sys_activated_idx].ref_h(point.h)
-                        hsv = list(point.hsv)
+                        point = Color(rgb, tp=CTP.rgb)
+                        hsv = np.array(point.hsv, dtype=float)
 
-                        if angle > 0.0:
-                            hsv[0] = float(hsv[0]) - 1E-4
-
-                        elif angle < 0.0:
-                            hsv[0] = float(hsv[0]) + 1E-4
+                        if self._args.dep_wtp:
+                            angle = Color((Color.spc_rgb2ryb_h(hsv[0]), 1, 1), tp=CTP.hsv).ref_h(Color.spc_rgb2ryb_h(self._args.sys_color_set[self._args.sys_activated_idx].h))
 
                         else:
-                            hsv[0] = float(hsv[0])
+                            angle = point.ref_h(self._args.sys_color_set[self._args.sys_activated_idx].h)
 
                         separ.append(hsv[0])
-                        fact.append(abs(angle) / 180.0 * value[3])
-
-                        if self._args.sys_color_set[self._args.sys_activated_idx].hsv[1] > hsv[1]:
-                            separ.append(hsv[1] - hsv[1] * value[3])
-                            fact.append((self._args.sys_color_set[self._args.sys_activated_idx].hsv[1] - hsv[1]) / (1.0 - hsv[1]))
-
-                        else:
-                            separ.append(hsv[1] + 0.00001 + (1.0 - hsv[1]) * value[3])
-                            fact.append((hsv[1] - self._args.sys_color_set[self._args.sys_activated_idx].hsv[1]) / hsv[1])
-
-                        if self._args.sys_color_set[self._args.sys_activated_idx].hsv[2] > hsv[2]:
-                            separ.append(hsv[2] - hsv[2] * value[3])
-                            fact.append((self._args.sys_color_set[self._args.sys_activated_idx].hsv[2] - hsv[2]) / (1.0 - hsv[2]))
-
-                        else:
-                            separ.append(hsv[2] + 0.00001 + (1.0 - hsv[1]) * value[3])
-                            fact.append((hsv[2] - self._args.sys_color_set[self._args.sys_activated_idx].hsv[2]) / hsv[2])
-
-                        self.image3c.run_args = ((0, 1, 2), tuple(separ), tuple(fact), value[1], value[2])
-                        self.image3c.run_category = "enhance_hsv"
-
-                    self.image3c.start()
-                    self._enhance_lock = True
-
-                elif revised_locating_value:
-                    rgb = self.image3c.rgb_data[int(round(revised_locating_value[1] * (shape[0] - 1)))][int(round(revised_locating_value[0] * (shape[1] - 1)))]
-                    fact = []
-
-                    if value[0] == 1:
-                        for i in range(3):
-                            if self._args.sys_color_set[self._args.sys_activated_idx].rgb[i] > rgb[i]:
-                                fori = (self._args.sys_color_set[self._args.sys_activated_idx].rgb[i] - rgb[i]) / (255.0 - (rgb[i] - 0.00001)) # divide by zero error.
-                                fact.append(fori * value[3])
-
-                            else:
-                                fori = (rgb[i] - self._args.sys_color_set[self._args.sys_activated_idx].rgb[i]) / (rgb[i] + 0.00001) # divide by zero error.
-                                fact.append(fori * value[3])
-
-                        self.image3c.run_args = ((0, 1, 2), tuple(rgb), tuple(fact), value[1], value[2])
-                        self.image3c.run_category = "enhance_rgb"
-
-                    elif value[0] == 2:
-                        point = Color(rgb, tp="rgb")
-                        angle = self._args.sys_color_set[self._args.sys_activated_idx].ref_h(point.h)
-                        hsv = list(point.hsv)
-
-                        if angle > 0.0:
-                            hsv[0] = float(hsv[0]) - 1E-4
-
-                        elif angle < 0.0:
-                            hsv[0] = float(hsv[0]) + 1E-4
-
-                        else:
-                            hsv[0] = float(hsv[0])
-
-                        fact.append(abs(angle) / 180.0 * value[3])
-
-                        if self._args.sys_color_set[self._args.sys_activated_idx].hsv[1] > hsv[1]:
-                            fori = (self._args.sys_color_set[self._args.sys_activated_idx].hsv[1] - hsv[1]) / (1.0 - (hsv[1] - 0.00001))
-                            fact.append(fori * value[3])
-
-                        else:
-                            fori = (hsv[1] - self._args.sys_color_set[self._args.sys_activated_idx].hsv[1]) / (hsv[1] + 0.00001)
-                            fact.append(fori * value[3])
-
-                        if self._args.sys_color_set[self._args.sys_activated_idx].hsv[2] > hsv[2]:
-                            fori = (self._args.sys_color_set[self._args.sys_activated_idx].hsv[2] - hsv[2]) / (1.0 - (hsv[2] - 0.00001))
-                            fact.append(fori * value[3])
-
-                        else:
-                            fori = (hsv[2] - self._args.sys_color_set[self._args.sys_activated_idx].hsv[2]) / (hsv[2] + 0.00001)
-                            fact.append(fori * value[3])
-
-                        self.image3c.run_args = ((0, 1, 2), tuple(hsv), tuple(fact), value[1], value[2])
+                        fact.append(angle / 180.0)
+                        separ.append(hsv[1])
+                        fact.append((self._args.sys_color_set[self._args.sys_activated_idx].hsv[1] - hsv[1]))
+                        separ.append(hsv[2])
+                        fact.append((self._args.sys_color_set[self._args.sys_activated_idx].hsv[2] - hsv[2]))
+                        self.image3c.run_args = ((0, 1, 2), tuple(separ), tuple(fact), value[1], value[2], True, self._args.dep_wtp)
                         self.image3c.run_category = "enhance_hsv"
 
                     self.image3c.start()
@@ -1196,12 +1138,14 @@ class Image(QWidget):
 
                 else:
                     self._locating_img = False
+                    self._locating_img_loc = None
 
             else:
                 self._locating_img = True
 
         else:
             self._locating_img = False
+            self._locating_img_loc = None
 
         self.update()
 
@@ -1229,7 +1173,9 @@ class Image(QWidget):
 
         self._categories.add(idx)
         self._croping_img = False
+        self._croping_img_loc = None
         self._locating_img = False
+        self._locating_img_loc = None
         self._home_image = False
         self.update()
 
@@ -1244,7 +1190,7 @@ class Image(QWidget):
 
         for i in range(5):
             rgb = self.image3c.rgb_data[int(round(value[i][1] * (self.image3c.rgb_data.shape[0] - 1)))][int(round(value[i][0] * (self.image3c.rgb_data.shape[1] - 1)))]
-            color = Color(rgb, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
+            color = Color(rgb, tp=CTP.rgb, overflow=self._args.sys_color_set.get_overflow())
             self._args.sys_color_set.modify(self._args.hm_rule, i, color, do_sync=False)
 
         self.ps_color_changed.emit(True)
@@ -1265,6 +1211,7 @@ class Image(QWidget):
 
         self._enhance_lock = False
         self._locating_img = False
+        self._locating_img_loc = None
         self._home_image = False
         self.update()
 
@@ -1288,11 +1235,11 @@ class Image(QWidget):
 
             if self._args.sys_activated_assit_idx < 0:
                 if not (rgb == self._args.sys_color_set[self._args.sys_activated_idx].rgb).all():
-                    color = Color(rgb, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
+                    color = Color(rgb, tp=CTP.rgb, overflow=self._args.sys_color_set.get_overflow())
                     self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, color)
 
             else:
-                color = Color(rgb, tp="rgb", overflow=self._args.sys_color_set.get_overflow())
+                color = Color(rgb, tp=CTP.rgb, overflow=self._args.sys_color_set.get_overflow())
                 self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][2:5] = gen_assit_args(self._args.sys_color_set[self._args.sys_activated_idx], color, self._args.sys_grid_assitlocs[self._args.sys_activated_idx][self._args.sys_activated_assit_idx][5])
 
         self.ps_color_changed.emit(True)
