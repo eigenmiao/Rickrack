@@ -27,11 +27,15 @@ class DPSplash(QSplashScreen):
     Show image when loading.
     """
 
-    def __init__(self, resources, sys_argv):
+    def __init__(self, resources, sys_argv, debug_tools):
         """
         Init splash.
         """
 
+        d_error, d_info, d_action = debug_tools
+        d_action(200)
+        d_info(203, resources)
+        d_info(200, sys_argv)
         display_lang = "en"
 
         if sys_argv["lang"]:
@@ -51,14 +55,20 @@ class DPSplash(QSplashScreen):
 
                 except Exception as err:
                     uss = None
+                    d_error(200, err)
 
                 if isinstance(uss, dict) and "lang" in uss and str(uss["lang"])[:2].lower() in ("zh", "ja", "ko"):
                     display_lang = "zh"
 
+                d_info(201, uss)
         super().__init__()
-        design_img = QImage(":/images/images/design_{}.png".format(display_lang)).scaled(780 * 1.2 * self.devicePixelRatioF(), 500 * 1.2 * self.devicePixelRatioF(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
+        d_info(205, locale.getdefaultlocale())
+        d_info(204, display_lang)
+        design_img = QImage(":/images/images/repository_{}.png".format(display_lang)).scaled(480 * 1.2 * self.devicePixelRatioF(), 240 * 1.2 * self.devicePixelRatioF(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
         design_img.setDevicePixelRatio(self.devicePixelRatioF())
+        d_info(202, self.devicePixelRatioF())
         self.setPixmap(QPixmap.fromImage(design_img))
+        d_action(201)
 
     def mousePressEvent(self, event):
         event.ignore()
