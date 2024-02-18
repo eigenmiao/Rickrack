@@ -17,7 +17,7 @@ https://github.com/eigenmiao/Rickrack
 """
 
 __VERSION__ = """
-v2.8.42-x3d3s3-stable
+v2.9.9-x3d3s3-pre
 """
 
 __AUTHOR__ = """
@@ -25,7 +25,7 @@ Eigenmiao (eigenmiao@outlook.com)
 """
 
 __DATE__ = """
-October 15, 2024
+February 18, 2024
 """
 
 __HELP__ = """
@@ -76,6 +76,9 @@ OPTION:
   -p, --port=INDEX  : provide color result on local service, where INDEX is 
                       the service port (less than 65536). Here, 0 stands for 
                       not opening the service (by default).
+      --debug       : print debug messages. It is not recommended to turn on 
+                      this switch during normal use as it may slow down the 
+                      startup speed.
 
 FILE:
   The input tag "-i" or "--input" can be omitted and use command 
@@ -124,6 +127,7 @@ EXAMPLE:
   $> Rickrack -o /path/to/mycolors.dps
   $> Rickrack -r settings
   $> Rickrack -w 0
+  $> Rickrack --debug > debug.log
   $> 
 
 NOTICE:
@@ -135,41 +139,49 @@ COPYRIGHT:
   {copyright}
 """.format(**{"version": __VERSION__[1:-1], "author": __AUTHOR__[1:-1], "copyright": __COPYRIGHT__[1:-1], "date": __DATE__[1:-1]})
 
-import os
-import sys
-import json
-import time
-import hashlib
-import numpy as np
-from getopt import getopt
-from fbs_runtime.application_context.PyQt5 import ApplicationContext
-from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QGridLayout, QMessageBox, QShortcut, QPushButton, QSizePolicy
-from PyQt5.QtCore import Qt, QCoreApplication, QTemporaryDir, QUrl, QTranslator, QSettings, QByteArray, QT_VERSION_STR
-from PyQt5.Qt import PYQT_VERSION_STR
-from PyQt5.QtGui import QGuiApplication, QIcon, QPixmap, QImage, QDesktopServices, QKeySequence, QFontDatabase
-from cguis.design.main_window import Ui_MainWindow
-from cguis.resource import view_rc
-from clibs.server import ResultServer
-from ricore.args import Args
-from ricore.color import Color
-from ricore.history import History
-from ricore.export import export_text
-from ricore.check import check_is_num
-from ricore.icon import get_icon
-from wgets.wheel import Wheel
-from wgets.image import Image
-from wgets.board import Board
-from wgets.depot import Depot
-from wgets.cube import CubeTable
-from wgets.rule import Rule
-from wgets.mode import Mode
-from wgets.operation import Operation
-from wgets.script import Script
-from wgets.channel import Channel
-from wgets.transformation import Transformation
-from wgets.settings import Settings
-from wgets.choice import Choice
-from wgets.splash import DPSplash
+from ricore.debug import debug_error, debug_info, debug_action, debug_free
+
+try:
+    import os
+    import sys
+    import json
+    import time
+    import hashlib
+    import numpy as np
+    from getopt import getopt
+    from fbs_runtime.application_context.PyQt5 import ApplicationContext
+    from PyQt5.QtWidgets import QWidget, QMainWindow, QApplication, QGridLayout, QMessageBox, QShortcut, QPushButton, QSizePolicy
+    from PyQt5.QtCore import Qt, QCoreApplication, QTemporaryDir, QUrl, QTranslator, QSettings, QByteArray, QT_VERSION_STR
+    from PyQt5.Qt import PYQT_VERSION_STR
+    from PyQt5.QtGui import QGuiApplication, QIcon, QPixmap, QImage, QDesktopServices, QKeySequence, QFontDatabase
+    from cguis.design.main_window import Ui_MainWindow
+    from cguis.resource import view_rc
+    from clibs.server import ResultServer
+    from wgets.wheel import Wheel
+    from wgets.image import Image
+    from wgets.board import Board
+    from wgets.depot import Depot
+    from wgets.cube import CubeTable
+    from wgets.rule import Rule
+    from wgets.mode import Mode
+    from wgets.operation import Operation
+    from wgets.script import Script
+    from wgets.channel import Channel
+    from wgets.transformation import Transformation
+    from wgets.settings import Settings
+    from wgets.choice import Choice
+    from wgets.splash import DPSplash
+    from ricore.args import Args
+    from ricore.color import Color, CTP
+    from ricore.history import History
+    from ricore.export import export_text
+    from ricore.check import check_is_num
+    from ricore.icon import get_icon
+
+except Exception as err:
+    debug_error(1, err)
+    debug_action(0)
+    sys.exit(0)
 
 
 class Rickrack(QMainWindow, Ui_MainWindow):
@@ -177,24 +189,31 @@ class Rickrack(QMainWindow, Ui_MainWindow):
     Rickrack main window framework.
     """
 
-    def __init__(self, resources, sys_argv):
+    def __init__(self, resources, sys_argv, debug_tools):
         """
         Init main window.
         """
 
+        d_error, d_info, d_action = debug_tools
+        d_action(101)
+        d_info(100, resources)
+        d_info(104, sys_argv)
         super().__init__()
         self.setupUi(self)
+        d_action(100)
         self.setAttribute(Qt.WA_AcceptTouchEvents)
         self.setAttribute(Qt.WA_InputMethodEnabled)
         self._sys_argv = sys_argv
         reset_all_args = self._sys_argv["reset"] in ("settings", "setting", "all") or self._sys_argv["temporary"]
-        self._args = Args(resources, resetall=reset_all_args, uselang=self._sys_argv["lang"])
+        self._args = Args(resources, resetall=reset_all_args, uselang=self._sys_argv["lang"], debug_tools=debug_tools)
         self._args.global_temp_dir = QTemporaryDir()
+        d_info(102, self._args.global_temp_dir, lambda x: x.path())
         try:
             geo_args = QSettings(self._args.geometry_args, QSettings.IniFormat)
 
         except Exception as err:
             geo_args = None
+            d_error(100, err)
 
         self._geo_args = geo_args
         self._save_settings_before_close = True
@@ -202,19 +221,30 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._curr_view_idx = 0
         self._curr_docks = None
         self._func_tr_()
+        d_action(109)
         app_icon = QIcon()
         app_icon.addPixmap(QPixmap(":/images/images/icon_128.png"), QIcon.Normal, QIcon.Off)
         self.setWindowIcon(app_icon)
         self.setMinimumSize(600, 460)
+        d_action(102)
         self._setup_workarea()
+        d_action(110)
         self._setup_result()
+        d_action(103)
         self._setup_rule()
+        d_action(104)
         self._setup_mode()
+        d_action(105)
         self._setup_operation()
+        d_action(106)
         self._setup_script()
+        d_action(107)
         self._setup_channel()
+        d_action(108)
         self._setup_transformation()
+        d_action(111)
         self._setup_settings()
+        d_action(114)
         self.tabifyDockWidget(self.operation_dock_widget, self.script_dock_widget)
         self.tabifyDockWidget(self.mode_dock_widget, self.transformation_dock_widget)
         self.tabifyDockWidget(self.rule_dock_widget, self.channel_dock_widget)
@@ -228,6 +258,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self.mode_dock_widget.visibilityChanged.connect(lambda x: self.actionMode.setChecked(self.mode_dock_widget.isVisible()))
         self.transformation_dock_widget.visibilityChanged.connect(lambda x: self.actionTransformation.setChecked(self.transformation_dock_widget.isVisible()))
         self.result_dock_widget.visibilityChanged.connect(lambda x: self.actionResult.setChecked(self.result_dock_widget.isVisible()))
+        d_action(115)
         self.actionOpen.triggered.connect(self._wget_operation.exec_open)
         self.actionSave.triggered.connect(self._wget_operation.exec_save)
         self.actionImport.triggered.connect(self._wget_operation.exec_import)
@@ -265,44 +296,27 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self.actionConcise_R.triggered.connect(lambda x: self._change_layout(4))
         self.actionConcise_L.triggered.connect(lambda x: self._change_layout(5))
         self._setup_toolbar()
+        d_action(113)
         self._setup_skey()
         self._setup_server()
+        d_action(117)
         self._tr = QTranslator()
         self._app = QApplication.instance()
         self._install_translator()
         self._wget_wheel.setFocus()
-        self._load_last_work()
-
-        if self._sys_argv["input"]:
-            if self._sys_argv["input"].split(".")[-1].lower() in ("png", "bmp", "jpg", "jpeg", "tif", "tiff", "webp"):
-                self._switch_to_image()
-                self._wget_image.open_image(self._sys_argv["input"])
-
-            else:
-                try:
-                    with open(self._sys_argv["input"], "r", encoding="utf-8") as f:
-                        color_dict = json.load(f)
-
-                except Exception as err:
-                    color_dict = None
-
-                if isinstance(color_dict, dict) and "type" in color_dict:
-                    if color_dict["type"] == "depot":
-                        self._switch_to_depot()
-                        self._wget_operation.dp_open(color_dict, direct_dict=True, dp_path=os.path.dirname(os.path.abspath(self._sys_argv["input"])))
-
-                    elif color_dict["type"] == "set":
-                        self._wget_operation.dp_import(color_dict, direct_dict=True)
 
         if self._args.load_settings_failed:
             self._wget_operation.warning(self._wget_operation.main_errs[self._args.load_settings_failed - 1])
 
-        self._default_state = QByteArray.fromBase64(bytes(self._args.default_layout, 'ascii')) if self._args.default_layout else self.saveState()
+        d_action(119)
+        self._default_state = QByteArray.fromBase64(bytes(self._args.default_layout, "ascii")) if self._args.default_layout else self.saveState()
         self._default_size = self.size()
+        d_action(112)
         self._change_layout()
         self._setup_geometry()
         QApplication.desktop().screenCountChanged.connect(self._setup_geometry)
         self.setWindowFlag(Qt.WindowStaysOnTopHint, on=self._args.win_on_top)
+        d_action(120)
         self.actionRule.setChecked(self.rule_dock_widget.isVisible())
         self.actionChannel.setChecked(self.channel_dock_widget.isVisible())
         self.actionOperation.setChecked(self.operation_dock_widget.isVisible())
@@ -320,6 +334,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self.transformation_dock_widget.setVisible(bool(self._sys_argv["window"] // 2 % 2))
             self.result_dock_widget.setVisible(bool(self._sys_argv["window"] % 2))
 
+        d_action(121)
+
         if os.path.isdir(os.sep.join((resources, "fonts"))):
             for font in os.listdir(os.sep.join((resources, "fonts"))):
                 if font.split(".")[-1].lower() in ("ttf", "otf"):
@@ -334,9 +350,44 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._sel_board_icon = None
         self._sel_depot_icon = None
         self._setup_interface_style(change_pn_colors=False)
+        d_action(118)
+        self._load_last_work()
+
+        if self._sys_argv["input"]:
+            self._args.d_info(103, self._sys_argv["input"])
+
+            if self._sys_argv["input"].split(".")[-1].lower() in ("png", "bmp", "jpg", "jpeg", "tif", "tiff", "webp"):
+                self._switch_to_image()
+                self._wget_image.open_image(self._sys_argv["input"])
+
+            else:
+                try:
+                    with open(self._sys_argv["input"], "r", encoding="utf-8") as f:
+                        color_dict = json.load(f)
+
+                except Exception as err:
+                    color_dict = None
+                    self._args.d_error(101, err)
+
+                if isinstance(color_dict, dict) and "type" in color_dict:
+                    if color_dict["type"] == "depot":
+                        self._switch_to_depot()
+                        self._wget_operation.dp_open(color_dict, direct_dict=True, dp_path=os.path.dirname(os.path.abspath(self._sys_argv["input"])))
+
+                    elif color_dict["type"] == "set":
+                        self._wget_operation.dp_import(color_dict, direct_dict=True)
+
+        d_action(116)
         self._history = History(self._args)
         self._history.backup()
         self._setup_history()
+        self._wget_rule.set_all_expand_states(self._geo_args.value("rule_fd", None), default=True)
+        self._wget_channel.set_all_expand_states(self._geo_args.value("channel_fd", None), default=True)
+        self._wget_operation.set_all_expand_states(self._geo_args.value("operation_fd", None), default=False)
+        self._wget_transformation.set_all_expand_states(self._geo_args.value("transformation_fd", None), default=False)
+        self._wget_mode.set_all_expand_states(self._geo_args.value("mode_fd", None), default=False)
+        self._wget_script.set_all_expand_states(self._geo_args.value("script_fd", None), default=False)
+        d_action(122)
 
     def _setup_geometry(self):
         """
@@ -522,7 +573,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_mode.ps_mode_changed.connect(lambda x: self._wget_cube_table.modify_box_visibility())
         self._wget_mode.ps_assistp_changed.connect(lambda x: self._wget_board.update())
         self._wget_mode.ps_info_changed.connect(lambda x: self._update_info_args())
-        self._wget_mode.ps_color_sys_changed.connect(lambda x: self._wget_wheel.update())
+        self._wget_mode.ps_color_spc_changed.connect(lambda x: self._wget_wheel.update())
+        self._wget_mode.ps_color_spc_changed.connect(lambda x: self._wget_board.update())
         self._wget_wheel.setMouseTracking(bool(self._args.show_info_pts[0]))
         self._wget_image.setMouseTracking(bool(self._args.show_info_pts[1]))
         self._wget_board.setMouseTracking(bool(self._args.show_info_pts[2]))
@@ -753,12 +805,12 @@ class Rickrack(QMainWindow, Ui_MainWindow):
 
         if isinstance(layout_src, str) and os.path.isfile(self._args.geometry_args):
             main_win_layout = 0
-            main_win_state = self._geo_args.value('main_win_state', None)
-            main_win_geometry = self._geo_args.value('main_win_geometry', None)
+            main_win_state = self._geo_args.value("main_win_state", None)
+            main_win_geometry = self._geo_args.value("main_win_geometry", None)
 
         elif isinstance(layout_src, int):
             main_win_layout = layout_src
-            main_win_state = QByteArray.fromBase64(bytes(self._args.layouts[layout_src], 'ascii'))
+            main_win_state = QByteArray.fromBase64(bytes(self._args.layouts[layout_src], "ascii"))
             main_win_geometry = None
 
         else:
@@ -766,12 +818,19 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             main_win_state = self._default_state
             main_win_geometry = None
             self.resize(self._default_size)
+            self._wget_rule.set_all_expand_states(None, default=True)
+            self._wget_channel.set_all_expand_states(None, default=True)
+            self._wget_operation.set_all_expand_states(None, default=False)
+            self._wget_transformation.set_all_expand_states(None, default=False)
+            self._wget_mode.set_all_expand_states(None, default=False)
+            self._wget_script.set_all_expand_states(None, default=False)
 
         if main_win_state:
             try:
                 self.restoreState(main_win_state)
 
             except Exception as err:
+                self._args.d_error(102, err)
                 pass
 
         if main_win_geometry:
@@ -779,6 +838,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 self.restoreGeometry(main_win_geometry)
 
             except Exception as err:
+                self._args.d_error(103, err)
                 pass
 
     def _load_last_work(self):
@@ -807,7 +867,6 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         """
 
         self._history.backup()
-        self._wget_cube_table.update_color()
 
     def _inner_undo_or_redo(self, undo=True):
         """
@@ -835,7 +894,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             self._args.sys_activated_idx = int(idx)
             self._args.sys_activated_assit_idx = -1
 
-        fmt_color = Color(color, tp="hsv", overflow=self._args.sys_color_set.get_overflow())
+        fmt_color = Color(color, tp=CTP.hsv, overflow=self._args.sys_color_set.get_overflow())
         self._args.sys_color_set.modify(self._args.hm_rule, self._args.sys_activated_idx, fmt_color)
         self._wget_cube_table.update_color()
         self._wget_cube_table.update_index()
@@ -961,7 +1020,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         if not self._wget_wheel.isVisible():
             self._switch_to_wheel()
 
-        self._wget_cube_table.create_set(direct=True)
+        self._wget_cube_table.create_set(direct=False)
 
     def _ins_open_image(self):
         """
@@ -995,7 +1054,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         if not self._wget_image.image3c.display:
             self._ins_open_image()
 
-        self._wget_image.extract_image(0)
+        self._wget_image.extract_image(-1)
 
     def _ins_derive(self):
         """
@@ -1165,6 +1224,12 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         self._wget_transformation._func_tr_()
         self._wget_mode._func_tr_()
         self._wget_script._func_tr_()
+        self._wget_rule._sw_func_tr_()
+        self._wget_channel._sw_func_tr_()
+        self._wget_operation._sw_func_tr_()
+        self._wget_transformation._sw_func_tr_()
+        self._wget_mode._sw_func_tr_()
+        self._wget_script._sw_func_tr_()
         self._wget_settings._func_tr_()
         self._wget_settings.retranslateUi(self._wget_settings)
         self.retranslateUi(self)
@@ -1216,12 +1281,14 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             qss_file = os.sep.join((self._args.resources, "styles", "default.qss"))
 
             if os.path.isfile(qss_file):
+                self._args.d_info(101, qss_file)
                 try:
                     with open(qss_file, encoding="utf-8") as qf:
                         qstyle = qf.read()
 
                 except Exception as err:
                     qstyle = ""
+                    self._args.d_error(104, err)
 
             else:
                 qstyle = ""
@@ -1398,6 +1465,18 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             for btn_idx in range(7):
                 name = ("up", "down", "left", "right", "reset", "zoom_in", "zoom_out")[btn_idx]
                 self._wget_transformation.move_btns[btn_idx].setIcon(get_icon(name, forecolor, backcolor, 1.0, 0.0, self._args.global_temp_dir.path(), app_icon))
+
+            fbox_icons = (
+                get_icon("full_right", forecolor, backcolor, 1.0, 0.0, self._args.global_temp_dir.path(), app_icon),
+                get_icon("up", forecolor, backcolor, 1.0, 0.0, self._args.global_temp_dir.path(), app_icon),
+            )
+
+            self._wget_rule.set_icons(fbox_icons)
+            self._wget_channel.set_icons(fbox_icons)
+            self._wget_operation.set_icons(fbox_icons)
+            self._wget_script.set_icons(fbox_icons)
+            self._wget_mode.set_icons(fbox_icons)
+            self._wget_transformation.set_icons(fbox_icons)
 
             if self._args.style_id in (1, 2):
                 curr_positive_color = (0, 0, 0)
@@ -1634,8 +1713,14 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 os.remove(os.sep.join((store_path, backup_file)))
 
         if self._args.geometry_args:
-            self._geo_args.setValue('main_win_state', self.saveState())
-            self._geo_args.setValue('main_win_geometry', self.saveGeometry())
+            self._geo_args.setValue("main_win_state", self.saveState())
+            self._geo_args.setValue("main_win_geometry", self.saveGeometry())
+            self._geo_args.setValue("rule_fd", self._wget_rule.get_all_expand_states())
+            self._geo_args.setValue("channel_fd", self._wget_channel.get_all_expand_states())
+            self._geo_args.setValue("operation_fd", self._wget_operation.get_all_expand_states())
+            self._geo_args.setValue("transformation_fd", self._wget_transformation.get_all_expand_states())
+            self._geo_args.setValue("mode_fd", self._wget_mode.get_all_expand_states())
+            self._geo_args.setValue("script_fd", self._wget_script.get_all_expand_states())
 
         self._args.save_settings()
 
@@ -1694,7 +1779,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self._wget_cube_table.clipboard_act("rgb"))
+            shortcut.activated.connect(self._wget_cube_table.clipboard_act(CTP.rgb))
 
         for skey in self._args.shortcut_keymaps[15]:
             if skey in self._connected_keymaps:
@@ -1705,7 +1790,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self._wget_cube_table.clipboard_act("hsv"))
+            shortcut.activated.connect(self._wget_cube_table.clipboard_act(CTP.hsv))
 
         for skey in self._args.shortcut_keymaps[16]:
             if skey in self._connected_keymaps:
@@ -1716,7 +1801,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self._wget_cube_table.clipboard_act("hec"))
+            shortcut.activated.connect(self._wget_cube_table.clipboard_act(CTP.hec))
 
         for skey in self._args.shortcut_keymaps[17]:
             if skey in self._connected_keymaps:
@@ -1727,7 +1812,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self._wget_wheel.clipboard_all("rgb"))
+            shortcut.activated.connect(self._wget_wheel.clipboard_all(CTP.rgb))
 
         for skey in self._args.shortcut_keymaps[18]:
             if skey in self._connected_keymaps:
@@ -1738,7 +1823,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self._wget_wheel.clipboard_all("hsv"))
+            shortcut.activated.connect(self._wget_wheel.clipboard_all(CTP.hsv))
 
         for skey in self._args.shortcut_keymaps[19]:
             if skey in self._connected_keymaps:
@@ -1749,7 +1834,7 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self._wget_wheel.clipboard_all("hec"))
+            shortcut.activated.connect(self._wget_wheel.clipboard_all(CTP.hec))
 
         for actv_idx, skey_idx in zip(range(5), (25, 24, 23, 26, 27)):
             for skey in self._args.shortcut_keymaps[skey_idx]:
@@ -1885,7 +1970,8 @@ class Rickrack(QMainWindow, Ui_MainWindow):
         if self._sys_argv["output"]:
             self._wget_operation.dp_export(self._sys_argv["output"], True)
 
-        result_text = export_text([(self._args.sys_color_set, self._args.hm_rule, "Console Results", "", (time.time(), time.time()), self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values),])
+        result_text = export_text([(self._args.sys_color_set, self._args.hm_rule, "Console Results", "", (time.time(), time.time()), self._args.sys_grid_locations, self._args.sys_grid_assitlocs, self._args.sys_grid_list, self._args.sys_grid_values),], useryb=self._args.dep_wtp)
+        self._args.d_action(125)
 
         for line in result_text.split("\n"):
             if line and len(line) > 3:
@@ -1903,9 +1989,12 @@ class Rickrack(QMainWindow, Ui_MainWindow):
                 self.save_main_settings()
 
             except Exception as err:
+                self._args.d_error(105, err)
                 pass
 
+        self._args.d_action(123)
         self._args.remove_temp_dir()
+        self._args.d_action(124)
         self._wget_wheel.close()
         self._wget_image.close()
         self._wget_depot.close()
@@ -2020,8 +2109,10 @@ class Rickrack(QMainWindow, Ui_MainWindow):
             _translate("QAbstractSpinBox", "Step &down"),
         )
 
-if __name__ == "__main__":
-    argv_opts, argv_left = getopt(sys.argv[1:], "hvtr:i:o:w:e:l:p:", ["help", "version", "temporary", "reset=", "input=", "output=", "export=", "window=", "sequence=", "lang=", "locale=", "port="])
+def main(debug_tools):
+    d_error, d_info, d_action = debug_tools
+    d_action(4)
+    argv_opts, argv_left = getopt(sys.argv[1:], "hvtr:i:o:w:e:l:p:", ["help", "version", "debug", "temporary", "reset=", "input=", "output=", "export=", "window=", "sequence=", "lang=", "locale=", "port="])
     sys_argv = {"temporary": False, "reset": "", "input": None, "output": None, "window": -1, "lang": "", "port": None}
 
     for opt_name,opt_value in argv_opts:
@@ -2075,15 +2166,41 @@ if __name__ == "__main__":
     if not sys_argv["input"] and argv_left and os.path.isfile(argv_left[-1]):
         sys_argv["input"] = argv_left[-1]
 
+    d_action(5)
     QCoreApplication.setAttribute(Qt.AA_EnableHighDpiScaling)
     QCoreApplication.setAttribute(Qt.AA_UseHighDpiPixmaps)
     QGuiApplication.setHighDpiScaleFactorRoundingPolicy(Qt.HighDpiScaleFactorRoundingPolicy.PassThrough)
+    d_action(6)
     appctxt = ApplicationContext()
-    DPS = DPSplash(appctxt.get_resource('.'), sys_argv)
+    d_action(7)
+    DPS = DPSplash(appctxt.get_resource('.'), sys_argv, debug_tools)
     DPS.show()
-    DP = Rickrack(appctxt.get_resource('.'), sys_argv)
+    d_action(8)
+    DP = Rickrack(appctxt.get_resource('.'), sys_argv, debug_tools)
     DP.show()
+    d_action(9)
     DPS.finish(DP)
     DPS.deleteLater()
-    exit_code = appctxt.app.exec_()
+    d_action(10)
+    return appctxt.app.exec_()
+
+if __name__ == "__main__":
+    exit_code = 0
+    sys_debug = "--debug" in sys.argv
+
+    if sys_debug:
+        debug_action(1)
+        debug_tools = (debug_error, debug_info, debug_action)
+        try:
+            debug_action(2)
+            exit_code = main(debug_tools)
+
+        except Exception as err:
+            debug_error(2, err)
+
+        debug_action(3)
+    else:
+        debug_tools = (debug_free, debug_free, debug_free)
+        exit_code = main(debug_tools)
+
     sys.exit(exit_code)
