@@ -17,12 +17,12 @@ import time
 import struct
 import swatch
 from lxml import etree
-from ricore.color import Color
+from ricore.color import Color, CTP
 from ricore.grid import gen_color_grid, gen_assit_color
 from ricore.check import fmt_name
 
 
-def get_export_color_list(color_list, export_grid=False, max_len=65535):
+def get_export_color_list(color_list, export_grid=False, max_len=65535, useryb=False):
     """
     Get the export_color_list and export_cname_list for formatting aco, gpl, xml, txt or others.
 
@@ -30,6 +30,7 @@ def get_export_color_list(color_list, export_grid=False, max_len=65535):
         color_list (tuple or list): [(color_set, hm_rule, name, desc, cr_time, grid_locations, grid_assitlocs, grid_list, grid_values), ...]
         export_grid (bool): True for exporting colors in grid list and False for exporting color set.
         max_len (int): max length of color list.
+        useryb (bool): if use ryb color space.
 
     Returns:
         export_color_list and export_cname_list.
@@ -42,7 +43,7 @@ def get_export_color_list(color_list, export_grid=False, max_len=65535):
         for idx in range(len(color_list)):
             if color_list[idx][7][0]:
                 for i in range(len(color_list[idx][7][0])):
-                    export_color_list.append(Color(color_list[idx][7][0][i], tp="hec"))
+                    export_color_list.append(Color(color_list[idx][7][0][i], tp=CTP.hec))
 
                     if len(color_list) == 1:
                         name = "{} {}: {}".format(fmt_name(color_list[idx][2]), i + 1, fmt_name(color_list[idx][7][1][i]))
@@ -56,11 +57,11 @@ def get_export_color_list(color_list, export_grid=False, max_len=65535):
                         break
 
             else:
-                color_grid = gen_color_grid(color_list[idx][0], color_list[idx][5], color_list[idx][6], grid_list=None, **color_list[idx][8]).tolist()
+                color_grid = gen_color_grid(color_list[idx][0], color_list[idx][5], color_list[idx][6], grid_list=None, **color_list[idx][8], useryb=useryb).tolist()
 
                 for i in range(len(color_grid)):
                     for j in range(len(color_grid[i])):
-                        export_color_list.append(Color(color_grid[i][j], tp="rgb"))
+                        export_color_list.append(Color(color_grid[i][j], tp=CTP.rgb))
 
                         if len(color_list) == 1:
                             name = "{} {}-{}".format(fmt_name(color_list[idx][2]), i + 1, j + 1)
@@ -86,7 +87,7 @@ def get_export_color_list(color_list, export_grid=False, max_len=65535):
                 name = "{} {}-{}".format(fmt_name(color_list[idx][2]), idx + 1, i + 1)
                 export_cname_list.append(name)
 
-            export_color_list.append(Color("FFFFFF", tp="hec"))
+            export_color_list.append(Color("FFFFFF", tp=CTP.hec))
             name = fmt_name(color_list[idx][2])
             export_cname_list.append(name)
 
@@ -105,7 +106,7 @@ def get_export_color_list(color_list, export_grid=False, max_len=65535):
     export_cname_list = export_cname_list[:max_len]
     return export_color_list, export_cname_list
 
-def export_ase(color_list, ctp="rgb", asetp="process", export_grid=False, white_ref=(95.047, 100.0, 108.883)):
+def export_ase(color_list, ctp="rgb", asetp="process", export_grid=False, white_ref=(95.047, 100.0, 108.883), useryb=False):
     """
     Export color set list in ase type (for Adobe exchange).
 
@@ -115,12 +116,13 @@ def export_ase(color_list, ctp="rgb", asetp="process", export_grid=False, white_
         asetp (str): 'spot', 'global' or 'process'. ref: see https://github.com/nsfmc/swatch.
         export_grid (bool): True for exporting colors in grid list and False for exporting color set.
         white_ref (tuple or list): xyz (Tristimulus) Reference values of a perfect reflecting diffuser. default: value of standard "D65, 2Ang".
+        useryb (bool): if use ryb color space.
 
     Returns:
         Binary strings.
     """
 
-    export_color_list, export_cname_list = get_export_color_list(color_list, export_grid=export_grid)
+    export_color_list, export_cname_list = get_export_color_list(color_list, export_grid=export_grid, useryb=useryb)
     data = []
 
     for idx in range(len(export_color_list)):
@@ -193,7 +195,7 @@ def import_ase(file_path, white_ref=(95.047, 100.0, 108.883)):
         grid_list.append(color)
     return grid_list, name_list
 
-def export_swatch(color_list, ctp="rgb", export_grid=False, white_ref=(95.047, 100.0, 108.883)):
+def export_swatch(color_list, ctp="rgb", export_grid=False, white_ref=(95.047, 100.0, 108.883), useryb=False):
     """
     Export color set list in swatch type (for Adobe exchange).
 
@@ -202,12 +204,13 @@ def export_swatch(color_list, ctp="rgb", export_grid=False, white_ref=(95.047, 1
         ctp (str): 'rgb', 'hsv', 'cmyk', 'lab' or 'grey'.
         export_grid (bool): True for exporting colors in grid list and False for exporting color set.
         white_ref (tuple or list): xyz (Tristimulus) Reference values of a perfect reflecting diffuser. default: value of standard "D65, 2Ang".
+        useryb (bool): if use ryb color space.
 
     Returns:
         Binary strings.
     """
 
-    export_color_list, export_cname_list = get_export_color_list(color_list, export_grid=export_grid)
+    export_color_list, export_cname_list = get_export_color_list(color_list, export_grid=export_grid, useryb=useryb)
     swatch_chars_v1 = struct.pack("!H", 1) + struct.pack("!H", len(export_color_list))
     swatch_chars_v2 = struct.pack("!H", 2) + struct.pack("!H", len(export_color_list))
 
@@ -333,19 +336,20 @@ def import_swatch(file_path, white_ref=(95.047, 100.0, 108.883)):
 
     return grid_list, name_list
 
-def export_gpl(color_list, export_grid=False):
+def export_gpl(color_list, export_grid=False, useryb=False):
     """
     Export color set list in gpl type (for GIMP exchange).
 
     Args:
         color_list (tuple or list): [(color_set, hm_rule, name, desc, cr_time, grid_locations, grid_assitlocs, grid_list, grid_values), ...]
         export_grid (bool): True for exporting colors in grid list and False for exporting color set.
+        useryb (bool): if use ryb color space.
 
     Returns:
         Plain text strings.
     """
 
-    export_color_list, export_cname_list = get_export_color_list(color_list, export_grid=export_grid)
+    export_color_list, export_cname_list = get_export_color_list(color_list, export_grid=export_grid, useryb=useryb)
     gpl_chars = "GIMP Palette\n"
 
     for idx in range(len(export_color_list)):
@@ -390,19 +394,20 @@ def import_gpl(file_path):
 
     return grid_list, name_list
 
-def export_xml(color_list, export_grid=False):
+def export_xml(color_list, export_grid=False, useryb=False):
     """
     Export color set list in xml type (for Pencil exchange).
 
     Args:
         color_list (tuple or list): [(color_set, hm_rule, name, desc, cr_time, grid_locations, grid_assitlocs, grid_list, grid_values), ...]
         export_grid (bool): True for exporting colors in grid list and False for exporting color set.
+        useryb (bool): if use ryb color space.
 
     Returns:
         Plain text strings.
     """
 
-    export_color_list, export_cname_list = get_export_color_list(color_list, export_grid=export_grid)
+    export_color_list, export_cname_list = get_export_color_list(color_list, export_grid=export_grid, useryb=useryb)
     xml_chars = "<!DOCTYPE PencilPalette>\n<palette>\n"
 
     for idx in range(len(export_color_list)):
@@ -471,12 +476,13 @@ def import_xml(file_path):
 
     return grid_list, name_list
 
-def export_text(color_list):
+def export_text(color_list, useryb=False):
     """
     Export color set list in plain text (for directly reading).
 
     Args:
         color_list (tuple or list): [(color_set, hm_rule, name, desc, cr_time, grid_locations, grid_assitlocs, grid_list, grid_values), ...]
+        useryb (bool): if use ryb color space.
 
     Returns:
         Plain text strings.
@@ -524,13 +530,13 @@ def export_text(color_list):
 
         plain_text += "  " + " ".join(grid_list)
         plain_text += "\n\n# Color Grid ...\n"
-        color_grid = gen_color_grid(color_list[idx][0], color_list[idx][5], color_list[idx][6], grid_list=None, **color_list[idx][8]).tolist()
+        color_grid = gen_color_grid(color_list[idx][0], color_list[idx][5], color_list[idx][6], grid_list=None, **color_list[idx][8], useryb=useryb).tolist()
 
         for i in range(len(color_grid)):
             grid_list = []
 
             for j in range(len(color_grid[i])):
-                grid_list.append(Color(color_grid[i][j], tp="rgb").hec)
+                grid_list.append(Color(color_grid[i][j], tp=CTP.rgb).hec)
 
             plain_text += "  " + " ".join(grid_list) + "\n"
         plain_text += "\n"
