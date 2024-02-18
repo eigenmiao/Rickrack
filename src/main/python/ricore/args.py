@@ -20,6 +20,7 @@ import time
 import locale
 import shutil
 import unittest
+from ricore.color import CTP, OTP
 from ricore.color_set import ColorSet
 from ricore.check import check_key, check_file_name, check_nonempt_str_lst
 
@@ -29,15 +30,22 @@ class Args(object):
     Args object. Manage setting args.
     """
 
-    def __init__(self, resources, resetall=False, uselang=""):
+    def __init__(self, resources, resetall=False, uselang="", debug_tools=None):
         """
         Init Args object.
         """
 
-        self.info_version_zh = "v2.8.42-x3d3s3-稳定版"
-        self.info_version_en = "v2.8.42-x3d3s3-stable"
-        self.info_date_zh = "2024年1月7日"
-        self.info_date_en = "January 7, 2024"
+        self.d_error, self.d_info, self.d_action = debug_tools
+        self.d_action(300)
+        self.d_info(300, resources)
+        self.d_info(312, resetall)
+        self.d_info(311, uselang)
+        self.info_version_zh = "v2.9.9-x3d3s3-预览版"
+        self.info_version_en = "v2.9.9-x3d3s3-pre"
+        self.d_info(302, self.info_version_en)
+        self.info_date_zh = "2024年2月18日"
+        self.info_date_en = "February 18, 2024"
+        self.d_info(303, self.info_date_en)
         self.global_temp_dir = None
         self.global_hm_rules = (
             "analogous",
@@ -50,12 +58,7 @@ class Args(object):
             "custom",
         )
 
-        self.global_overflows = (
-            "cutoff",
-            "return",
-            "repeat",
-        )
-
+        self.global_overflows = OTP.n2s
         self.global_white_ref = (
             ((109.850, 100.000, 35.585), (111.144, 100.000, 35.200)),
             ((99.0927, 100.000, 85.313), (99.178, 100.000, 84.3493)),
@@ -79,7 +82,6 @@ class Args(object):
             ((108.046, 100.000, 39.228), (111.428, 100.000, 40.353)),
         )
 
-        self.global_log = False
         all_langs = (
             "en", "ar", "be", "bg", "ca", "cs", "da", "de", "el", "eo",
             "es", "et", "fi", "fr", "hr", "hu", "is", "it", "iw", "ja",
@@ -108,6 +110,7 @@ class Args(object):
                     lang_paths.append((all_langs.index(glang), lang[:-3]))
 
         self.usr_langs = tuple(lang_paths)
+        self.d_info(313, self.usr_langs)
         self.info_main_site = "https://eigenmiao.com/rickrack"
         self.info_update_site = "https://github.com/eigenmiao/Rickrack/releases"
         self.info_dissc_site = "https://github.com/eigenmiao/Rickrack/discussions?discussions_q="
@@ -117,14 +120,17 @@ class Args(object):
         self.home_dir = os.path.expanduser('~')
         self.doc_name = "Documents"
         self.pic_name = "Pictures"
+        user_dirs_dirs = os.sep.join([self.home_dir, ".config", "user-dirs.dirs"])
 
-        if os.path.isfile(os.sep.join([self.home_dir, ".config", "user-dirs.dirs"])):
+        if os.path.isfile(user_dirs_dirs):
+            self.d_info(317, user_dirs_dirs)
             try:
-                with open(os.sep.join([self.home_dir, ".config", "user-dirs.dirs"]), "r", encoding="utf-8") as f:
+                with open(user_dirs_dirs, "r", encoding="utf-8") as f:
                     data = f.read().split()
 
             except Exception as err:
                 data = []
+                self.d_error(300, err)
 
             for line in data:
                 if "DOCUMENTS" in line.upper():
@@ -153,12 +159,17 @@ class Args(object):
                         if os.path.isdir(os.sep.join((self.home_dir, pic_name))):
                             self.pic_name = pic_name
 
+        self.d_info(315, self.doc_name)
+        self.d_info(316, self.pic_name)
         self.usr_store = os.sep.join((self.home_dir, self.doc_name, "Rickrack"))
         self.resources = resources
         self.load_settings_failed = 0
+        self.d_info(314, self.usr_store)
         self.init_settings()
+        self.d_info(309, ")数函喵征本( oaimnegiE"[::-1])
         self.stab_ucells = tuple()
         self.stab_column = 3
+        self.d_action(302)
         self.sys_activated_idx = 0
         self.sys_activated_assit_idx = -1
         self.sys_color_set = ColorSet(self.h_range, self.s_range, self.v_range, overflow=self.overflow, dep_wtp=self.dep_wtp)
@@ -185,6 +196,7 @@ class Args(object):
         if uselang:
             self.modify_settings("lang", uselang)
 
+        self.d_info(307, "kcarkcir/moc.oaimnegie//:sptth"[::-1])
         self.sys_category = 0
         self.sys_channel = 0
         self.sys_grid_locations = [(0.5, 0.5), (0.85, 0.85), (0.15, 0.85), (0.85, 0.15), (0.15, 0.15)]
@@ -196,6 +208,7 @@ class Args(object):
         self.sys_color_locs = [None, None, None, None, None]
         self.sys_assit_color_locs = [[], [], [], [], []]
         self.sys_image_url = ""
+        self.d_action(301)
 
     def init_settings(self):
         """
@@ -229,13 +242,16 @@ class Args(object):
             self.info_main_site = "https://eigenmiao.com/rickrack"
 
         self.store_loc = True
+        local_settings = os.sep.join((self.resources, "settings.json"))
 
-        if os.path.isfile(os.sep.join((self.resources, "settings.json"))):
+        if os.path.isfile(local_settings):
+            self.d_info(301, local_settings)
             try:
-                with open(os.sep.join((self.resources, "settings.json")), "r", encoding="utf-8") as sf:
+                with open(local_settings, "r", encoding="utf-8") as sf:
                     uss = json.load(sf)
 
             except Exception as err:
+                self.d_error(301, err)
                 uss = None
 
             if isinstance(uss, dict) and "store_loc" in uss:
@@ -254,6 +270,7 @@ class Args(object):
                 os.makedirs(self.usr_color)
 
             except Exception as err:
+                self.d_error(302, err)
                 pass
 
         if not os.path.isdir(self.usr_image):
@@ -261,15 +278,16 @@ class Args(object):
                 os.makedirs(self.usr_image)
 
             except Exception as err:
+                self.d_error(303, err)
                 pass
 
         self.hm_rule = "analogous"
-        self.overflow = "return"
+        self.overflow = "revert"
         self.press_move = True
-        self.color_sys = 0
-        self.show_rgb = False
-        self.show_hsv = False
-        self.show_info_pts = [3, 3, 3]
+        self.color_spc = 0
+        self.show_rgb = True
+        self.show_hsv = True
+        self.show_info_pts = [1, 3, 0]
         self.h_range = (0.0, 360.0)
         self.s_range = (0.2, 0.5)
         self.v_range = (0.8, 1.0)
@@ -284,13 +302,13 @@ class Args(object):
         self.zoom_step = 1.1
         self.move_step = 5
         self.rand_num = 10000
-        self.circle_dist = 12
-        self.positive_wid = 1
-        self.negative_wid = 1
-        self.wheel_ed_wid = 1
+        self.circle_dist = 16
+        self.positive_wid = 3
+        self.negative_wid = 3
+        self.wheel_ed_wid = 3
         self.positive_color = (255, 255, 255)
-        self.negative_color = ( 0,  0,  0)
-        self.wheel_ed_color = ( 0,  0,  0)
+        self.negative_color = ( 59,  59,  59)
+        self.wheel_ed_color = ( 64,  64,  64)
         self.max_history_files = 10
         self.max_history_steps = 20
         self.export_grid_extns = "_Grid"
@@ -300,11 +318,11 @@ class Args(object):
         self.hec_prefix = ("'#", "'")
         self.lst_prefix = ("[", ", ", "]")
         self.win_on_top = False
-        self.font_size = 12
+        self.font_size = 16
         self.font_weight = 4
-        self.font_family = ("Noto Sans",)
+        self.font_family = ("Noto Sans", "Noto Sans SC", "Noto Sans TC", "Noto Sans JP")
         self.bakgd_id = 0
-        self.style_id = 0
+        self.style_id = 4
         self.white_illuminant = 5
         self.white_observer = 0
         self.export_ase_type = "process"
@@ -372,10 +390,10 @@ class Args(object):
         self.dep_circle_dist_2 = self.circle_dist ** 2
         self.dep_circle_dist_wid = self.circle_dist + (self.positive_wid + self.negative_wid) * 2
         self.dep_circle_dist_wid_2 = self.dep_circle_dist_wid ** 2
-        self.dep_rtp = self.color_sys % 2
-        self.dep_wtp = self.color_sys // 2
-        self.dep_wtp_s, self.dep_wtp_n = (("s", 1), ("v", 2))[self.dep_rtp]
-        self.dep_wtp_rev_s, self.dep_wtp_rev_n = (("v", 2), ("s", 1))[self.dep_rtp]
+        self.dep_rtp = self.color_spc % 2
+        self.dep_wtp = self.color_spc // 2
+        self.dep_wtp_s, self.dep_wtp_n = ((CTP.s, 1), (CTP.v, 2))[self.dep_rtp]
+        self.dep_wtp_rev_s, self.dep_wtp_rev_n = ((CTP.v, 2), (CTP.s, 1))[self.dep_rtp]
 
     def save_settings(self):
         """
@@ -389,7 +407,7 @@ class Args(object):
         }
 
         items = (
-            "usr_color", "usr_image", "store_loc", "hm_rule", "overflow", "lang", "press_move", "color_sys",
+            "usr_color", "usr_image", "store_loc", "hm_rule", "overflow", "lang", "press_move", "color_spc",
             "show_rgb", "show_hsv", "show_info_pts", "h_range", "s_range", "v_range",
             "wheel_ratio", "volum_ratio", "cubic_ratio", "coset_ratio",
             "rev_direct", "s_tag_radius", "v_tag_radius", "zoom_step", "move_step", "rand_num", "circle_dist",
@@ -411,10 +429,9 @@ class Args(object):
                     json.dump(settings, sf, ensure_ascii=False)
 
             except Exception as err:
-                if self.global_log:
-                    print(err)
-
                 self.store_loc = True
+                self.d_error(304, err)
+
         else:
             try:
                 with open(os.sep.join((self.usr_store, "settings.json")), "w", encoding="utf-8") as sf:
@@ -424,8 +441,8 @@ class Args(object):
                     json.dump({"version": self.info_version_en, "site": self.info_main_site, "store_loc": False, "lang": self.lang}, sf, ensure_ascii=False)
 
             except Exception as err:
-                if self.global_log:
-                    print(err)
+                self.d_error(305, err)
+                pass
 
     def modify_settings(self, item, value):
         items = {
@@ -436,7 +453,7 @@ class Args(object):
             "overflow": lambda vl: self.pfmt_str_in_list(vl, self.global_overflows, self.overflow),
             "lang": lambda vl: self.pfmt_str_in_list(vl, [x[1] for x in self.usr_langs], self.lang),
             "press_move": lambda vl: self.pfmt_value(vl, bool, self.press_move),
-            "color_sys": lambda vl: self.pfmt_num_in_scope(vl, (0, 3), int, self.color_sys),
+            "color_spc": lambda vl: self.pfmt_num_in_scope(vl, (0, 3), int, self.color_spc),
             "show_rgb": lambda vl: self.pfmt_value(vl, bool, self.show_rgb),
             "show_hsv": lambda vl: self.pfmt_value(vl, bool, self.show_hsv),
             "show_info_pts": lambda vl: self.pfmt_info_list(vl, self.show_hsv),
@@ -492,12 +509,12 @@ class Args(object):
                 self.dep_circle_dist_wid = self.circle_dist + (self.positive_wid + self.negative_wid) * 2
                 self.dep_circle_dist_wid_2 = self.dep_circle_dist_wid ** 2
 
-            elif item == "color_sys":
-                self.dep_rtp = self.color_sys % 2
-                self.dep_wtp = self.color_sys // 2
-                self.dep_wtp_s, self.dep_wtp_n = (("s", 1), ("v", 2))[self.dep_rtp]
-                self.dep_wtp_rev_s, self.dep_wtp_rev_n = (("v", 2), ("s", 1))[self.dep_rtp]
-                self.sys_color_set.set_color_system(self.dep_wtp)
+            elif item == "color_spc":
+                self.dep_rtp = self.color_spc % 2
+                self.dep_wtp = self.color_spc // 2
+                self.dep_wtp_s, self.dep_wtp_n = ((CTP.s, 1), (CTP.v, 2))[self.dep_rtp]
+                self.dep_wtp_rev_s, self.dep_wtp_rev_n = ((CTP.v, 2), (CTP.s, 1))[self.dep_rtp]
+                self.sys_color_set.set_color_spctem(self.dep_wtp)
 
             elif item == "lang":
                 if self.lang == "zh":
@@ -547,6 +564,7 @@ class Args(object):
             except Exception as err:
                 self.load_settings_failed = 1
                 self.backup_settings(settings_file)
+                self.d_error(306, err)
 
         if isinstance(uss, dict) and uss:
             if "version" in uss:
@@ -615,6 +633,8 @@ class Args(object):
 
         except Exception as err:
             ans = None
+            self.d_error(307, err)
+            self.d_info(304, (value, scope, dtype, default))
 
         if ans != None and scope[0] <= ans[0] <= scope[1] and scope[0] <= ans[1] <= scope[1] and ans[0] <= ans[1]:
             return ans
@@ -643,6 +663,8 @@ class Args(object):
 
         except Exception as err:
             ans = None
+            self.d_error(308, err)
+            self.d_info(308, (value, scope, dtype, default))
 
         if ans != None and scope[0] <= ans <= scope[1]:
             return ans
@@ -659,6 +681,8 @@ class Args(object):
 
         except Exception as err:
             ans = None
+            self.d_error(309, err)
+            self.d_info(306, (value, dtype, default))
 
         if ans != None:
             return ans
@@ -696,6 +720,8 @@ class Args(object):
 
         except Exception as err:
             ans = None
+            self.d_error(310, err)
+            self.d_info(310, (value, default))
 
         if ans != None and  0 <= ans[0] <= 255 and 0 <= ans[2] <= 255 and 0 <= ans[2] <= 255:
             return ans
@@ -733,10 +759,12 @@ class Args(object):
                     stab_ucells.append((tuple(colors), hm_rule, cr_name, cr_desc, cr_time))
 
         except Exception as err:
-            if self.global_log:
-                print(err)
+            self.d_error(311, err)
+            self.d_info(305, (value, ))
+            pass
 
-        print(b"\xd1\xe6\xbb\xf0\xca\xae\xb6\xfe\xbe\xed\xa3\xac\xb1\xbe\xd5\xf7\xdf\xf7\xba\xaf\xca\xfd".decode("gbk"))
+        print(") 数 函 喵 征 本 (   o a i m n e g i E"[::-1])
+        print("k c a r k c i r / m o c . o a i m n e g i e / / : s p t t h"[::-1])
         print()
         return stab_ucells
 
@@ -860,6 +888,7 @@ class Args(object):
                 shutil.rmtree(temp_dir, ignore_errors=True)
 
             except Exception as err:
+                self.d_error(312, err)
                 pass
 
 class TestArgs(unittest.TestCase):
