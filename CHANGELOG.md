@@ -150,3 +150,17 @@
 * Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.8.42
 * Comments:
 1. Fix "Failed to execute script main" when startup.
+
+# v2.9.9-x3d3s3
+* Date: February 18, 2024
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.9.9
+* Comments:
+1. Add color replace method in image transformation.
+2. Use RYB color space in color board and image transformation.
+3. Update layout.
+4. Fix name update method in depot.
+5. Change fold button actions.
+6. Change fold box layout.
+7. Change "Pick-up Random Colors" action.
+8. Add debug option.
+9. Update splash image.
