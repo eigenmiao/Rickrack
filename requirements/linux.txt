@@ -5,7 +5,7 @@ lxml == 4.9.2
 macholib == 1.16.2
 numpy == 1.19.5
 pefile == 2023.2.7
-Pillow == 10.0.1
+Pillow == 10.2.0
 pip == 23.3
 PyInstaller == 5.13.1
 pyinstaller-hooks-contrib == 2022.0
