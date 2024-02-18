@@ -20,10 +20,10 @@ import time
 import numpy as np
 from PyQt5.QtWidgets import QWidget, QGridLayout, QScrollArea, QFrame, QShortcut, QMenu, QAction, QDialog, QDialogButtonBox, QPushButton, QApplication, QMessageBox
 from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication, QMimeData, QPoint, QUrl
-from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QCursor, QKeySequence, QPixmap, QImage, QIcon, QDrag
+from PyQt5.QtGui import QPainter, QPen, QBrush, QColor, QCursor, QKeySequence, QPixmap, QIcon, QDrag
 from cguis.design.info_dialog import Ui_InfoDialog
 from cguis.resource import view_rc
-from ricore.color import FakeColor, Color
+from ricore.color import Color, CTP
 from ricore.export import export_list
 from ricore.transpt import get_link_tag
 from ricore.grid import norm_grid_locations, norm_grid_list, norm_grid_values
@@ -184,6 +184,7 @@ class Info(QDialog, Ui_InfoDialog):
                 self._clone.name = name
                 self._clone.desc = desc
                 self._clone.cr_time = (self._clone.cr_time[0], time.time())
+                self._clone.update_text()
 
     def update_values(self):
         """
@@ -308,11 +309,11 @@ class UnitCell(QWidget):
         self.color_set = []
 
         for hsv in hsv_set:
-            if hsv == None:
-                self.color_set.append(None)
+            if isinstance(hsv, (tuple, list, np.ndarray)):
+                self.color_set.append(Color(hsv, tp=CTP.hsv))
 
             else:
-                self.color_set.append(FakeColor(Color.hsv2rgb(hsv), hsv, Color.hsv2hec(hsv)))
+                self.color_set.append(None)
 
         self.color_set = tuple(self.color_set)
         self.hm_rule = str(hm_rule)
@@ -670,11 +671,11 @@ class Depot(QWidget):
                 if idx < len(self._args.stab_ucells):
                     self.activate_idx(idx)
 
-                    if idx == len(self._args.stab_ucells) - 1:
-                        self.attach_set()
+                    if idx < len(self._args.stab_ucells) - 1:
+                        self.import_set()
 
                     else:
-                        self.import_set()
+                        self.attach_set()
 
                 else:
                     self.activate_idx(None)
@@ -933,11 +934,11 @@ class Depot(QWidget):
         Insert current color set (combine attach_set and import_set funcs).
         """
 
-        if self._current_idx == len(self._args.stab_ucells) - 1:
-            self.attach_set()
+        if self._current_idx < len(self._args.stab_ucells) - 1:
+            self.import_set()
 
         else:
-            self.import_set()
+            self.attach_set()
 
     def delete_set(self):
         """
@@ -1202,7 +1203,7 @@ class Depot(QWidget):
                 for i in (2, 1, 0, 3, 4):
                     color = self._args.sys_color_set[i].getti(ctp)
 
-                    if ctp == "hec":
+                    if ctp == CTP.hec:
                         color = self._args.hec_prefix[0] + str(color) + self._args.hec_prefix[1]
 
                     else:
@@ -1212,9 +1213,9 @@ class Depot(QWidget):
                     data_lst.append(color)
             else:
                 for i in (2, 1, 0, 3, 4):
-                    color = getattr(self._args.stab_ucells[self._current_idx].color_set[i], ctp)
+                    color = self._args.stab_ucells[self._current_idx].color_set[i].getti(ctp)
 
-                    if ctp == "hec":
+                    if ctp == CTP.hec:
                         color = self._args.hec_prefix[0] + str(color) + self._args.hec_prefix[1]
 
                     else:
@@ -1271,13 +1272,13 @@ class Depot(QWidget):
         self._action_paste.triggered.connect(self.clipboard_in)
         self._menu.addAction(self._action_paste)
         self._action_copy_rgb = QAction(self)
-        self._action_copy_rgb.triggered.connect(self.clipboard_cur("rgb"))
+        self._action_copy_rgb.triggered.connect(self.clipboard_cur(CTP.rgb))
         self._menu.addAction(self._action_copy_rgb)
         self._action_copy_hsv = QAction(self)
-        self._action_copy_hsv.triggered.connect(self.clipboard_cur("hsv"))
+        self._action_copy_hsv.triggered.connect(self.clipboard_cur(CTP.hsv))
         self._menu.addAction(self._action_copy_hsv)
         self._action_copy_hec = QAction(self)
-        self._action_copy_hec.triggered.connect(self.clipboard_cur("hec"))
+        self._action_copy_hec.triggered.connect(self.clipboard_cur(CTP.hec))
         self._menu.addAction(self._action_copy_hec)
         self._action_zoom_in = QAction(self)
         self._action_zoom_in.triggered.connect(lambda: self.zoom(self._args.zoom_step))
@@ -1399,7 +1400,7 @@ class Depot(QWidget):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self.clipboard_cur("rgb"))
+            shortcut.activated.connect(self.clipboard_cur(CTP.rgb))
 
         for skey in self._args.shortcut_keymaps[21]:
             if skey in self._connected_keymaps:
@@ -1410,7 +1411,7 @@ class Depot(QWidget):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self.clipboard_cur("hsv"))
+            shortcut.activated.connect(self.clipboard_cur(CTP.hsv))
 
         for skey in self._args.shortcut_keymaps[22]:
             if skey in self._connected_keymaps:
@@ -1421,7 +1422,7 @@ class Depot(QWidget):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self.clipboard_cur("hec"))
+            shortcut.activated.connect(self.clipboard_cur(CTP.hec))
 
         for skey in self._args.shortcut_keymaps[45]:
             if skey in self._connected_keymaps:
@@ -1432,7 +1433,7 @@ class Depot(QWidget):
                 shortcut = QShortcut(QKeySequence(skey), self)
                 self._connected_keymaps[skey] = shortcut
 
-            shortcut.activated.connect(self.clipboard_cur("hec"))
+            shortcut.activated.connect(self.clipboard_cur(CTP.hec))
 
         for skey in self._args.shortcut_keymaps[46]:
             if skey in self._connected_keymaps:
