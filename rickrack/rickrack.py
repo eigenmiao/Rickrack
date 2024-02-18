@@ -211,7 +211,7 @@ def startup():
     dp_proj = ""
     dp_argv = {}
 
-    argv_opts, argv_left = getopt(sys.argv[1:], "hvtr:i:o:w:e:l:p:d:", ["help", "version", "temporary", "reset=", "input=", "output=", "export=", "window=", "sequence=", "lang=", "locale=", "port=", "project=", "dir="])
+    argv_opts, argv_left = getopt(sys.argv[1:], "hvtr:i:o:w:e:l:p:d:", ["help", "version", "debug", "temporary", "reset=", "input=", "output=", "export=", "window=", "sequence=", "lang=", "locale=", "port=", "project=", "dir="])
 
     for opt_name,opt_value in argv_opts:
         if opt_name in ("-h", "--help"):
@@ -219,6 +219,9 @@ def startup():
 
         elif opt_name in ("-v", "--version"):
             dp_argv["version"] = True
+
+        elif opt_name in ("--debug", ):
+            dp_argv["debug"] = True
 
         elif opt_name in ("-t", "--temporary"):
             dp_argv["temporary"] = True
@@ -773,7 +776,7 @@ class Rickrack(object):
         The sequence displayed in Rickrack Result window is 2, 1, 0, 3, 4 according to the color set list, i.e., the first color in color list is the middle (main) color in Rickrack Result window.
 
         Args:
-            dp_argv (dict): rickrack argv, includes "help", "version", "temporary", "reset", "input", "output", "window", "sequence", "lang" and (or) "port". for example, {"help": True, "reset": "all"}.
+            dp_argv (dict): rickrack argv, includes "help", "version", "debug", "temporary", "reset", "input", "output", "window", "sequence", "lang" and (or) "port". for example, {"help": True, "reset": "all"}.
             dp_proj (str): rickrack startup argv, project directory.
         """
 
@@ -838,7 +841,7 @@ class Rickrack(object):
         run_argv = ""
 
         for dp_key in sdp_argv:
-            if dp_key in ("help", "version", "temporary"):
+            if dp_key in ("help", "version", "temporary", "debug"):
                 run_argv = run_argv + " --{}".format(dp_key)
 
                 if dp_key == "help":
