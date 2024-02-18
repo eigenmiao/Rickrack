@@ -13,8 +13,8 @@ infomation about VioletPy.
 Copyright (c) 2019-2021 by Eigenmiao. All Rights Reserved.
 """
 
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QDoubleSpinBox, QSlider, QSpacerItem, QSizePolicy, QCheckBox
-from PyQt5.QtCore import Qt, pyqtSignal
+from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QDoubleSpinBox, QSlider, QSpacerItem, QSizePolicy, QCheckBox, QPushButton, QScrollArea, QFrame
+from PyQt5.QtCore import Qt, pyqtSignal, QCoreApplication
 
 
 class NoWheelSlider(QSlider):
@@ -70,7 +70,7 @@ class SlideText(QWidget):
         local_grid_layout = QGridLayout(self)
         local_grid_layout.setContentsMargins(0, 0, 0, 0)
         local_grid_layout.setHorizontalSpacing(2)
-        local_grid_layout.setVerticalSpacing(9)
+        local_grid_layout.setVerticalSpacing(0)
         self.lab_local = QLabel(self)
         local_grid_layout.addWidget(self.lab_local, 0, 0, 1, 1)
         self.dsp_local = NoWheelDoubleSpinBox(self)
@@ -203,7 +203,7 @@ class SlideText(QWidget):
 
 class RGBHSVCkb(QWidget):
     """
-    Box with a R, G, B, H, S, V ckeckboxes.
+    Box with R, G, B, H, S, V ckeckboxes.
     """
 
     ps_value_changed = pyqtSignal(tuple)
@@ -228,7 +228,7 @@ class RGBHSVCkb(QWidget):
         local_grid_layout = QGridLayout(self)
         local_grid_layout.setContentsMargins(0, 0, 0, 0)
         local_grid_layout.setHorizontalSpacing(2)
-        local_grid_layout.setVerticalSpacing(9)
+        local_grid_layout.setVerticalSpacing(4)
         self.lab_link = QLabel(self)
         local_grid_layout.addWidget(self.lab_link, 0, 0, 1, 3)
         self.ckb_r = QCheckBox(self)
@@ -349,14 +349,333 @@ class RGBHSVCkb(QWidget):
         return self._values
 
     def set_prefix_text(self, text):
-        if isinstance(text, (tuple, list)) and len(text) > 1:
-            self._prefix_text = (str(text[0]), str(text[1]))
-
-        else:
-            self._prefix_text = (str(text), str(text))
+        self._prefix_text = text
 
         if self._values:
             self.lab_link.setText(self._prefix_text[1] + " ".join([x.upper() for x in self._values]))
 
         else:
             self.lab_link.setText(self._prefix_text[0])
+
+class RGBCMYCkb(QWidget):
+    """
+    Box with R, G, B, C, M, Y ckeckboxes.
+    """
+
+    ps_angle_changed = pyqtSignal(tuple)
+
+    def __init__(self, wget):
+        """
+        Init operation.
+        """
+
+        super().__init__(wget)
+        self._avi_values = ("r", "g", "b", "c", "m", "y")
+        self._avi_angles = (0, 120, 240, 180, 300, 60)
+        self._values = []
+        self._angles = []
+        self._prefix_text = ""
+        self._emitting = True
+        local_grid_layout = QGridLayout(self)
+        local_grid_layout.setContentsMargins(0, 0, 0, 0)
+        local_grid_layout.setHorizontalSpacing(2)
+        local_grid_layout.setVerticalSpacing(4)
+        self.lab_link = QLabel(self)
+        local_grid_layout.addWidget(self.lab_link, 0, 0, 1, 3)
+        self.ckb_r = QCheckBox(self)
+        self.ckb_r.setText("R")
+        self.ckb_r.setChecked("r" in self._values)
+        local_grid_layout.addWidget(self.ckb_r, 1, 0, 1, 1)
+        self.ckb_r.stateChanged.connect(self.set_angle_from_ckb(0))
+        self.ckb_g = QCheckBox(self)
+        self.ckb_g.setText("G")
+        self.ckb_g.setChecked("g" in self._values)
+        local_grid_layout.addWidget(self.ckb_g, 1, 1, 1, 1)
+        self.ckb_g.stateChanged.connect(self.set_angle_from_ckb(120))
+        self.ckb_b = QCheckBox(self)
+        self.ckb_b.setText("B")
+        self.ckb_b.setChecked("b" in self._values)
+        local_grid_layout.addWidget(self.ckb_b, 1, 2, 1, 1)
+        self.ckb_b.stateChanged.connect(self.set_angle_from_ckb(240))
+        self.ckb_c = QCheckBox(self)
+        self.ckb_c.setText("C")
+        self.ckb_c.setChecked("c" in self._values)
+        local_grid_layout.addWidget(self.ckb_c, 2, 0, 1, 1)
+        self.ckb_c.stateChanged.connect(self.set_angle_from_ckb(180))
+        self.ckb_m = QCheckBox(self)
+        self.ckb_m.setText("M")
+        self.ckb_m.setChecked("m" in self._values)
+        local_grid_layout.addWidget(self.ckb_m, 2, 1, 1, 1)
+        self.ckb_m.stateChanged.connect(self.set_angle_from_ckb(300))
+        self.ckb_y = QCheckBox(self)
+        self.ckb_y.setText("Y")
+        self.ckb_y.setChecked("y" in self._values)
+        local_grid_layout.addWidget(self.ckb_y, 2, 2, 1, 1)
+        self.ckb_y.stateChanged.connect(self.set_angle_from_ckb(60))
+        self._ckbs = (self.ckb_r, self.ckb_g, self.ckb_b, self.ckb_c, self.ckb_m, self.ckb_y)
+
+    def disable(self):
+        for ckb in self._ckbs:
+            ckb.setDisabled()
+
+    def enable(self):
+        for ckb in self._ckbs:
+            ckb.setEnabled()
+
+    def set_angles(self, angles):
+        """
+        Inner func for set value.
+
+        Args:
+            angles (tuple or list): angle list with values in 0, 120, 240, 180, 300 or 60.
+        """
+
+        self._angles = []
+
+        for angle_idx in range(6):
+            angle = self._avi_angles[angle_idx]
+            state = angle in angles
+
+            if self._ckbs[angle_idx].isChecked() != state:
+                self._ckbs[angle_idx].setChecked(state)
+
+            if state:
+                self._angles.append(self._avi_angles[angle_idx])
+
+        if self._angles:
+            self.lab_link.setText(self._prefix_text[1] + " ".join([self._avi_values[self._avi_angles.index(x)].upper() for x in self._angles]))
+
+        else:
+            self.lab_link.setText(self._prefix_text[0])
+
+    def set_angle_from_ckb(self, angle):
+        def _func_(state):
+            if state:
+                self._angles.append(angle)
+
+            else:
+                self._angles.pop(angle)
+
+            self._angles.sort()
+
+            if self._angles:
+                self.lab_link.setText(self._prefix_text[1] + " ".join([self._avi_values[self._avi_angles.index(x)].upper() for x in self._angles]))
+                self.ps_angle_changed.emit(tuple(self._angles))
+
+            else:
+                self.lab_link.setText(self._prefix_text[0])
+
+        return _func_
+
+    def get_angles(self):
+        return self._angles
+
+    def set_prefix_text(self, text):
+        self._prefix_text = text
+
+        if self._angles:
+            self.lab_link.setText(self._prefix_text[1] + " ".join([self._avi_values[self._avi_angles.index(x)].upper() for x in self._angles]))
+
+        else:
+            self.lab_link.setText(self._prefix_text[0])
+
+class FoldingBox(QWidget):
+    """
+    Box with a button and a group box.
+    """
+
+    ps_fbox_updated = pyqtSignal(bool)
+
+    def __init__(self, wget, title=""):
+        """
+        Init operation.
+        """
+
+        super().__init__(wget)
+        self._is_expanded = True
+        self._title = str(title)
+        self._fbox_icons = (None, None)
+        local_grid_layout = QGridLayout(self)
+        local_grid_layout.setContentsMargins(0, 0, 0, 0)
+        local_grid_layout.setHorizontalSpacing(0)
+        local_grid_layout.setVerticalSpacing(0)
+        self.top_btn = QPushButton(self)
+        self.top_btn.setProperty("class", "fbox")
+        local_grid_layout.addWidget(self.top_btn, 0, 0, 1, 1)
+        self.top_btn.clicked.connect(self.change_state)
+        self.gbox = QWidget(self)
+        self.gbox.setProperty("class", "gbox")
+        local_grid_layout.addWidget(self.gbox, 1, 0, 1, 1)
+        self.gbox_grid_layout = QGridLayout(self.gbox)
+        self.gbox_grid_layout.setContentsMargins(3, 6, 3, 6)
+        self.gbox_grid_layout.setHorizontalSpacing(3)
+        self.gbox_grid_layout.setVerticalSpacing(9)
+        self.end_btn = QPushButton(self)
+        self.end_btn.setProperty("class", "ebox")
+        local_grid_layout.addWidget(self.end_btn, 2, 0, 1, 1)
+        self.end_btn.clicked.connect(self.change_state)
+
+    @property
+    def is_expanded(self):
+        return self._is_expanded
+
+    def expand(self):
+        self.top_btn.show()
+        self.gbox.show()
+        self.end_btn.show()
+        self._is_expanded = True
+        self.update_title()
+
+    def fold(self):
+        self.top_btn.show()
+        self.gbox.hide()
+        self.end_btn.hide()
+        self._is_expanded = False
+        self.update_title()
+
+    def change_state(self, state=False):
+        if self._is_expanded:
+            self.fold()
+
+        else:
+            self.expand()
+
+    def set_title(self, title):
+        self._title = str(title)
+        self.update_title()
+
+    def set_icons(self, fbox_icons):
+        self._fbox_icons = fbox_icons
+
+    def update_title(self):
+        self.top_btn.setText(self._title)
+
+        if self._is_expanded:
+            self.top_btn.show()
+            self.end_btn.show()
+
+            if self._fbox_icons[1]:
+                self.top_btn.setIcon(self._fbox_icons[1])
+                self.end_btn.setIcon(self._fbox_icons[1])
+
+        else:
+            self.top_btn.show()
+            self.end_btn.hide()
+
+            if self._fbox_icons[0]:
+                self.top_btn.setIcon(self._fbox_icons[0])
+
+        self.ps_fbox_updated.emit(True)
+
+class SideWidget(QWidget):
+    """
+    Docker widget template.
+    """
+
+    def __init__(self, wget):
+        """
+        Init SideWidget.
+        """
+
+        super().__init__(wget)
+        self._sw_func_tr_()
+        self._state = False
+        self._all_fboxes = ()
+        self._fbox_icons = (None, None)
+        self._exp_all_btn = QPushButton(self)
+        self._exp_all_btn.setProperty("class", "fbox")
+        self._exp_all_btn.clicked.connect(self.expand_or_fold_all_fbox)
+        gen_grid_layout = QGridLayout(self)
+        gen_grid_layout.setContentsMargins(0, 0, 0, 0)
+        gen_grid_layout.setHorizontalSpacing(0)
+        gen_grid_layout.setVerticalSpacing(0)
+        scroll_area = QScrollArea(self)
+        scroll_area.setFrameShape(QFrame.Box)
+        scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        scroll_area.setWidgetResizable(True)
+        gen_grid_layout.addWidget(scroll_area)
+        self.scroll_contents = QWidget()
+        self.scroll_grid_layout = QGridLayout(self.scroll_contents)
+        self.scroll_grid_layout.setContentsMargins(3, 9, 3, 3)
+        self.scroll_grid_layout.setHorizontalSpacing(3)
+        self.scroll_grid_layout.setVerticalSpacing(3)
+        scroll_area.setWidget(self.scroll_contents)
+        self.over_spacer = QSpacerItem(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+    def set_icons(self, fbox_icons):
+        self._fbox_icons = fbox_icons
+
+        for fbox in self._all_fboxes:
+            fbox.set_icons(fbox_icons)
+            fbox.update_title()
+
+    def expand_or_fold_all_fbox(self, value):
+        state = True in self.get_all_expand_states()
+
+        for fbox in self._all_fboxes:
+            if state:
+                fbox.fold()
+
+            else:
+                fbox.expand()
+
+        if state:
+            self.over_spacer.changeSize(0, 0, QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+        else:
+            self.over_spacer.changeSize(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.sw_update_text(force=True)
+
+    def get_all_expand_states(self):
+        return [fbox.is_expanded for fbox in self._all_fboxes]
+
+    def set_all_expand_states(self, states, default=False):
+        if isinstance(states, (tuple, list)) and len(states) == len(self._all_fboxes):
+            states = [str(i).lower().startswith("t") if isinstance(i, str) else bool(i) for i in states]
+
+        else:
+            states = [bool(default), ] * len(self._all_fboxes)
+
+        for fbox, state in zip(self._all_fboxes, states):
+            if state:
+                fbox.expand()
+                self.over_spacer.changeSize(0, 0, QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+            else:
+                fbox.fold()
+
+        self.sw_update_text(force=True)
+
+    def connect_by_fboxes(self):
+        for fbox in self._all_fboxes:
+            fbox.ps_fbox_updated.connect(self.sw_update_text)
+
+    def sw_update_text(self, force=False):
+        state = True in self.get_all_expand_states()
+
+        if force or state != self._state:
+            self._state = state
+
+            if state:
+                if self._fbox_icons[1]:
+                    self._exp_all_btn.setIcon(self._fbox_icons[1])
+
+                self._exp_all_btn.setText(self.exp_all_descs[1])
+                self.over_spacer.changeSize(0, 0, QSizePolicy.Minimum, QSizePolicy.Minimum)
+
+            else:
+                if self._fbox_icons[0]:
+                    self._exp_all_btn.setIcon(self._fbox_icons[0])
+
+                self._exp_all_btn.setText(self.exp_all_descs[0])
+                self.over_spacer.changeSize(5, 5, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+    def _sw_func_tr_(self):
+        _translate = QCoreApplication.translate
+        self.exp_all_descs = (
+            _translate("General", "Expand All Items"),
+            _translate("General", "Fold All Items"),
+        )
+

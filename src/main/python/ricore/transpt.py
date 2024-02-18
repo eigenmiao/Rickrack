@@ -272,7 +272,7 @@ def get_outer_circles(pt_array, activated_idx, pts_array, assit_pts_array, pt_ra
     else:
         circle_locations = []
 
-        if sel_assit_idx == len(assit_pts_array[sel_idx]):
+        if sel_assit_idx > len(assit_pts_array[sel_idx]) - 1:
             sel_assit_idx = -1
 
         if sel_assit_idx > -1:
