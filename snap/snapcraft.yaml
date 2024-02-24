@@ -1,5 +1,5 @@
 name: rickrack
-version: 2.9.9
+version: 2.9.10
 summary: Generate harmonious colors freely.
 description: |
     Rickrack is a free and open-source color palette generator. It provides various functionalities to generate a harmonious set of colors, offering you better color combination options. You can easily obtain the desired color combinations through color wheel selection, color picking from images, and more. It offers support for various color palette formats like aco, ase, gpl, and xml, making them easily importable into popular image processing software such as Photoshop, Clip Studio Paint, GIMP, Krita, and Inkscape. You can apply these colors to your own creations or share them with others.
