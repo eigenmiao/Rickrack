@@ -40,11 +40,11 @@ class Args(object):
         self.d_info(300, resources)
         self.d_info(312, resetall)
         self.d_info(311, uselang)
-        self.info_version_zh = "v2.9.9-x3d3s3-预览版"
-        self.info_version_en = "v2.9.9-x3d3s3-pre"
+        self.info_version_zh = "v2.9.10-x3d3s3-预览版"
+        self.info_version_en = "v2.9.10-x3d3s3-pre"
         self.d_info(302, self.info_version_en)
-        self.info_date_zh = "2024年2月18日"
-        self.info_date_en = "February 18, 2024"
+        self.info_date_zh = "2024年2月24日"
+        self.info_date_en = "February 24, 2024"
         self.d_info(303, self.info_date_en)
         self.global_temp_dir = None
         self.global_hm_rules = (

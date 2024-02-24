@@ -376,6 +376,9 @@ class Color(object):
 
         assert len(rgb) == 3, rgb
 
+        if min(rgb) >= 0 and max(rgb) <= 255:
+            return np.array(rgb, dtype=np.uint8)
+
         _rgb = np.rint(rgb)
         _rgb[np.where(_rgb < 0)] = 0
         _rgb[np.where(_rgb > 255)] = 255
@@ -415,29 +418,33 @@ class Color(object):
             standard hsv color.
         """
 
-        assert isinstance(overflow, int) and overflow in OTP.rgfull, overflow
         assert len(hsv) == 3, hsv
+        assert isinstance(overflow, int) and overflow in OTP.rgfull, overflow
+
+        if 0.0 <= hsv[0] < 360.0 and min(hsv[1:]) >= 0.0 and max(hsv[1:]) <= 1.0:
+            return np.array(hsv, dtype=np.float32)
 
         _h, _s, _v = hsv
 
-        if _s < 0.0 or _s > 1.0 or _v < 0.0 or _v > 1.0:
-            if overflow == 0: # "cutoff":
-                _s = 0.0 if _s < 0.0 else _s
-                _s = 1.0 if _s > 1.0 else _s
-                _v = 0.0 if _v < 0.0 else _v
-                _v = 1.0 if _v > 1.0 else _v
+        if overflow == 0: # "cutoff":
+            _s = 0.0 if _s < 0.0 else _s
+            _s = 1.0 if _s > 1.0 else _s
+            _v = 0.0 if _v < 0.0 else _v
+            _v = 1.0 if _v > 1.0 else _v
 
-            elif overflow == 1: # "revert":
-                _s = _s % 1.0 if _s // 1.0 % 2.0 == 0.0 else 1.0 - (_s % 1.0)
-                _v = _v % 1.0 if _v // 1.0 % 2.0 == 0.0 else 1.0 - (_v % 1.0)
+        elif overflow == 1: # "revert":
+            _s = _s % 1.0 if _s // 1.0 % 2.0 == 0.0 else 1.0 - (_s % 1.0)
+            _v = _v % 1.0 if _v // 1.0 % 2.0 == 0.0 else 1.0 - (_v % 1.0)
 
-            else: # "repeat":
-                _s = _s % 1.0
-                _v = _v % 1.0
+        else: # "repeat":
+            _s = _s % 1.0
+            _v = _v % 1.0
 
-        _h = round(_h % 360.0 * 1E5) / 1E5
-        _s = round(_s * 1E5) / 1E5
-        _v = round(_v * 1E5) / 1E5
+        _h = _h % 360.0
+
+        # _h = round(_h % 360.0 * 1E5) / 1E5
+        # _s = round(_s * 1E5) / 1E5
+        # _v = round(_v * 1E5) / 1E5
 
         return np.array((_h, _s, _v), dtype=np.float32)
 
@@ -464,9 +471,11 @@ class Color(object):
         _v[np.where(_v < 0.0)] = 0.0
         _v[np.where(_v > 1.0)] = 1.0
 
-        _h = np.round(_h % 360.0 * 1E5) / 1E5
-        _s = np.round(_s * 1E5) / 1E5
-        _v = np.round(_v * 1E5) / 1E5
+        _h = _h % 360.0
+
+        # _h = np.round(_h % 360.0 * 1E5) / 1E5
+        # _s = np.round(_s * 1E5) / 1E5
+        # _v = np.round(_v * 1E5) / 1E5
 
         return np.stack((_h, _s, _v), axis=2).astype(np.float32)
 
@@ -482,7 +491,9 @@ class Color(object):
             standard hex code (hec) color.
         """
 
-        return str(hec)
+        assert isinstance(hec, str) and len(hec) == 6, hec
+
+        return hec
 
     @classmethod
     def fmt_lab(cls, lab):
@@ -497,6 +508,9 @@ class Color(object):
         """
 
         assert len(lab) == 3, lab
+
+        if 0.0 <= lab[0] <= 100.0 and min(lab[1:]) >= -128.0 and max(lab[1:]) <= 128.0:
+            return np.array(lab, dtype=np.float32)
 
         _l, _a, _b = lab
 
@@ -524,6 +538,9 @@ class Color(object):
         """
 
         assert len(cmyk) == 4, cmyk
+
+        if min(cmyk) >= 0.0 and max(cmyk) <= 1.0:
+            return np.array(cmyk, dtype=np.float32)
 
         _cmyk = np.array(cmyk)
         _cmyk[np.where(_cmyk < 0.0)] = 0.0
@@ -722,7 +739,7 @@ class Color(object):
             hsv color.
         """
 
-        color = rgb
+        color = cls.fmt_rgb(rgb)
 
         v = max(color) / 255.0
         if abs(v - 0) < 1E-5:
@@ -841,7 +858,7 @@ class Color(object):
             rgb color.
         """
 
-        h, s, v = hsv
+        h, s, v = cls.fmt_hsv(hsv)
 
         # red to yellow.
         if 0 <= h < 60:
@@ -954,7 +971,7 @@ class Color(object):
         # hec_r = hex(r)[2:].upper()
         # TypeError: 'float' object cannot be interpreted as an integer
 
-        r, g, b = rgb
+        r, g, b = cls.fmt_rgb(rgb)
 
         hec_r = hex(int(r))[2:].upper()
         hec_g = hex(int(g))[2:].upper()
@@ -1065,7 +1082,7 @@ class Color(object):
             rgb color.
         """
 
-        l, a, b = lab
+        l, a, b = cls.fmt_lab(lab)
 
         y = (l + 16) / 116
         x = a / 500 + y
@@ -1097,7 +1114,7 @@ class Color(object):
             cmyk color.
         """
 
-        r, g, b = rgb
+        r, g, b = cls.fmt_rgb(rgb)
 
         c = 1.0 - (r / 255.0)
         m = 1.0 - (g / 255.0)
@@ -1127,7 +1144,7 @@ class Color(object):
             rgb color.
         """
 
-        c, m, y, k = cmyk
+        c, m, y, k = cls.fmt_cmyk(cmyk)
 
         c = (c * (1.0 - k) + k)
         m = (m * (1.0 - k) + k)
