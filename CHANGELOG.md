@@ -164,3 +164,10 @@
 7. Change "Pick-up Random Colors" action.
 8. Add debug option.
 9. Update splash image.
+
+# v2.9.10-x3d3s3
+* Date: February 24, 2024
+* Tag: https://github.com/eigenmiao/Rickrack/releases/tag/v2.9.10
+* Comments:
+1. Fix interface layout color display error.
+2. Adding a startup icon in the snapcraft version.
